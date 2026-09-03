@@ -1844,7 +1844,6 @@ MonoBehaviour:
   websiteButton: {fileID: 1770198199}
   replayButton: {fileID: 1450358746}
   leaderboardButton: {fileID: 544966759}
-  quitImage: {fileID: 0}
 --- !u!1 &1642933468
 GameObject:
   m_ObjectHideFlags: 0
