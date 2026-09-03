@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 717195667161477889}
   - component: {fileID: 7219221561574403906}
+  - component: {fileID: 1816156305138406166}
   m_Layer: 0
   m_Name: ControlBinding
   m_TagString: Untagged
@@ -58,3 +59,19 @@ MonoBehaviour:
   mouseSensitivity: 0
   invertMouseYAxis: 0
   alwaysFreeLook: 0
+  keyboardSensitivity: 0
+  blast: 0
+  respawn: 0
+  toggleRadar: 0
+--- !u!114 &1816156305138406166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6318433827656586393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e8f72c892b43a040b460f9d4299c923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
