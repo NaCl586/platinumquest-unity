@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5555881499082582540
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4031813014279271966}
+  - component: {fileID: 3167097420455520725}
+  - component: {fileID: 3342417961228664164}
+  m_Layer: 0
+  m_Name: EasterEgg
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4031813014279271966
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555881499082582540}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 515315464815659503}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3167097420455520725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555881499082582540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eff08ef200aa4ef4ab0fecb915a01e1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  powerupType: 9
+  powerupName: 
+  autoUse: 1
+  respawnTime: Infinity
+  pickupSound: {fileID: 0}
+  useSound: {fileID: 0}
+  meshRenderer: {fileID: 0}
+  skinnedMeshRenderer: {fileID: 0}
+  isActive: 1
+  rotateMesh: 1
+  showHelpOnPickup: 0
+  gotEasterEggSfx: {fileID: 8300000, guid: 1b54985f027927e4f83c001ff3e8400b, type: 3}
+  alreadyGotEggSfx: {fileID: 8300000, guid: 8cf345aec46d7b349a67ec3e91507222, type: 3}
+--- !u!65 &3342417961228664164
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555881499082582540}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 1.5, z: 1.5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &1215167629023607069
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4031813014279271966}
+    m_Modifications:
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591933373622775932, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: m_Name
+      value: NestEgg
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155960098915539914, guid: 522be0950be3129409fffe49578f5765,
+        type: 3}
+      propertyPath: skinName
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 522be0950be3129409fffe49578f5765, type: 3}
+--- !u!4 &515315464815659503 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1728221354850463986, guid: 522be0950be3129409fffe49578f5765,
+    type: 3}
+  m_PrefabInstance: {fileID: 1215167629023607069}
+  m_PrefabAsset: {fileID: 0}

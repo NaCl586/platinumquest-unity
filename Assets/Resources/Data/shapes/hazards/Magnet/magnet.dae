@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+    <asset>
+        <contributor>
+            <author>Torque3D MIT User</author>
+            <authoring_tool>Torque 3D MIT 3.9.0 Object Exporter</authoring_tool>
+        </contributor>
+        <created>2/1/2026 4:00:45 PM</created>
+        <modified>2/1/2026 4:00:45 PM</modified>
+        <unit name="meter" meter="1" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="spCupAttract" name="spCupAttract">
+            <init_from>file://spCupAttract</init_from>
+        </image>
+        <image id="smokeParticle" name="smokeParticle">
+            <init_from>file://smokeParticle</init_from>
+        </image>
+    </library_images>
+    <library_effects>
+        <effect id="spCupAttract-effect" name="spCupAttract-effect">
+            <profile_COMMON>
+                <newparam sid="spCupAttract-surface">
+                    <surface type="2D">
+                        <init_from>spCupAttract</init_from>
+                        <format>A8R8G8B8</format>
+                    </surface>
+                </newparam>
+                <newparam sid="spCupAttract-sampler">
+                    <sampler2D>
+                        <source>spCupAttract-surface</source>
+                    </sampler2D>
+                </newparam>
+                <technique sid="common">
+                    <blinn>
+                        <emission>
+                            <color sid="emission">0.0 0.0 0.0 1.0</color>
+                        </emission>
+                        <ambient>
+                            <color sid="ambient">0.0 0.0 0.0 1.0</color>
+                        </ambient>
+                        <diffuse>
+                            <texture texture="spCupAttract-sampler" texcoord="UVMap">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                        <specular>
+                            <color sid="specular">0.5 0.5 0.5 1.0</color>
+                        </specular>
+                        <shininess>
+                            <float sid="shininess">1.0</float>
+                        </shininess>
+                        <reflective>
+                            <color sid="reflective">0.0 0.0 0.0 1.0</color>
+                        </reflective>
+                        <reflectivity>
+                            <float sid="reflectivity">0.5</float>
+                        </reflectivity>
+                        <transparent opaque="RGB_ZERO">
+                            <color sid="transparent">0.0 0.0 0.0 1.0</color>
+                        </transparent>
+                        <transparency>
+                            <float sid="transparency">0.0</float>
+                        </transparency>
+                        <index_of_refraction>
+                            <float sid="index_of_refraction">1</float>
+                        </index_of_refraction>
+                    </blinn>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="smokeParticle-effect" name="smokeParticle-effect">
+            <profile_COMMON>
+                <newparam sid="smokeParticle-surface">
+                    <surface type="2D">
+                        <init_from>smokeParticle</init_from>
+                        <format>A8R8G8B8</format>
+                    </surface>
+                </newparam>
+                <newparam sid="smokeParticle-sampler">
+                    <sampler2D>
+                        <source>smokeParticle-surface</source>
+                    </sampler2D>
+                </newparam>
+                <technique sid="common">
+                    <blinn>
+                        <emission>
+                            <color sid="emission">0.0 0.0 0.0 1.0</color>
+                        </emission>
+                        <ambient>
+                            <color sid="ambient">0.0 0.0 0.0 1.0</color>
+                        </ambient>
+                        <diffuse>
+                            <texture texture="smokeParticle-sampler" texcoord="UVMap">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                        <specular>
+                            <color sid="specular">0.5 0.5 0.5 1.0</color>
+                        </specular>
+                        <shininess>
+                            <float sid="shininess">1.0</float>
+                        </shininess>
+                        <reflective>
+                            <color sid="reflective">0.0 0.0 0.0 1.0</color>
+                        </reflective>
+                        <reflectivity>
+                            <float sid="reflectivity">0.5</float>
+                        </reflectivity>
+                        <transparent opaque="RGB_ZERO">
+                            <color sid="transparent">0.0 0.0 0.0 1.0</color>
+                        </transparent>
+                        <transparency>
+                            <float sid="transparency">0.0</float>
+                        </transparency>
+                        <index_of_refraction>
+                            <float sid="index_of_refraction">1</float>
+                        </index_of_refraction>
+                    </blinn>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_materials>
+        <material id="spCupAttract-material" name="spCupAttract">
+            <instance_effect url="#spCupAttract-effect" />
+        </material>
+        <material id="smokeParticle-material" name="smokeParticle">
+            <instance_effect url="#smokeParticle-effect" />
+        </material>
+    </library_materials>
+    <library_geometries>
+        <geometry id="magnet-mesh" name="magnet">
+            <mesh>
+                <source id="magnet-mesh-positions">
+                    <float_array id="magnet-mesh-positions-array" count="204">-0.1114 0.1388 -0.0201 -0.1114 0.0718 0.0299 -0.1114 0.1388 0.0299 -0.1114 0.0718 -0.0201 -0.1124 -0.0435 0.0299 -0.1124 -0.0435 -0.0201 -0.0951 -0.1040 0.0299 -0.0951 -0.1040 -0.0201 -0.0479 -0.1505 0.0299 -0.0479 -0.1505 -0.0201 -0.0000 -0.1676 0.0299 -0.0000 -0.1676 -0.0201 0.0478 -0.1505 0.0299 0.0478 -0.1505 -0.0201 0.0950 -0.1040 0.0299 0.0950 -0.1040 -0.0201 0.1123 -0.0435 0.0299 0.1123 -0.0435 -0.0201 0.1132 0.0718 0.0299 0.1132 0.0718 -0.0201 0.1132 0.1388 0.0299 0.1132 0.1388 -0.0201 -0.1474 0.1388 -0.0201 -0.1474 0.0718 0.0299 -0.1474 0.0718 -0.0201 -0.1474 0.1388 0.0299 -0.1483 -0.0435 0.0299 -0.1483 -0.0435 -0.0201 -0.1262 -0.1217 0.0299 -0.1262 -0.1217 -0.0201 -0.0658 -0.1812 0.0299 -0.0658 -0.1812 -0.0201 -0.0000 -0.2030 0.0299 -0.0000 -0.2030 -0.0201 0.0657 -0.1812 0.0299 0.0657 -0.1812 -0.0201 0.1261 -0.1217 0.0299 0.1261 -0.1217 -0.0201 0.1482 -0.0435 0.0299 0.1482 -0.0435 -0.0201 0.1491 0.0718 0.0299 0.1491 0.0718 -0.0201 0.1491 0.1388 0.0299 0.1491 0.1388 -0.0201 -0.2411 0.2285 -0.0001 -0.0189 0.2285 -0.0001 -0.2411 -0.0308 -0.0001 -0.0189 -0.0308 -0.0001 -0.1300 0.2285 -0.1112 -0.1300 0.2285 0.1110 -0.1300 -0.0308 -0.1112 -0.1300 -0.0308 0.1110 -0.2411 0.0989 -0.1112 -0.2411 0.0989 0.1110 -0.0189 0.0989 -0.1112 -0.0189 0.0989 0.1110 0.0189 0.2345 -0.0001 0.2411 0.2345 -0.0001 0.0189 -0.0248 -0.0001 0.2411 -0.0248 -0.0001 0.1300 0.2345 -0.1112 0.1300 0.2345 0.1110 0.1300 -0.0248 -0.1112 0.1300 -0.0248 0.1110 0.0189 0.1049 -0.1112 0.0189 0.1049 0.1110 0.2411 0.1049 -0.1112 0.2411 0.1049 0.1110 
+                    </float_array>
+                    <technique_common>
+                        <accessor source="#magnet-mesh-positions-array" count="68" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="magnet-mesh-normals">
+                    <float_array id="magnet-mesh-normals-array" count="126">1.0000 0.0000 -0.0000 1.0000 -0.0028 0.0000 1.0000 -0.0056 0.0000 0.9962 0.0869 -0.0000 0.9832 0.1823 -0.0000 0.9012 0.4335 -0.0000 0.8120 0.5836 -0.0000 0.5921 0.8058 -0.0001 0.4674 0.8840 -0.0001 0.1177 0.9930 -0.0001 -0.1183 0.9929 -0.0001 -0.4678 0.8838 -0.0001 -0.5923 0.8057 -0.0001 -0.8120 0.5836 -0.0000 -0.9012 0.4335 -0.0000 -0.9823 0.1874 -0.0000 -0.9952 0.0975 -0.0000 -1.0000 0.0050 -0.0000 -1.0000 0.0025 -0.0000 -1.0000 0.0000 0.0000 -1.0000 0.0028 0.0000 -1.0000 0.0056 0.0000 -0.9963 -0.0859 0.0000 -0.9836 -0.1803 0.0000 -0.9020 -0.4316 0.0000 -0.8126 -0.5828 0.0000 -0.5862 -0.8101 0.0001 -0.4539 -0.8910 0.0001 -0.1095 -0.9939 0.0001 0.1100 -0.9939 0.0001 0.4542 -0.8908 0.0001 0.5863 -0.8100 0.0001 0.8126 -0.5828 0.0000 0.9020 -0.4316 0.0000 0.9826 -0.1855 0.0000 0.9953 -0.0965 0.0000 1.0000 -0.0050 0.0000 1.0000 -0.0025 0.0000 -0.0000 -0.0001 -0.9999 0.0000 0.9999 -0.0001 -0.0000 0.0001 0.9999 0.0000 0.0000 0.0000 
+                    </float_array>
+                    <technique_common>
+                        <accessor source="#magnet-mesh-normals-array" count="42" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="magnet-mesh-map-0">
+                    <float_array id="magnet-mesh-map-0-array" count="60">0.4000 0.0000 0.3700 1.0000 0.4000 1.0000 0.3700 0.0000 0.8800 0.0000 0.8600 1.0000 0.8800 1.0000 0.8600 0.0000 0.8400 1.0000 0.8400 0.0000 0.8200 1.0000 0.8200 0.0000 0.8000 1.0000 0.8000 0.0000 0.7800 1.0000 0.7800 0.0000 0.7600 1.0000 0.7600 0.0000 0.7400 1.0000 0.7400 0.0000 0.7200 1.0000 0.7200 0.0000 0.1300 0.0000 0.1000 1.0000 0.1300 1.0000 0.1000 0.0000 0.0000 1.0000 1.0000 1.0000 0.0000 0.0000 1.0000 0.0000 
+                    </float_array>
+                    <technique_common>
+                        <accessor source="#magnet-mesh-map-0-array" count="30" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="magnet-mesh-vertices">
+                    <input semantic="POSITION" source="#magnet-mesh-positions" />
+                </vertices>
+                <triangles material="spCupAttract-material" count="84">
+                    <input semantic="VERTEX" source="#magnet-mesh-vertices" offset="0" />
+                    <input semantic="NORMAL" source="#magnet-mesh-normals" offset="1" />
+                    <input semantic="TEXCOORD" source="#magnet-mesh-map-0" offset="2" set="0" />
+                    <p>27 38 18 3 38 21 5 38 19 24 38 20 3 38 21 27 38 18 5 38 19 29 38 16 27 38 18 7 38 17 29 38 16 5 38 19 31 38 14 29 38 16 7 38 17 9 38 15 31 38 14 7 38 17 33 38 12 31 38 14 9 38 15 11 38 13 33 38 12 9 38 15 35 38 10 33 38 12 11 38 13 13 38 11 35 38 10 11 38 13 37 38 8 35 38 10 13 38 11 15 38 9 37 38 8 13 38 11 39 38 5 37 38 8 15 38 9 17 38 7 39 38 5 15 38 9 41 38 6 39 38 5 17 38 7 19 38 4 41 38 6 17 38 7 3 2 4 4 3 5 5 4 7 1 1 6 4 3 5 3 2 4 6 5 8 5 4 7 4 3 5 7 6 9 5 4 7 6 5 8 8 7 10 7 6 9 6 5 8 9 8 11 7 6 9 8 7 10 10 9 12 9 8 11 8 7 10 11 10 13 9 8 11 10 9 12 12 11 14 11 10 13 10 9 12 13 12 15 11 10 13 12 11 14 14 13 16 13 12 15 12 11 14 15 14 17 13 12 15 14 13 16 16 15 18 15 14 17 14 13 16 17 16 19 15 14 17 16 15 18 18 17 20 17 16 19 16 15 18 19 18 21 17 16 19 18 17 20 26 22 18 24 21 21 27 23 19 23 20 20 24 21 21 26 22 18 27 23 19 28 24 16 26 22 18 29 25 17 28 24 16 27 23 19 30 26 14 28 24 16 29 25 17 31 27 15 30 26 14 29 25 17 32 28 12 30 26 14 31 27 15 33 29 13 32 28 12 31 27 15 34 30 10 32 28 12 33 29 13 35 31 11 34 30 10 33 29 13 36 32 8 34 30 10 35 31 11 37 33 9 36 32 8 35 31 11 38 34 5 36 32 8 37 33 9 39 35 7 38 34 5 37 33 9 40 36 6 38 34 5 39 35 7 41 37 4 40 36 6 39 35 7 38 40 18 18 40 21 16 40 19 40 40 20 18 40 21 38 40 18 16 40 19 36 40 16 38 40 18 14 40 17 36 40 16 16 40 19 34 40 14 36 40 16 14 40 17 12 40 15 34 40 14 14 40 17 32 40 12 34 40 14 12 40 15 10 40 13 32 40 12 12 40 15 30 40 10 32 40 12 10 40 13 8 40 11 30 40 10 10 40 13 28 40 8 30 40 10 8 40 11 6 40 9 28 40 8 8 40 11 26 40 5 28 40 8 6 40 9 4 40 7 26 40 5 6 40 9 23 40 6 26 40 5 4 40 7 1 40 4 23 40 6 4 40 7 0 0 0 1 1 1 3 2 3 2 0 2 1 1 1 0 0 0 20 19 23 19 18 22 18 17 24 21 19 25 19 18 22 20 19 23 23 20 24 22 19 25 24 21 22 25 19 23 22 19 25 23 20 24 42 0 2 41 37 3 43 0 0 40 36 1 41 37 3 42 0 2 24 38 24 0 38 25 3 38 22 22 38 23 0 38 25 24 38 24 43 38 2 19 38 3 21 38 0 41 38 1 19 38 3 43 38 2 42 39 2 21 39 25 20 39 0 43 39 23 21 39 25 42 39 2 40 40 24 20 40 25 18 40 22 42 40 23 20 40 25 40 40 24 25 40 2 1 40 3 2 40 0 23 40 1 1 40 3 25 40 2 22 39 2 2 39 25 0 39 0 25 39 23 2 39 25 22 39 2 
+                    </p>
+                </triangles>
+                <triangles material="smokeParticle-material" count="24">
+                    <input semantic="VERTEX" source="#magnet-mesh-vertices" offset="0" />
+                    <input semantic="NORMAL" source="#magnet-mesh-normals" offset="1" />
+                    <input semantic="TEXCOORD" source="#magnet-mesh-map-0" offset="2" set="0" />
+                    <p>49 41 27 50 41 28 48 41 26 51 41 29 50 41 28 49 41 27 50 41 28 49 41 27 48 41 26 51 41 29 49 41 27 50 41 28 45 41 27 46 41 28 47 41 29 44 41 26 46 41 28 45 41 27 45 41 27 46 41 28 44 41 26 47 41 29 46 41 28 45 41 27 54 41 28 53 41 27 52 41 26 55 41 29 53 41 27 54 41 28 53 41 27 54 41 28 52 41 26 55 41 29 54 41 28 53 41 27 61 41 27 62 41 28 60 41 26 63 41 29 62 41 28 61 41 27 62 41 28 61 41 27 60 41 26 63 41 29 61 41 27 62 41 28 57 41 27 58 41 28 59 41 29 56 41 26 58 41 28 57 41 27 57 41 27 58 41 28 56 41 26 59 41 29 58 41 28 57 41 27 66 41 28 65 41 27 64 41 26 67 41 29 65 41 27 66 41 28 65 41 27 66 41 28 64 41 26 67 41 29 66 41 28 65 41 27 
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+        <extra>
+            <technique profile="OpenCOLLADAMaya">
+                <originalMayaNodeId sid="originalMayaNodeId">magnet</originalMayaNodeId>
+                <double_sided sid="double_sided">1</double_sided>
+                <param sid="colladaId" type="string">magnet-mesh</param>
+            </technique>
+        </extra>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="magnet" name="magnet" type="NODE">
+                <instance_geometry url="#magnet-mesh" name="magnet">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="spCupAttract-material" target="#spCupAttract-material">
+                                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0" />
+                            </instance_material>
+                            <instance_material symbol="smokeParticle-material" target="#smokeParticle-material">
+                                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0" />
+                            </instance_material>
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+                <extra>
+                    <technique profile="OpenCOLLADA">
+                        <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+                        <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+                        <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+                        <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+                    </technique>
+                </extra>
+                <extra>
+                    <technique profile="OpenCOLLADAMaya">
+                        <originalMayaNodeId sid="originalMayaNodeId" type="string">magnet</originalMayaNodeId>
+                        <param sid="colladaId" type="string">magnet</param>
+                    </technique>
+                </extra>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

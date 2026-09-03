@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+    <asset>
+        <contributor>
+            <author>Torque3D MIT User</author>
+            <authoring_tool>Torque 3D MIT 3.9.0 Object Exporter</authoring_tool>
+        </contributor>
+        <created>8/19/2026 8:53:30 PM</created>
+        <modified>8/19/2026 8:53:30 PM</modified>
+        <unit name="meter" meter="1" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images />
+    <library_effects />
+    <library_materials />
+    <library_geometries>
+        <geometry id="skyend-mesh" name="skyend">
+            <mesh>
+                <source id="skyend-mesh-positions">
+                    <float_array id="skyend-mesh-positions-array" count="0" />
+                    <technique_common>
+                        <accessor source="#skyend-mesh-positions-array" count="0" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="skyend-mesh-normals">
+                    <float_array id="skyend-mesh-normals-array" count="0" />
+                    <technique_common>
+                        <accessor source="#skyend-mesh-normals-array" count="0" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="skyend-mesh-map-0">
+                    <float_array id="skyend-mesh-map-0-array" count="0" />
+                    <technique_common>
+                        <accessor source="#skyend-mesh-map-0-array" count="0" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="skyend-mesh-vertices">
+                    <input semantic="POSITION" source="#skyend-mesh-positions" />
+                </vertices>
+            </mesh>
+        </geometry>
+        <extra>
+            <technique profile="OpenCOLLADAMaya">
+                <originalMayaNodeId sid="originalMayaNodeId">skyend</originalMayaNodeId>
+                <double_sided sid="double_sided">1</double_sided>
+                <param sid="colladaId" type="string">skyend-mesh</param>
+            </technique>
+        </extra>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="skyend" name="skyend" type="NODE">
+                <instance_geometry url="#skyend-mesh" name="skyend">
+                    <bind_material>
+                        <technique_common />
+                    </bind_material>
+                </instance_geometry>
+                <extra>
+                    <technique profile="OpenCOLLADA">
+                        <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+                        <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+                        <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+                        <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+                    </technique>
+                </extra>
+                <extra>
+                    <technique profile="OpenCOLLADAMaya">
+                        <originalMayaNodeId sid="originalMayaNodeId" type="string">skyend</originalMayaNodeId>
+                        <param sid="colladaId" type="string">skyend</param>
+                    </technique>
+                </extra>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

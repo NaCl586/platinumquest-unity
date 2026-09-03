@@ -1,0 +1,232 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6427163205462063887
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3431608774312782353}
+  - component: {fileID: 7392636824646167896}
+  m_Layer: 0
+  m_Name: MarbleInfo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3431608774312782353
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6427163205462063887}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 938.5698, y: 617.43195, z: -3.6782691}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7392636824646167896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6427163205462063887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45582baf5830c964d9641f3913eae1fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abstractMarble:
+  - {fileID: 2193267672069527581, guid: d3d73e3b58755e0458b3da199a3af01b, type: 3}
+  - {fileID: 4556774876309296142, guid: 037bb56ffa7173f4b9d3f952e57cc25e, type: 3}
+  - {fileID: 4367335099117240861, guid: 4df93e98feadf24408059991f1c81ec5, type: 3}
+  - {fileID: 5691586335099023910, guid: c369b2343d4cd1a4291ea390eceafe65, type: 3}
+  - {fileID: 907509717010094200, guid: 28f1b32b63dda484493ded1607bb3b6d, type: 3}
+  communitySelectedMarble:
+  - {fileID: 3262992229016741449, guid: 3c9cc61411394e14eb1fa8962ba0592b, type: 3}
+  - {fileID: 1396940397502404674, guid: 3035c1e1dfc77af42b859d2ee7834542, type: 3}
+  - {fileID: 4547921670575028050, guid: 04e6236b1b746bd44b00798f1bc3b8f5, type: 3}
+  - {fileID: 5795344672254813405, guid: e9a609d8b019d894688e1c572263da42, type: 3}
+  - {fileID: 6532499890966174354, guid: 024094ebfbbd1ce4aac07cdfc5346bf2, type: 3}
+  - {fileID: 1828526229156034778, guid: bf0e3a37737a01d49854cefb9f498f87, type: 3}
+  - {fileID: 2818885448023881595, guid: 4022cd20bde06a04d9de0b7547acd49f, type: 3}
+  - {fileID: 3318430925245640447, guid: ed6ede4236c29844d9beda1abb02163b, type: 3}
+  - {fileID: 2828687172181365768, guid: 81fa85fb7c0bf3346801eaa821167b8e, type: 3}
+  - {fileID: 493761554183039293, guid: 89bf17e3173e265449b8b02438bfbace, type: 3}
+  - {fileID: 5549144621770967508, guid: b9842e6b5ac2be9479f8674ea78f977a, type: 3}
+  - {fileID: 964062191110916667, guid: 6b114b6a521f51c428a68d0d2aa262a9, type: 3}
+  - {fileID: 5367960056117600236, guid: 617c277909b07e943bbbd66b3e069059, type: 3}
+  - {fileID: 2260192811261069718, guid: 6021c9ec0a594764087d5b6ae525d8db, type: 3}
+  - {fileID: 5847687576977829739, guid: cb2ad3408d18a8b45af0f0103b0f7841, type: 3}
+  - {fileID: 7379871156228583012, guid: 32baaa14431ef84469982d7f327bf0e9, type: 3}
+  - {fileID: 6439659416004233710, guid: b3c4da2f12770cb4ba661988e31bcdde, type: 3}
+  - {fileID: 1734562187096584999, guid: 9ef1b917a474a354a8821f79830bf19f, type: 3}
+  - {fileID: 2525338159689821073, guid: 5dafe8cb0d3b5be449612f3483322582, type: 3}
+  - {fileID: 5094222668813320069, guid: f264b6abe2db99947ba39f67f8e82f67, type: 3}
+  customMarble:
+  - {fileID: 3199357541713168852, guid: 2665d7b3cbc63f34387e491cc4e010ce, type: 3}
+  - {fileID: 2265958427146969852, guid: d6ea0da75cbc6b94d9b282648d1860c3, type: 3}
+  - {fileID: 4964480698321737709, guid: a446fdf8ee4b4ea46a9dc24659ae7af4, type: 3}
+  - {fileID: 331342247033078359, guid: afb60294b1314ac46a50b9e3821992a0, type: 3}
+  - {fileID: 645255741084359308, guid: 411c2671612def94b8179fd863780c66, type: 3}
+  - {fileID: 6495588385361149820, guid: 25e292d8679070b4e93877591b93b5af, type: 3}
+  - {fileID: 6469803600491914522, guid: 652a8b749e63db54882854dc7b602433, type: 3}
+  - {fileID: 1040045459935572157, guid: 804bb36849fbab8468949edb023e7a42, type: 3}
+  - {fileID: 3547293933360628038, guid: 69ef4241833a0d7448a3e2e69a5c958a, type: 3}
+  - {fileID: 5931262129652891789, guid: d81c12400051ceb439f532740385da88, type: 3}
+  cyberFoxMarble:
+  - {fileID: 2790880854499370260, guid: acd77ba7ab541044b96d730bba3c6abd, type: 3}
+  - {fileID: 8002504603277345891, guid: 6768df61e9089024285144088233bbc1, type: 3}
+  - {fileID: 6558148432289252736, guid: 85ae3bee5c9a55941bab09c22421f696, type: 3}
+  - {fileID: 4158829732385130460, guid: 4029b9d7e50fa654ab5fb2e809a58ded, type: 3}
+  - {fileID: 2269387601436781192, guid: 3d2a87eadc0365644ba1b2d6bd766aa3, type: 3}
+  fruitMarble:
+  - {fileID: 2499661887949084697, guid: 80a49a9c2ccc0ce47b90eb52837be7cf, type: 3}
+  - {fileID: 8012581188278326359, guid: 85db3219910bd6347b10085a0861c3ca, type: 3}
+  - {fileID: 1976604553914546484, guid: f246c60a98259f544a5daf766b2c8a29, type: 3}
+  - {fileID: 262028177609168577, guid: 4e8272bbd1e098444ab1ff7091b6a5a3, type: 3}
+  fubarMarble:
+  - {fileID: 8606545266197651555, guid: 07ac601a3642b4a44bfb0278a0f4d2bd, type: 3}
+  - {fileID: 9077721318137231599, guid: 131a8ece53a99a145bf94c557dab971d, type: 3}
+  - {fileID: 6804694138787897598, guid: af2ae7481984b594181d0b5b3bbd9d87, type: 3}
+  - {fileID: 8793510938822720107, guid: 1a2a95bfeaa21f6468dfde58636bba9e, type: 3}
+  - {fileID: 6644430548821894056, guid: 64599cd11b524604eb4976096aa54c22, type: 3}
+  - {fileID: 1636893925520025167, guid: 72edd9b4c379ef7409114d1496d39f52, type: 3}
+  - {fileID: 1122730703914648434, guid: a19ecb0f3c7cac24d92548272336ccca, type: 3}
+  - {fileID: 3963038732188730235, guid: 75d581b8932c15d44921be7f58fbb0e4, type: 3}
+  - {fileID: 8345431189386988011, guid: 892ab78afa0253a458807ea950492a12, type: 3}
+  - {fileID: 464189256043243238, guid: afca827f21dec144f90083f32bdd7a5a, type: 3}
+  - {fileID: 1272417373573577297, guid: 9d34f50d1f8bd1c44a49a0262ab78824, type: 3}
+  - {fileID: 5654635585539852244, guid: ff585306b8f95444a9dfe801cd670fee, type: 3}
+  - {fileID: 1227574151205331535, guid: 4bf3775bae1ca7248826a659fcd1d159, type: 3}
+  - {fileID: 3254116954412439881, guid: 296548616ac865b4ea8a92818bb57c77, type: 3}
+  - {fileID: 1807315545716893888, guid: bdec347f52b0aad4086d79ad62f2a63e, type: 3}
+  materialEffectsMarble:
+  - {fileID: 1258529681321069888, guid: 948de7bef3177bd4599a9f0f329e0582, type: 3}
+  - {fileID: 1066309629257192746, guid: 1b3294bbf6e2aa545b89cd34b4a31935, type: 3}
+  - {fileID: 6805675068809424970, guid: d4dfaaeb62f03184cb99f0b69d86c7a8, type: 3}
+  platinumMarble:
+  - {fileID: 7283203289921317526, guid: ca1804aad2dfbf3408ce36800fddf4ab, type: 3}
+  - {fileID: 8195948819701339649, guid: c885e6b827122f142aabce9237226e1e, type: 3}
+  - {fileID: 5592614878252884978, guid: 5bc458ebfbe1e7146af9ac0d90ccbeb3, type: 3}
+  - {fileID: 7215485083474444348, guid: a9e0fae5c36b82a429e951adf230050e, type: 3}
+  - {fileID: 1607413247257248848, guid: c9ba8f295ade7954182300f5fa87cea6, type: 3}
+  - {fileID: 1963603380774071349, guid: d5a31bb7294930048b9d425a87f54386, type: 3}
+  - {fileID: 7314729239450530313, guid: d9c21789cbfc4c74d8c73a6c91d59de1, type: 3}
+  - {fileID: 1976002696002483734, guid: a9b9bf6a7ce4f904887b86f2b0c6f99c, type: 3}
+  - {fileID: 6570484101518206580, guid: 4917c6adae30151438536eeac3db3487, type: 3}
+  - {fileID: 6514951383908328509, guid: cbc307a3a800499458240b922bf351ed, type: 3}
+  - {fileID: 4924720110584976569, guid: 58570774bb4c0994996e728699a80ebc, type: 3}
+  - {fileID: 6796797197456009528, guid: 5a5a539a8284ede419013dc3af96ea35, type: 3}
+  - {fileID: 8054295215885070656, guid: 6e7b837910de9b543b3207106380b1ad, type: 3}
+  - {fileID: 4280500526975249614, guid: 1ebccc4c35d5dac4d8dd71a4099b7424, type: 3}
+  - {fileID: 5189123475278296000, guid: 311c017feb633c94287804ed1bedf60f, type: 3}
+  - {fileID: 9205283262861238792, guid: 345387f09a28c3b449612f40b8b869fb, type: 3}
+  - {fileID: 1710443727074579314, guid: 1e24bcb46f6b3a844af43b9a148f22ba, type: 3}
+  - {fileID: 3693505151089784461, guid: 722c8f2643b25bb4ab5b4d2b6559179d, type: 3}
+  - {fileID: 755130410644907979, guid: 21fd5aa07dfc59b4a8963208395cfa90, type: 3}
+  - {fileID: 2105100526576790375, guid: 6381c0bbb8fc5e4408194029466dc2c5, type: 3}
+  - {fileID: 2193803570561407829, guid: 06ae7b76b4667f0408a36085f06f733a, type: 3}
+  - {fileID: 5384254761061296813, guid: 742f29179560b6b4b857a1e54ff2092b, type: 3}
+  - {fileID: 8658547293825690345, guid: 6f271b856b0c64449ac30c9e5158bffc, type: 3}
+  - {fileID: 4717742082197848761, guid: 214c2c7dace435d43951f9d0a511b7e8, type: 3}
+  - {fileID: 2338053987652750853, guid: 9e10c25c50232104bb5f42d12f243c80, type: 3}
+  - {fileID: 8998148899970831101, guid: 8a2c0842da8573840a1dce3dee28c444, type: 3}
+  - {fileID: 2862851250746003086, guid: 7c2c969a3d7bf924993ffde1d01a67bc, type: 3}
+  - {fileID: 1415867407191496406, guid: abfa8670d359082449254da06fbc995a, type: 3}
+  - {fileID: 97654791459250467, guid: a6ab2b465eb85114585e3214768256fb, type: 3}
+  - {fileID: 2332102027837114896, guid: 635ebff37f01cfb4a9fbc2fa15f22928, type: 3}
+  - {fileID: 9073416856830234728, guid: 6dfc3c3cf1a31ea488dd025a29beac4e, type: 3}
+  - {fileID: 1449263520266634032, guid: 18ae7496f527ffa4790e545d4cd24709, type: 3}
+  - {fileID: 9097136161716072394, guid: 5b4784e686c583f47b9bbb63e8d40e6a, type: 3}
+  - {fileID: 5214514550876953422, guid: 470cd0e2ca86e7747922560910c05299, type: 3}
+  - {fileID: 534225449475616135, guid: 4d820ea731466d54ea3a3f79eec24937, type: 3}
+  - {fileID: 6700628973376097663, guid: b4ef92c9cc545804f883ab64e96f6bb1, type: 3}
+  - {fileID: 6758880637332224211, guid: 0cc5bd6fa28174845baf2ee4d96d4961, type: 3}
+  - {fileID: 995805496252789937, guid: c70ba19950f74d1489010e4ebd0a64e9, type: 3}
+  - {fileID: 3544159335096132568, guid: 3fde6816f73e62545b07b28ebb7d6455, type: 3}
+  - {fileID: 2298584238685663743, guid: df0ed1a58ebe9d54f815b1ea4740e9f6, type: 3}
+  pqClassicMarble:
+  - {fileID: 8439471869444797089, guid: b95d50ad4b8eda941bed68555a68f244, type: 3}
+  - {fileID: 55427367075821655, guid: e93ce7c219d9cb2429505c568ec9ddab, type: 3}
+  - {fileID: 405578040808961600, guid: 6b35e49712b425340969b5574ba700d0, type: 3}
+  - {fileID: 2279988004477868011, guid: 8c173d6fab637854fb1d95e1f717c8f4, type: 3}
+  - {fileID: 8717825357015985907, guid: 8256e0abe4299834aaf4dba54915d071, type: 3}
+  - {fileID: 248114448383034521, guid: d6124ce6dc44b6646bb0725d579cea77, type: 3}
+  - {fileID: 3897935131775356601, guid: 0cbb575be1798bf47ad3afc1079c4657, type: 3}
+  - {fileID: 2161434962734501666, guid: 654546c59f601794eb2eb5e0568ccf9f, type: 3}
+  - {fileID: 7753365569231510381, guid: 13aa21f0afa61eb46a34feb82e18a513, type: 3}
+  - {fileID: 614836263205197076, guid: 4bfcc9433ccfe064e8ee93aaae3fde14, type: 3}
+  - {fileID: 6044277961003622279, guid: 6ef90c36d619bb046b6f8a99d59064ed, type: 3}
+  - {fileID: 4432706188354266197, guid: f1e3b05291480b44a8c8d6c24a8a6ff1, type: 3}
+  - {fileID: 2514263119150381922, guid: 51e287a15b5adbf4e9b6f6c7c28ef6b3, type: 3}
+  solidColorsMarble:
+  - {fileID: 4955226888399708265, guid: 550dc6fdf56567a409a8ab52c40022af, type: 3}
+  - {fileID: 8158526161205303207, guid: 7b272fbf1f05ad64c96b5271f0031dd8, type: 3}
+  - {fileID: 3988965674110485047, guid: 3c08061f82e55524e9af59f314fb07e1, type: 3}
+  - {fileID: 174353357236810405, guid: 5545b08a19b09b941bc27700f252c70c, type: 3}
+  - {fileID: 2739013761528950854, guid: 998be4860915e444b9e3f310f43fde35, type: 3}
+  - {fileID: 2263074707408354658, guid: aff84b2c9cca849478fed30f79e28dc4, type: 3}
+  - {fileID: 751871555236124749, guid: 53b70e5778237da4dab277571a526855, type: 3}
+  sportsMarble:
+  - {fileID: 8384345522144094314, guid: 3f4f3572f7afb574cbdd6a01394081c7, type: 3}
+  - {fileID: 3680998012572011388, guid: 3f69a91b5d6ac4c44b4f679ae5613b55, type: 3}
+  - {fileID: 3114098532160863371, guid: 5dabf6ccff13d4f45a27c41eb4a13e77, type: 3}
+  - {fileID: 739275550318384370, guid: d5a28d8c938079a40b24f7aa8903e670, type: 3}
+  - {fileID: 5500314805368879389, guid: 2db1743cfc5e4ec47aba6b2970729c1b, type: 3}
+  - {fileID: 2150962213930061595, guid: bb241f3c21c2c1e46a5459c1beae3dd0, type: 3}
+  - {fileID: 1977133869604726285, guid: 6e2f8053d6b2f464a83e32ba890bd466, type: 3}
+  - {fileID: 405868208709112726, guid: 5b445c8887996c14fbd4f19026895e8e, type: 3}
+  - {fileID: 3196387316050841422, guid: e653eb48ff9d83a43a5f403105e39a1e, type: 3}
+  - {fileID: 7347937748712064873, guid: 86da26e353df3d3409c669b240282f89, type: 3}
+  - {fileID: 7949278639767947859, guid: 51fc043400d355143b9aeb9c49440430, type: 3}
+  - {fileID: 4189167404078792257, guid: f6455cad5893b8648a4320833c381dbf, type: 3}
+  ultraMarble:
+  - {fileID: 3686566912159463052, guid: bfbdf4d5062b81849bfb17d69e14cc81, type: 3}
+  - {fileID: 6037334638727965395, guid: be89c4e16f974b846bb0d57fb5a46b28, type: 3}
+  - {fileID: 6424343572052524548, guid: 175d2bfbdba50b241a362e6aad440e5a, type: 3}
+  - {fileID: 1008322767362095696, guid: c40da16e627f0cd4daedab365ed2971d, type: 3}
+  - {fileID: 1575611614891339603, guid: c7478985d55bd9b4d9fc740c5a270328, type: 3}
+  - {fileID: 8187907819368760378, guid: 9edb30377803bed429b4291a5fa1c8f8, type: 3}
+  - {fileID: 8412256400236969084, guid: 65828af5533f0c7499b9dea68b7bfe73, type: 3}
+  - {fileID: 7170502219243651882, guid: 0afe7bb37e00b3a48b708ee45439b3d7, type: 3}
+  - {fileID: 5819130707030931835, guid: 37724562683f0f441aac1202c655a69d, type: 3}
+  - {fileID: 3031321689669446481, guid: d647cab62e5c2d24b8b1f3bf7229841c, type: 3}
+  - {fileID: 7605883416410103739, guid: 0433df83901f7b240be5cbb9bf3c08fa, type: 3}
+  - {fileID: 3669221028323278183, guid: 230e15c3cfc148542a2f12cae6ecd9b0, type: 3}
+  - {fileID: 4730287115767357402, guid: 34b8cb87d3154a64aa585178fafabe52, type: 3}
+  - {fileID: 3025433456016576346, guid: 7c375d047a457de48a64df42718e172f, type: 3}
+  - {fileID: 7432997197161445260, guid: 175b4c46c6fe34041a6cfb51bea47dc4, type: 3}
+  - {fileID: 5286232013920722752, guid: ea4aab2cc59938e4d931d41f547fcef8, type: 3}
+  - {fileID: 8953959905996669125, guid: a606a7b432359c8408ff0627beea5891, type: 3}
+  - {fileID: 7934573231449462006, guid: 778977f3fe5748045a97eb225ff823d9, type: 3}
+  - {fileID: 236768181153183836, guid: 2c180e04a63991b4585991cd28b0a198, type: 3}
+  - {fileID: 353930050488270102, guid: ee9e01605a288974fae0b0abc2cafacd, type: 3}
+  - {fileID: 8019764483469356942, guid: caf0e1a37e67a784a9fa07005ec558c2, type: 3}
+  - {fileID: 4096819415115178559, guid: 31a9e6904d2335d4480a63f348b7ad67, type: 3}
+  - {fileID: 1872298504709959772, guid: 58cd22f9b322b18498c4cd265a9d4f1b, type: 3}
+  - {fileID: 3402118937511926910, guid: 01bacce1a94d95940960709d6019a94e, type: 3}
+  - {fileID: 4946159752425566635, guid: 215f1058a69099745a2e7c0fbd0d7a4e, type: 3}
+  - {fileID: 8343666898940234054, guid: ad1f6f0cbec2ccc4a9af8fd6898572b6, type: 3}
+  - {fileID: 5389063011508050624, guid: 9bd35ed82ffc35b4fac59a72ef36a24f, type: 3}
+  - {fileID: 3196142480577394703, guid: 371bfc2bfb60db84288ab2d4c9a1ac5c, type: 3}
+  - {fileID: 1866392080984668175, guid: 8406ba21f4f0f924ab298efa3259c96c, type: 3}
+  - {fileID: 7328855294625670036, guid: c21224bae0767ee40b8b857f37466288, type: 3}
+  - {fileID: 6040796226173028055, guid: e5180c31e39ed6f46bc2433495c3a06b, type: 3}
+  - {fileID: 8222665170630951501, guid: 4615d8f4f48236e49a6e22d6c584549b, type: 3}
+  - {fileID: 7204588084164737581, guid: 3bd6a60f1ee3f8b40ab3c28cefa4ab7a, type: 3}
+  - {fileID: 2415690953371101326, guid: 3b1c8c136e3b59b41b1dc7c54502c971, type: 3}
+  - {fileID: 1959471873593946794, guid: 595189c433a00174c934120ca58f11cc, type: 3}
+  - {fileID: 7297212070716324035, guid: 158c1c69034df274ab380c4995173c6f, type: 3}
+  - {fileID: 5884982268463367127, guid: 30b4cc9b03ba0804f998168a8c6b4631, type: 3}
+  - {fileID: 8272098636097226964, guid: 24f43eb8668d6914f89a919a4a2ff4e8, type: 3}
+  - {fileID: 8552622629659013448, guid: 8d251789706e44743a3092ea5bcbe0fc, type: 3}
+  - {fileID: 6703522926358371785, guid: daa0f5df7f819ea43bedf3a4d8ab6e41, type: 3}

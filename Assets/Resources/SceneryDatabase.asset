@@ -1,0 +1,267 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f50ad55d02ee1e4fab6669db65c61e4, type: 3}
+  m_Name: SceneryDatabase
+  m_EditorClassIdentifier: 
+  Cloud48: {fileID: 6418187345731516206, guid: a901e8163127b9d46a7f2a45939f7cc6, type: 3}
+  Cloud36: {fileID: 3022842511757930999, guid: 0e07b445c076acf49a4afcfc7be4035c, type: 3}
+  Cloud24: {fileID: 5845334291710364715, guid: 5814e3c16fee09c42afef64bb0b86c23, type: 3}
+  FlatLargeClouds: {fileID: 3409778035543059969, guid: ed67cb6c7adb0b04c88c62a693823aba,
+    type: 3}
+  OrbitingClouds: {fileID: 3892220201154958615, guid: cc88bdafc2c72ba4e9775472ea9a2a74,
+    type: 3}
+  clear: {fileID: 3204869663405654185, guid: e1f9c6770633c924c9cdaf8c8257e0c6, type: 3}
+  Cloudy: {fileID: 437477567688997491, guid: 5d4ebac84ccbf6447afa9f6efeb4e445, type: 3}
+  dusk: {fileID: 5251375392221685407, guid: 194f26137a9c0774c90097f1d771efce, type: 3}
+  Wintry: {fileID: 237992903846912750, guid: 36c05b27264e5a2499e660544f1c183c, type: 3}
+  Fence_1TilesLength: {fileID: 1349172808746024535, guid: 82b2ec06d4afca947953950ce552ffdf,
+    type: 3}
+  Fence_2TilesLength: {fileID: 820690513164677665, guid: c47dfd663ec831141b731908ca87e409,
+    type: 3}
+  Fence_3TilesLength: {fileID: 3052960702708677675, guid: ec3a4997d4fefe54391fdb8d9c51cc60,
+    type: 3}
+  Fence_4TilesLength: {fileID: 1254354772759084800, guid: d879688339f0e3043b598dbe0059802d,
+    type: 3}
+  Fence_5TilesLength: {fileID: 2065259096666738888, guid: 62883bc907c338e4690002e8ca1532e8,
+    type: 3}
+  FencePole: {fileID: 885700422095572859, guid: 49060cc0350786c4b8116ae2c168e26a,
+    type: 3}
+  Metal_End_Fence_Short: {fileID: 6292423628392741725, guid: 2ec99fa0e6f918a45aacb617cb6f177b,
+    type: 3}
+  Metal_Start_Fence_Short: {fileID: 3335597090239493729, guid: 604db2319277e554a8764f63df59b279,
+    type: 3}
+  Metal_Pole_Fence_Short: {fileID: 6886963856259058047, guid: 2f0ad09a2a091e241926ba1a3f2ed72e,
+    type: 3}
+  Metal_End_Fence_Tall: {fileID: 5241931241565483555, guid: 0d84bc4248319f24487ffc46b03ba116,
+    type: 3}
+  Metal_Start_Fence_Tall: {fileID: 286846952369046255, guid: 7604d4c76a9f4d141b20730049a4e892,
+    type: 3}
+  Metal_Pole_Fence_Tall: {fileID: 6886963856259058047, guid: 2f0ad09a2a091e241926ba1a3f2ed72e,
+    type: 3}
+  Plastic_End_Fence_Short: {fileID: 1500318959258246550, guid: 3f9b19d2d50f162419b8cd75994ac1b4,
+    type: 3}
+  Plastic_Start_Fence_Short: {fileID: 7474696110274245945, guid: 44a454acfbcf9044283244566917cd00,
+    type: 3}
+  Plastic_Pole_Fence_Short: {fileID: 5926677271107739692, guid: 731dfbbf5117a6c40ab39fff9ff4c9e1,
+    type: 3}
+  Plastic_End_Fence_Tall: {fileID: 7276188891762736484, guid: f13d38663e865cf42870e45030d19f67,
+    type: 3}
+  Plastic_Start_Fence_Tall: {fileID: 2160025372671576295, guid: a4be2876daf666e40a03456a03f5b739,
+    type: 3}
+  Plastic_Pole_Fence_Tall: {fileID: 5926677271107739692, guid: 731dfbbf5117a6c40ab39fff9ff4c9e1,
+    type: 3}
+  Plant01: {fileID: 5289661405357841854, guid: 9fe2ee9438c13de4ca27dd02d6735e13, type: 3}
+  Fern01: {fileID: 7297842809365165339, guid: d4e52ddb394b2784094b7a66f5abc722, type: 3}
+  Flowers: {fileID: 3836232346036345933, guid: dcedb98a8e2f6444b80607422765984e, type: 3}
+  Tulip: {fileID: 5404656535971460902, guid: 63a8ee9406d9f07489cce9184798e1cd, type: 3}
+  Scarce_Tulips: {fileID: 8365572780611347087, guid: 6452ecf04d72874419d585add2509af5,
+    type: 3}
+  Dense_Tulips: {fileID: 6401633084654985541, guid: e48fa98784cf31f4fb4ddf4cb5481455,
+    type: 3}
+  Scarce_tulips_3tiles: {fileID: 2394952573636818366, guid: 15b6af312a079b045a7f39ee403ed5e3,
+    type: 3}
+  EffectPlant: {fileID: 9088072029498967032, guid: e6c87eefd62a711469bddb1d6ca89054,
+    type: 3}
+  Grass: {fileID: 1393152690004867887, guid: 8285da57d1fae5c49988b5d2174e6c18, type: 3}
+  LargeGrass: {fileID: 618217856122305896, guid: a86150969058fb342b13e0cab8602e3b,
+    type: 3}
+  Grass02Small: {fileID: 648241963522579520, guid: a2bcdbad0e5e9a0479a8723987477d11,
+    type: 3}
+  Grass02DenseSmall: {fileID: 1262812236437141993, guid: cd328c58e4f28e242972cfaaac5d8e81,
+    type: 3}
+  Grass02DenseLarge: {fileID: 7916353271036535924, guid: 61cf9bdf6e4a1e2459a100ba6d9c1b37,
+    type: 3}
+  NaturalPlant: {fileID: 7297842809365165339, guid: d4e52ddb394b2784094b7a66f5abc722,
+    type: 3}
+  VinesWideLong: {fileID: 4132031754316275979, guid: 6b39681c6e1233748a5abbbf922f8f3e,
+    type: 3}
+  VinesWideShort: {fileID: 4740659337591088896, guid: 43ad80f92d57002418c6fc01231c42db,
+    type: 3}
+  VinesThinLong: {fileID: 5341213786683444734, guid: 2f4ad78b627376f46a83b9a4eab4704b,
+    type: 3}
+  VinesThinShort: {fileID: 1898900760533113612, guid: 5dc5115beddc4cb44b4658fc22beae40,
+    type: 3}
+  Tree01: {fileID: 4607857438096223173, guid: 5ea18d3212d48f943be40dccbb9e1e72, type: 3}
+  Tree02: {fileID: 6704742419667731279, guid: 9e129d7ffb87b31428b5c99f1afe9e55, type: 3}
+  Tree03: {fileID: 6250457884979386552, guid: 7a70463435dbac1428a4f2f5fd1e1859, type: 3}
+  TreeBare01: {fileID: 8802179275779917351, guid: 118b0071cf0045e49a3ce11f656085ca,
+    type: 3}
+  TreeBare02: {fileID: 7160775097365793335, guid: d741e1bb78fa09c4fa9cb2ed3d90074b,
+    type: 3}
+  TreeBare03: {fileID: 4488670170397329735, guid: 4748976dcd0d4164ea87507bde833283,
+    type: 3}
+  Rock01: {fileID: 629608543477454766, guid: b6b9315377a3e0548ba1313630c69dd4, type: 3}
+  Rock02: {fileID: 1080051248146432372, guid: a45ff86b67953b041b20d7bf3dcc3b9a, type: 3}
+  Rock03: {fileID: 2617574718120741690, guid: d6f1f7671bca5964092028a5f7a553c6, type: 3}
+  Rock04: {fileID: 9065581790508526075, guid: 9275cf938916c3a4397751ca5b9214ad, type: 3}
+  Marble_Graffiti: {fileID: 4621049118151752903, guid: 6b0ca618557157c49b4ce243254777dc,
+    type: 3}
+  Marble_Graffiti_2: {fileID: 4621049118151752903, guid: 8645ece674f56f745b371f4f4fe8bc94,
+    type: 3}
+  SuperJump_Graffiti: {fileID: 1282071471265360771, guid: 58321ff1cb2c3fe45b6fac197a6428bf,
+    type: 3}
+  Cannon_Graffiti: {fileID: 115538496381658710, guid: e65c3b12f0ecad941b4e251646e64780,
+    type: 3}
+  PQ_Graffiti: {fileID: 2301254007696654190, guid: a9e172addb471e442a92733c4e1341f3,
+    type: 3}
+  PQRulez_Graffiti: {fileID: 3827280384461253863, guid: 7a021627fb797c8429945223630b3c2f,
+    type: 3}
+  PQRulez_Graffiti_2: {fileID: 3827280384461253863, guid: 314d77682b04ba14bbfa39f43777bd7e,
+    type: 3}
+  Logo_Graffiti: {fileID: 5586599758218796630, guid: 4d9279295adc97d4cb31cc110400e53d,
+    type: 3}
+  GG_Graffiti: {fileID: 9014139769581913326, guid: a2f714beefbdc6e499700a1051d43891,
+    type: 3}
+  GGlogo_Graffiti: {fileID: 8022409929949968768, guid: eddfca0c0cea35440abd8a6a16658cef,
+    type: 3}
+  PhilsEmpire_Graffiti: {fileID: 3071061277685333038, guid: 93e897d9348a07642b15eefe56a6ee9d,
+    type: 3}
+  Tornado_Graffiti: {fileID: 507776375282182831, guid: 9e570f1f88a2d57499fd1a7bff3c18c1,
+    type: 3}
+  Hourglass_Graffiti: {fileID: 5291036109456517773, guid: b13b28f066cf3f94a94a28a9470413b7,
+    type: 3}
+  Sandhill01: {fileID: 6631689627018073737, guid: 1244174b2ec09b947a1f4fb602bce241,
+    type: 3}
+  Sandhill02: {fileID: 1571403083069398257, guid: 57da6468c3a0c52458de092b8787535f,
+    type: 3}
+  Sandhill03: {fileID: 263255355608172971, guid: e96f66fe2f1a6924fac519499562bfac,
+    type: 3}
+  Sandhill04: {fileID: 2205977782315663215, guid: b1454eee5053eb24c94ec7367ebe7f77,
+    type: 3}
+  Sandhill05: {fileID: 1651890430014609826, guid: 8b12409a852af194e9c679400e98fd92,
+    type: 3}
+  Asteroid: {fileID: 5884791112754282619, guid: 4edbe9808609d124193d23cce8b7d3f9,
+    type: 3}
+  Window01: {fileID: 5243998859734533962, guid: 7e0daf7d1c2c46a4e9ae8d7eb3da33c6,
+    type: 3}
+  Window01_light: {fileID: 5908685912804954402, guid: b0ee0a7d34dd7e942a311c2f49255792,
+    type: 3}
+  Window01_3x3: {fileID: 5514047406219345721, guid: 049203382dd0e9345bed13d7256f52f3,
+    type: 3}
+  Window01_3x3_light: {fileID: 882246597013237200, guid: 3e59462fbf6922a4fb83bd6afac3089e,
+    type: 3}
+  Window01_6x6: {fileID: 3523484182892967820, guid: 2434e814dd35fb14d8137c068c6f275f,
+    type: 3}
+  Window01_6x6_light: {fileID: 5939468686548083068, guid: c3dcb05a6f031964cb9a79c6ae3ac933,
+    type: 3}
+  Window01_12x12: {fileID: 4975583956488925793, guid: 868f7ef6c32f8fe4bac9aa71eba3632c,
+    type: 3}
+  Window01_12x12_light: {fileID: 448258975491499658, guid: 7e153b091b9320a4d92c42e0ecbfdfad,
+    type: 3}
+  Window01_3x12: {fileID: 2756149989598900217, guid: db775d9b45173b34782f40a6a3ce7695,
+    type: 3}
+  Window01_3x12_light: {fileID: 2208681745001952510, guid: 698c6cc3314ecde469d111df34290fcf,
+    type: 3}
+  Window01O: {fileID: 2688065759462761429, guid: 5eededb9231a40a46a7930b465038a81,
+    type: 3}
+  Window01O_light: {fileID: 3413396772600825044, guid: 0a778b275ecab6c48b88401118b25e22,
+    type: 3}
+  Window01O_3x3: {fileID: 4812965425668219351, guid: 10cc8dc7e14d9be4bbc259de3e541cc0,
+    type: 3}
+  Window01O_3x3_light: {fileID: 3386051624055529490, guid: 8f16de30b5f1ad4478b4b837612ed431,
+    type: 3}
+  Window01O_6x6: {fileID: 5532044988848478193, guid: b8e1c4a94d79dcc4489389dd6b840b43,
+    type: 3}
+  Window01O_6x6_light: {fileID: 4865216486123187443, guid: 626a926e6335f0a4e844581f82fc30ae,
+    type: 3}
+  Window02: {fileID: 5243998859734533962, guid: 7e0daf7d1c2c46a4e9ae8d7eb3da33c6,
+    type: 3}
+  Window02_light: {fileID: 5926154433502374284, guid: e37cd5a63b19bac4c95c514a80e564f1,
+    type: 3}
+  Window02_3x3: {fileID: 2002968779607969580, guid: 6caf29cc0ebdb7f44b94432098922408,
+    type: 3}
+  Window02_3x3_light: {fileID: 1057742612404024700, guid: 04b4479751d6d5c45b7a37c170eab485,
+    type: 3}
+  Window02O: {fileID: 5794896539224143284, guid: 90c79d38fb1f2d044be4cb49cd6f6279,
+    type: 3}
+  Window02O_light: {fileID: 5928155208318483394, guid: b9055dfad3072034497d88680284544b,
+    type: 3}
+  Window02O_3x3: {fileID: 2002968779607969580, guid: 6caf29cc0ebdb7f44b94432098922408,
+    type: 3}
+  Window02O_3x3_light: {fileID: 1057742612404024700, guid: 04b4479751d6d5c45b7a37c170eab485,
+    type: 3}
+  Window03: {fileID: 1334100385232466070, guid: 74dff8b676897394da99a91bfc2ab303,
+    type: 3}
+  Window03_light: {fileID: 236478802474611093, guid: ae66796e2e2f76c41a12e24f13e74a4d,
+    type: 3}
+  Window03_3x3: {fileID: 6684512021303245916, guid: 6970205f5f886bf43bdc4397b1f90ceb,
+    type: 3}
+  Window03_3x3_light: {fileID: 3748822388857650226, guid: 4f4d40af28784a94f9f0db257dfafada,
+    type: 3}
+  Window03O: {fileID: 5050448131723233527, guid: ce9a9f8e6b49a384791ac397d6ea9d9e,
+    type: 3}
+  Window03O_light: {fileID: 1094293564150101546, guid: 8df5b92e1548112449b88fc5dc8ddb6f,
+    type: 3}
+  Window03O_3x3: {fileID: 8578512918118409412, guid: 055c84b08ebc3d34da35bb9effeb3f8e,
+    type: 3}
+  Window03O_3x3_light: {fileID: 3677442648332628721, guid: 6d5c05ae88426184b8fdd2a9c9c91c90,
+    type: 3}
+  Window04: {fileID: 779084596003808329, guid: 6961570ca0f23044eb8d89c8f59e3125, type: 3}
+  Window04_light: {fileID: 3224206193006046350, guid: 5bfbfc11738f8d54aae913c7d341ea88,
+    type: 3}
+  Window04_3x3: {fileID: 7494827470607613719, guid: d2c65c189e620104b9ea734ea5cd43f2,
+    type: 3}
+  Window04_3x3_light: {fileID: 4081359728952253335, guid: 92878b3185e23964789c0032ed5e0896,
+    type: 3}
+  Window04O: {fileID: 8935499432848443568, guid: 8ceea9771390df64eb4bce96d5a89a1d,
+    type: 3}
+  Window04O_light: {fileID: 6007602905086822775, guid: dbfde749d7d975546861419bc60092df,
+    type: 3}
+  Window04O_3x3: {fileID: 7276915646117405222, guid: 1122086a76a8d3c40b0f378c91702d32,
+    type: 3}
+  Window04O_3x3_light: {fileID: 16887196306018463, guid: d431b09e8d41df54a81a49da92dcffce,
+    type: 3}
+  Barrier: {fileID: 3700743107864020594, guid: c63427d296264d14fab8127a313b987e, type: 3}
+  Sign01: {fileID: 4359508904841545421, guid: ee4cac75c1957824d9696bab3f269101, type: 3}
+  Sign02: {fileID: 8590696869581653785, guid: 20d155a44fbf38f43b6b3b373a98ee35, type: 3}
+  RoadsignYellow: {fileID: 6149599892786194087, guid: ea1e6e338fefc1f49834f574c99e7b02,
+    type: 3}
+  RoadsignRed: {fileID: 297639574268112584, guid: 3a081e78db726384d98a3068fa996faa,
+    type: 3}
+  ConstructonRoadsignYellow: {fileID: 713817992867289637, guid: 266f29a899fcd6b4185f41c061991858,
+    type: 3}
+  ConstructonRoadsignRed: {fileID: 908655078779432258, guid: 0b081d2f2a74dce4887fce3d3e7ee65d,
+    type: 3}
+  DetourRoadsignYellow: {fileID: 6952401146232990313, guid: 96e8dcb730455f84eb366be63eccc608,
+    type: 3}
+  DetourRoadsignRed: {fileID: 6593735304669711622, guid: 155368ec0bac5344c887d8265ce09c6b,
+    type: 3}
+  Cardboardsign: {fileID: 7323612448561642094, guid: b6df68d2b36bfce45b919dd8d1944acc,
+    type: 3}
+  Carboardsign_L: {fileID: 8483619758020851227, guid: b6739648de83c2844a072e0aa3e2ae0b,
+    type: 3}
+  Carboardsign_R: {fileID: 8722575766001354830, guid: edc58fe38025df446bd72c9bc5970072,
+    type: 3}
+  Carboardsign_UP_L: {fileID: 3868011472036995758, guid: f68ec52ac75548d43ab7811fa75105f0,
+    type: 3}
+  Carboardsign_UP_R: {fileID: 4726700214709524298, guid: 8366db7b6e0e3ec49884f79b2161a351,
+    type: 3}
+  Carboardsign_DOWN_L: {fileID: 2253964028595197344, guid: 58b797e482c13f94b9cdeed9423fbe7b,
+    type: 3}
+  Carboardsign_DOWN_R: {fileID: 8012618156800698264, guid: bd62baf9d9084ef4ab513ebb2c2843cd,
+    type: 3}
+  PillowOnUse: {fileID: 3308638787461899166, guid: 2ef7f3b50c5520548a95f57f76dd646e,
+    type: 3}
+  Spectrum: {fileID: 42247314907644066, guid: 12ecf7418ee233643b0a2ef605f080f1, type: 3}
+  Spectrum2: {fileID: 7734097940182526436, guid: 23bcabd7d5c0b9348ac59b8039ce2a06,
+    type: 3}
+  Spectrum3: {fileID: 8665291384797280595, guid: bc58386bf3b34484bab130619ae1ee08,
+    type: 3}
+  Spectrum4: {fileID: 8665291384797280595, guid: bc58386bf3b34484bab130619ae1ee08,
+    type: 3}
+  WireBall: {fileID: 3061602381208930111, guid: 08e810a0ba44c714fab370d6bef8d76b,
+    type: 3}
+  soundstage: {fileID: 9087889270095497560, guid: 3c872c9408bbeaf4d9d45a531ab490c7,
+    type: 3}
+  Marblius: {fileID: 7701367600346844394, guid: 825c1a66a234e854c86a0585f3993a18,
+    type: 3}
+  Bat: {fileID: 2380614377295767200, guid: 6e119625dbbf53742a7a53441eb4c872, type: 3}
