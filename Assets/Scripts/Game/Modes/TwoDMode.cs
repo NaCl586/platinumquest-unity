@@ -459,13 +459,14 @@ public class TwoDMode : NullMode
 
     private float GetBaseFov()
     {
+        float savedFov = PlayerPrefs.GetFloat("Graphics_FieldOfView", 70f);
         if (MissionInfo.instance != null &&
             MissionInfo.instance.hasCameraFov)
         {
-            return MissionInfo.instance.cameraFov;
+            return MissionInfo.instance.cameraFov * savedFov / 70f;
         }
 
-        return PlayerPrefs.GetFloat("Graphics_FieldOfView", 70f);
+        return savedFov;
     }
 
     // ============================================================
