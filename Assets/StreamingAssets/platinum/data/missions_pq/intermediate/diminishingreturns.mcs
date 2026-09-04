@@ -3297,98 +3297,98 @@ new SimGroup(MissionGroup) {
 		dataBlock = "Checkpoint_PQ";
 	};
 	new StaticShape() {
-		position = "6.52888 3.97606 31.632";
+		position = "6.52888 3.97606 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard1";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "6.92657 5.88557 31.632";
+		position = "6.92657 5.88557 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard1";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "2.00269 6.60248 31.5838";
+		position = "2.00269 6.60248 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "6.03201 2.59926 31.632";
+		position = "6.03201 2.59926 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard1";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "4.09453 2.8016 31.632";
+		position = "4.09453 2.8016 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard1";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "1.97978 3.23496 31.632";
+		position = "1.97978 3.23496 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard1";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "-0.0175913 7.19863 31.5838";
+		position = "-0.0175913 7.19863 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "-1.94615 6.97389 31.5838";
+		position = "-1.94615 6.97389 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "3.03516 14.0134 31.5838";
+		position = "3.03516 14.0134 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "2.00004 10.618 31.5838";
+		position = "2.00004 10.618 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "0.877975 11.906 31.5838";
+		position = "0.877975 11.906 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "1.25577 14.0485 31.5838";
+		position = "1.25577 14.0485 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "2.18568 15.4408 31.5838";
+		position = "2.18568 15.4408 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";
 			noParticles = "0";
 	};
 	new StaticShape() {
-		position = "3.34273 11.9111 31.5838";
+		position = "3.34273 11.9111 31.33";
 		rotation = "1 0 0 0";
 		scale = "1.5 1.5 2";
 		dataBlock = "IceShard2";

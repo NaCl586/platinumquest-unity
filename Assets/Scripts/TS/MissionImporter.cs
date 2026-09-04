@@ -234,6 +234,10 @@ namespace TS
         {
             public GameObject gameObject;
             public string pathName;
+
+            public Vector3? initialPathPosition;
+            public Quaternion? initialPathRotation;
+            public Vector3? initialPathScale;
         }
 
         [Serializable]
@@ -2555,7 +2559,14 @@ namespace TS
 
             foreach (PendingPathEntry entry in pendingPathEntries)
             {
-                if (entry == null || entry.gameObject == null || string.IsNullOrEmpty(entry.pathName)) continue;
+                if (
+                    entry == null ||
+                    entry.gameObject == null ||
+                    string.IsNullOrEmpty(entry.pathName)
+                )
+                {
+                    continue;
+                }
 
                 if (!pathManager.TryGetNode(entry.pathName, out PathNode node))
                 {
@@ -2563,13 +2574,29 @@ namespace TS
                     continue;
                 }
 
-                PathMover mover = entry.gameObject.GetComponent<PathMover>() ?? entry.gameObject.AddComponent<PathMover>();
-                mover.InitializePath(node.nodeName, pathManager, true);
+                PathMover mover =
+                    entry.gameObject.GetComponent<PathMover>()
+                    ?? entry.gameObject.AddComponent<PathMover>();
+
+                mover.InitializePath(
+                    node.nodeName,
+                    pathManager,
+                    true,
+                    entry.initialPathPosition,
+                    entry.initialPathRotation,
+                    entry.initialPathScale
+                );
+
                 movementManager.RegisterMovingObject(mover);
+
                 initializedCount++;
             }
 
-            Debug.Log($"Path resolution complete: {initializedCount} paths initialized, {missingPathCount} path references unresolved.");
+            Debug.Log(
+                $"Path resolution complete: {initializedCount} paths initialized, " +
+                $"{missingPathCount} path references unresolved."
+            );
+
             pendingPathEntries.Clear();
         }
 
@@ -2928,11 +2955,113 @@ namespace TS
 
         private void CheckForPath(TSObject obj, GameObject go)
         {
-            if (obj == null || go == null) return;
-            string pathName = NormalizeMissionObjectName(obj.GetField("Path"));
-            if (string.IsNullOrEmpty(pathName)) return;
+            if (obj == null || go == null)
+                return;
 
-            pendingPathEntries.Add(new PendingPathEntry { gameObject = go, pathName = pathName });
+            string pathName = NormalizeMissionObjectName(obj.GetField("Path"));
+
+            if (string.IsNullOrEmpty(pathName))
+                return;
+
+            Vector3? initialPathPosition = null;
+            Quaternion? initialPathRotation = null;
+            Vector3? initialPathScale = null;
+
+            // =====================================================
+            // INITIAL PATH POSITION
+            //
+            // Torque format:
+            //
+            // x y z
+            // axisX axisY axisZ angle
+            //
+            // Example:
+            //
+            // -7 -3.82334 0.75 1 0 0 -90
+            // =====================================================
+
+            string initialPositionString = obj.GetField("initialPathPosition");
+
+            if (!string.IsNullOrWhiteSpace(initialPositionString))
+            {
+                float[] parts = ParseVectorString(initialPositionString);
+
+                if (parts.Length >= 7)
+                {
+                    Vector3 position = ConvertPoint(
+                        new float[]
+                        {
+                    parts[0],
+                    parts[1],
+                    parts[2]
+                        }
+                    );
+
+                    float[] rotationParts =
+                    {
+                parts[3],
+                parts[4],
+                parts[5],
+                parts[6]
+            };
+
+                    Quaternion rotation = ConvertRotation(rotationParts);
+
+                    initialPathPosition = position;
+                    initialPathRotation = rotation;
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"Object '{obj.Name}' has invalid initialPathPosition: " +
+                        $"'{initialPositionString}'. Expected 7 values.",
+                        go
+                    );
+                }
+            }
+
+            // =====================================================
+            // INITIAL PATH SCALE
+            // =====================================================
+
+            string initialScaleString = obj.GetField("initialPathScale");
+
+            if (!string.IsNullOrWhiteSpace(initialScaleString))
+            {
+                float[] parts = ParseVectorString(initialScaleString);
+
+                if (parts.Length >= 3)
+                {
+                    initialPathScale = ConvertScale(
+                        new float[]
+                        {
+                    parts[0],
+                    parts[1],
+                    parts[2]
+                        }
+                    );
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"Object '{obj.Name}' has invalid initialPathScale: " +
+                        $"'{initialScaleString}'. Expected 3 values.",
+                        go
+                    );
+                }
+            }
+
+            pendingPathEntries.Add(
+                new PendingPathEntry
+                {
+                    gameObject = go,
+                    pathName = pathName,
+
+                    initialPathPosition = initialPathPosition,
+                    initialPathRotation = initialPathRotation,
+                    initialPathScale = initialPathScale
+                }
+            );
         }
 
         private void RegisterImportedObject(TSObject obj, GameObject go, Quaternion additionalRotation = default, bool offset = false)

@@ -37,18 +37,31 @@ public class PathMover : MonoBehaviour
 
     public string NextNode => pathFollower != null ? pathFollower.NextNodeName : null;
 
-    public void InitializePath(string nodeName, PathManager manager, bool fromField = true)
+    public void InitializePath(
+    string nodeName,
+    PathManager manager,
+    bool fromField = true,
+    Vector3? initialPathPosition = null,
+    Quaternion? initialPathRotation = null,
+    Vector3? initialPathScale = null
+)
     {
         if (manager == null)
         {
-            Debug.LogWarning($"PathMover on '{name}': " + "PathManager is null.", this);
+            Debug.LogWarning(
+                $"PathMover on '{name}': PathManager is null.",
+                this
+            );
 
             return;
         }
 
         if (string.IsNullOrWhiteSpace(nodeName))
         {
-            Debug.LogWarning($"PathMover on '{name}': " + "Path name is empty.", this);
+            Debug.LogWarning(
+                $"PathMover on '{name}': Path name is empty.",
+                this
+            );
 
             return;
         }
@@ -56,7 +69,8 @@ public class PathMover : MonoBehaviour
         if (!manager.TryGetNode(nodeName, out PathNode node))
         {
             Debug.LogWarning(
-                $"PathMover on '{name}': " + $"Could not find path node '{nodeName}'.",
+                $"PathMover on '{name}': " +
+                $"Could not find path node '{nodeName}'.",
                 this
             );
 
@@ -71,7 +85,14 @@ public class PathMover : MonoBehaviour
         // activated by a PathTrigger.
         triggerControlled = !fromField;
 
-        pathFollower = new GameObjectPathFollower(gameObject, firstNodeName, pathManager);
+        pathFollower = new GameObjectPathFollower(
+            gameObject,
+            firstNodeName,
+            pathManager,
+            initialPathPosition,
+            initialPathRotation,
+            initialPathScale
+        );
 
         pathActive = true;
     }

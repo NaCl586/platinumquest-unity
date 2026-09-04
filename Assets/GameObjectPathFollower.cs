@@ -52,14 +52,35 @@ public class GameObjectPathFollower
         public Vector3 scale;
     }
 
-    public GameObjectPathFollower(GameObject target, string firstNodeName, PathManager pathManager)
+    public GameObjectPathFollower(
+    GameObject target,
+    string firstNodeName,
+    PathManager pathManager,
+    Vector3? initialPathPosition = null,
+    Quaternion? initialPathRotation = null,
+    Vector3? initialPathScale = null
+)
     {
         this.target = target;
         this.pathManager = pathManager;
 
-        initialPosition = target.transform.position;
-        initialRotation = target.transform.rotation;
-        initialScale = target.transform.localScale;
+        initialPosition =
+            initialPathPosition ?? target.transform.position;
+
+        initialRotation =
+            initialPathRotation ?? target.transform.rotation;
+
+        initialScale =
+            initialPathScale ?? target.transform.localScale;
+
+        // Make the actual GameObject start at the
+        // specified initial path transform.
+        target.transform.SetPositionAndRotation(
+            initialPosition,
+            initialRotation
+        );
+
+        target.transform.localScale = initialScale;
 
         previousPosition = initialPosition;
         previousRotation = initialRotation;
@@ -71,14 +92,24 @@ public class GameObjectPathFollower
         prevNodeName = currentNodeName;
 
         rngCursor = UnityEngine.Random.Range(0, 256);
-        PathFollowerState state = EvaluateTransform(currentNodeName, prevNodeName, 0f);
+
+        PathFollowerState state =
+            EvaluateTransform(
+                currentNodeName,
+                prevNodeName,
+                0f
+            );
 
         if (state != null)
         {
             frameStartState = state;
             frameEndState = CloneState(state);
 
-            ApplyState(state.position, state.rotation, state.scale);
+            ApplyState(
+                state.position,
+                state.rotation,
+                state.scale
+            );
         }
     }
 
