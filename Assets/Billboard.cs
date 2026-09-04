@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Collections;
 
 public class Billboard : MonoBehaviour
 {
@@ -6,7 +8,18 @@ public class Billboard : MonoBehaviour
 
     private void Start()
     {
-        cam = CameraController.instance.GetComponent<Camera>();
+        StartCoroutine(WaitUntilCameraFound());
+    }
+
+    IEnumerator WaitUntilCameraFound()
+    {
+        yield return null;
+
+        while (cam == null)
+        {
+            cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+            yield return null;
+        }
     }
 
     private void LateUpdate()

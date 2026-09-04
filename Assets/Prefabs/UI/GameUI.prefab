@@ -3082,8 +3082,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
   canvas: {fileID: 1535437742724973689}
-  maxRadarDistance: 500
-  maxVisibleGems: 25
+  maxRadarDistance: 250
+  maxVisibleRadarItems: 25
   gemRadarIcons:
   - {fileID: 21300000, guid: ddd2c92e4c2994d46a1a4fa841034837, type: 3}
   - {fileID: 21300000, guid: 39d559d2418b3f946911b40c1e83a237, type: 3}
@@ -3115,11 +3115,12 @@ MonoBehaviour:
   teleporterIcon: {fileID: 21300000, guid: 9d85cd7e1b6a0774a9f2271288b36230, type: 3}
   timeTravelIcon: {fileID: 21300000, guid: d9714b1f67dbc424ea3470453c586fc8, type: 3}
   ellipseScreenFraction: {x: 0.9, y: 0.9}
-  gemIconSize: {x: 24, y: 21.33333}
-  endPadIconSize: {x: 32, y: 32}
-  checkpointIconSize: {x: 32, y: 32}
-  cannonIconSize: {x: 32, y: 32}
-  powerupIconSize: {x: 32, y: 32}
+  gemIconSize: {x: 16, y: 16}
+  endPadIconSize: {x: 16, y: 16}
+  checkpointIconSize: {x: 16, y: 16}
+  cannonIconSize: {x: 16, y: 16}
+  powerupIconSize: {x: 16, y: 16}
+  timeTravelIconSize: {x: 16, y: 16}
   pointerSize: {x: 60, y: 60}
   pointerAlpha: 1
 --- !u!1 &1772334355037591066

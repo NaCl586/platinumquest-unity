@@ -25,11 +25,11 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Darkness: 0.059
+    - _Darkness: 0.336
     - _DistortionScale: 12
-    - _DistortionSpeed: 1
-    - _DistortionStrength: 0.008
-    - _Intensity: 0
+    - _DistortionSpeed: 1.19
+    - _DistortionStrength: 0.0183
+    - _Intensity: 1
     m_Colors:
-    - _Tint: {r: 0.05, g: 0.35, b: 0.45, a: 1}
+    - _Tint: {r: 0, g: 0.31631523, b: 0.4245283, a: 1}
   m_BuildTextureStacks: []

@@ -17,6 +17,9 @@ public class Bubble : Powerups
         if (!isActive)
             return;
 
+        if (Marble.instance.BubbleInfinite)
+            return;
+
         Marble marble = FindFirstObjectByType<Marble>();
 
         if (marble == null)

@@ -78,6 +78,7 @@ public class Marble : MonoBehaviour
     [SerializeField] private float bubbleTime;
     [SerializeField] private float bubbleTotalTime;
     [SerializeField] private bool bubbleInfinite;
+    public bool BubbleInfinite => bubbleInfinite;
     private List<PhysicsAttributeOverride> bubblePhysicsLayer;
 
     [Header("Bubble Audio")]
@@ -287,7 +288,20 @@ public class Marble : MonoBehaviour
         }
 
         if (IsInWater())
+        {
+            WaterPhysicsTrigger trigger =
+                WaterPhysicsTrigger.GetClosestTrigger(this);
+
+            // Bubble particles are visible only when the entire
+            // marble is below the water surface.
+            SetBubbleParticle(IsFullySubmerged(trigger));
+
             UpdateWaterPhysics();
+        }
+        else
+        {
+            SetBubbleParticle(false);
+        }
     }
 
     public void LateUpdate()
@@ -418,7 +432,7 @@ public class Marble : MonoBehaviour
 
             lastWaterTrigger = trigger;
 
-            SetBubbleParticle(true);
+            SetBubbleParticle(IsFullySubmerged(trigger));
 
             EnterWater();
 
@@ -474,6 +488,38 @@ public class Marble : MonoBehaviour
 
         // Play the splash while the exact trigger is still known.
         PlayWaterSplash(trigger, "Exit");
+    }
+
+    private bool IsFullySubmerged(WaterPhysicsTrigger trigger = null)
+    {
+        if (trigger == null)
+            trigger = WaterPhysicsTrigger.GetClosestTrigger(this);
+
+        if (trigger == null)
+            return false;
+
+        Collider waterCollider = trigger.GetComponent<Collider>();
+
+        if (waterCollider == null)
+            return false;
+
+        SphereCollider sphereCollider = GetComponent<SphereCollider>();
+
+        if (sphereCollider == null)
+            return false;
+
+        float maxScale = Mathf.Max(
+            Mathf.Abs(transform.lossyScale.x),
+            Mathf.Abs(transform.lossyScale.y),
+            Mathf.Abs(transform.lossyScale.z)
+        );
+
+        float radius = sphereCollider.radius * maxScale;
+
+        float waterSurfaceY = waterCollider.bounds.max.y;
+        float marbleTopY = transform.position.y + radius;
+
+        return marbleTopY <= waterSurfaceY;
     }
 
     private void SetBubbleParticle(bool active)
