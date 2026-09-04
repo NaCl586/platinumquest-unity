@@ -231,32 +231,79 @@ public class MissionInfo : MonoBehaviour
 
     private Sprite TryLoadMissionSprite(string basePath, string levelName)
     {
-        string[] supportedExtensions = { ".jpg", ".jpeg", ".png"};
+        string[] supportedExtensions = { ".jpg", ".jpeg", ".png" };
 
-        // Get all files in the target directory to perform a case-insensitive match
+        if (string.IsNullOrEmpty(basePath))
+        {
+            return null;
+        }
+
+        if (!Directory.Exists(basePath))
+        {
+            return null;
+        }
+
+        // Make sure levelName is just the filename, without an extension.
+        string cleanLevelName = Path.GetFileNameWithoutExtension(levelName);
+
         string imagePath = Directory.GetFiles(basePath)
             .FirstOrDefault(filePath =>
             {
                 string fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
                 string extension = Path.GetExtension(filePath);
 
-            // Compare level name and extension ignoring uppercase/lowercase differences
-            bool isNameMatch = string.Equals(fileNameWithoutExt, levelName, StringComparison.OrdinalIgnoreCase);
-                bool isExtensionSupported = supportedExtensions.Any(ext => string.Equals(ext, extension, StringComparison.OrdinalIgnoreCase));
+                bool isNameMatch = string.Equals(
+                    fileNameWithoutExt,
+                    cleanLevelName,
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+                bool isExtensionSupported = supportedExtensions.Any(
+                    ext => string.Equals(
+                        ext,
+                        extension,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
 
                 return isNameMatch && isExtensionSupported;
             });
 
         if (string.IsNullOrEmpty(imagePath))
+        {
             return null;
+        }
 
-        byte[] imageData = File.ReadAllBytes(imagePath);
-        Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        byte[] imageData;
+
+        try
+        {
+            imageData = File.ReadAllBytes(imagePath);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+
+        Texture2D tex = new Texture2D(
+            2,
+            2,
+            TextureFormat.RGBA32,
+            false
+        );
 
         if (!tex.LoadImage(imageData))
+        {
+            UnityEngine.Object.Destroy(tex);
             return null;
+        }
 
-        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+        return Sprite.Create(
+            tex,
+            new Rect(0, 0, tex.width, tex.height),
+            new Vector2(0.5f, 0.5f),
+            100f
+        );
     }
 
     private void ParseMissionData(

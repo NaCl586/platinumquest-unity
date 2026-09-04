@@ -29,8 +29,12 @@ public class IceShard : MonoBehaviour
     private AudioClip destroyedSound;
 
     public int Points { get; private set; }
+
     public Color messageColor;
     public string message;
+
+    // Controls whether the ambient particles are allowed to show.
+    public bool noParticles = false;
 
     private bool initialized;
 
@@ -211,10 +215,15 @@ public class IceShard : MonoBehaviour
 
     private void UpdateAmbientEffects()
     {
-        // Regular Ice Shards have ambient effects.
-        // Point Ice Shards do not.
+        // Ambient effects are shown only when:
+        //
+        // 1. This is a regular Ice Shard (Points == 0)
+        // 2. Particles are enabled
+        //
+        // Point Ice Shards never show ambient effects.
         bool showAmbientEffects =
-            Points == 0;
+            Points == 0 &&
+            !noParticles;
 
         SetParticleState(
             mistParticle,
@@ -225,6 +234,12 @@ public class IceShard : MonoBehaviour
             shineParticle,
             showAmbientEffects
         );
+    }
+
+    public void SetParticles(bool value)
+    {
+        noParticles = !value;
+        UpdateAmbientEffects();
     }
 
     private void SetParticleState(

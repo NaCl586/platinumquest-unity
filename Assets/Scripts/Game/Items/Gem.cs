@@ -46,16 +46,22 @@ public class Gem : MonoBehaviour
 
     public GameObject beam;
 
+    public ParticleSystem particle;
+
+    public bool noParticle;
+
     public void SetGemColor(string color)
     {
         if (string.IsNullOrWhiteSpace(color))
         {
             // No color specified -> choose a random gem color.
-            gemColorIndex = Random.Range(0, gemColors.Length);
+            gemColorIndex =
+                Random.Range(0, gemColors.Length);
         }
         else
         {
-            string colorName = color.Trim().ToLowerInvariant();
+            string colorName =
+                color.Trim().ToLowerInvariant();
 
             gemColorIndex = -1;
 
@@ -101,12 +107,18 @@ public class Gem : MonoBehaviour
             mrBottom.materials[0].mainTexture =
                 selectedTexture;
 
+        // --------------------------------------------------------
+        // Calculate the gem color
+        // --------------------------------------------------------
+
         Texture2D tex2D =
             selectedTexture as Texture2D;
 
         if (tex2D != null)
         {
-            gemColor = GetAverageColor(tex2D);
+            gemColor =
+                GetAverageColor(tex2D);
+
             gemColor.a = 1f;
         }
         else
@@ -114,12 +126,29 @@ public class Gem : MonoBehaviour
             gemColor = Color.white;
         }
 
-        if(GameManager.instance.GetGameMode<HuntMode>() != null)
+        // --------------------------------------------------------
+        // Particle
+        // --------------------------------------------------------
+
+        UpdateParticle();
+
+        // --------------------------------------------------------
+        // Hunt beam
+        // --------------------------------------------------------
+
+        if (GameManager.instance.GetGameMode<HuntMode>() != null)
         {
             beam.SetActive(true);
-            for(int i = 0; i < beam.transform.childCount; i++)
+
+            for (int i = 0;
+                 i < beam.transform.childCount;
+                 i++)
             {
-                var skinswapper = beam.transform.GetChild(i).GetComponent<SkinSwapper>();
+                var skinswapper =
+                    beam.transform
+                        .GetChild(i)
+                        .GetComponent<SkinSwapper>();
+
                 skinswapper.skinName = color;
                 skinswapper.ApplySkin();
             }
@@ -128,6 +157,27 @@ public class Gem : MonoBehaviour
         {
             beam.SetActive(false);
         }
+    }
+
+    // ============================================================
+    // Particle
+    // ============================================================
+
+    private void UpdateParticle()
+    {
+        if (particle == null)
+            return;
+
+        // noParticle completely disables the particle object.
+        particle.gameObject.SetActive(!noParticle);
+
+        if (noParticle)
+            return;
+
+        ParticleSystem.MainModule main =
+            particle.main;
+
+        main.startColor = gemColor;
     }
 
     private void SetGemType(Texture texture)
@@ -144,10 +194,11 @@ public class Gem : MonoBehaviour
         // Remove ".gem" if present.
         if (textureName.EndsWith(".gem"))
         {
-            textureName = textureName.Substring(
-                0,
-                textureName.Length - 4
-            );
+            textureName =
+                textureName.Substring(
+                    0,
+                    textureName.Length - 4
+                );
         }
 
         switch (textureName)
@@ -209,9 +260,12 @@ public class Gem : MonoBehaviour
 
     public Color GetAverageColor(Texture2D texture)
     {
-        Color[] pixels = texture.GetPixels();
+        Color[] pixels =
+            texture.GetPixels();
 
-        Vector3 total = Vector3.zero;
+        Vector3 total =
+            Vector3.zero;
+
         int count = 0;
 
         foreach (Color pixel in pixels)
@@ -240,12 +294,14 @@ public class Gem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Transform mesh = transform.Find("Mesh");
+        Transform mesh =
+            transform.Find("Mesh");
 
         if (mesh == null)
             return;
 
-        Quaternion rot = mesh.rotation;
+        Quaternion rot =
+            mesh.rotation;
 
         mesh.rotation =
             Quaternion.AngleAxis(

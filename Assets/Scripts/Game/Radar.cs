@@ -6,142 +6,235 @@ using UnityEngine.UI;
 public class Radar : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField]
-    private Camera playerCamera;
-
-    [SerializeField]
-    private Canvas canvas;
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private Canvas canvas;
 
     [Header("Radar Limits & Filtering")]
-    [Tooltip("Maximum distance from the camera a gem can be to show up on the radar.")]
-    [SerializeField]
-    private float maxRadarDistance = 500f;
+    [Tooltip("Maximum distance from the camera for radar targets.")]
+    [SerializeField] private float maxRadarDistance = 500f;
 
-    [Tooltip(
-        "Maximum number of closest gems to show on the radar at once " +
-        "(like original MB $Radar::MaxDots = 25). Set to 0 for unlimited."
-    )]
-    [SerializeField]
-    private int maxVisibleGems;
+    [Tooltip("Maximum total number of visible items on the radar. Set to 0 for unlimited.")]
+    [SerializeField] private int maxVisibleRadarItems = 25;
 
     [Header("Radar Icons")]
     [Tooltip("Must match the order of Gem.gemColors.")]
-    [SerializeField]
-    private Sprite[] gemRadarIcons;
+    [SerializeField] private Sprite[] gemRadarIcons;
+    [SerializeField] private Sprite endPadIcon;
+    [SerializeField] private Sprite checkpointIcon;
+    [SerializeField] private Sprite pointerIcon;
 
-    [SerializeField]
-    private Sprite endPadIcon;
+    [Header("Cannon Radar Icons")]
+    [SerializeField] private Sprite cannonIcon;
+    [SerializeField] private Sprite cannonLowIcon;
+    [SerializeField] private Sprite cannonMidIcon;
+    [SerializeField] private Sprite cannonHighIcon;
 
-    [SerializeField]
-    private Sprite pointerIcon;
+    [Header("Powerup Radar Icons")]
+    [SerializeField] private Sprite anvilIcon;
+    [SerializeField] private Sprite bubbleIcon;
+    [SerializeField] private Sprite fireballIcon;
+    [SerializeField] private Sprite gravityModifierIcon;
+    [SerializeField] private Sprite shockAbsorberIcon;
+    [SerializeField] private Sprite superBounceIcon;
+    [SerializeField] private Sprite superJumpIcon;
+    [SerializeField] private Sprite superSpeedIcon;
+    [SerializeField] private Sprite teleporterIcon;
+    [SerializeField] private Sprite timeTravelIcon;
 
-    [Header("Radar Position")]
-    [SerializeField]
-    private Vector2 ellipseScreenFraction =
-        new Vector2(0.79f, 0.85f);
-
-    [Header("Icon Size")]
-    [SerializeField]
-    private Vector2 gemIconSize =
-        new Vector2(32f, 32f);
-
-    [SerializeField]
-    private Vector2 endPadIconSize =
-        new Vector2(32f, 32f);
+    [Header("Radar Position & Scaling")]
+    [SerializeField] private Vector2 ellipseScreenFraction = new Vector2(0.79f, 0.85f);
+    [SerializeField] private Vector2 gemIconSize = new Vector2(32f, 32f);
+    [SerializeField] private Vector2 endPadIconSize = new Vector2(32f, 32f);
+    [SerializeField] private Vector2 checkpointIconSize = new Vector2(32f, 32f);
+    [SerializeField] private Vector2 cannonIconSize = new Vector2(32f, 32f);
+    [SerializeField] private Vector2 powerupIconSize = new Vector2(32f, 32f);
 
     [Header("Pointer")]
-    [SerializeField]
-    private Vector2 pointerSize =
-        new Vector2(100f, 70f);
+    [SerializeField] private Vector2 pointerSize = new Vector2(100f, 70f);
+    [SerializeField, Range(0f, 1f)] private float pointerAlpha = 0.6f;
 
-    [SerializeField, Range(0f, 1f)]
-    private float pointerAlpha = 0.6f;
+    // ============================================================
+    // MARKER INTERFACE & IMPLS
+    // ============================================================
 
-    private class GemMarker
+    private interface IRadarMarker
+    {
+        float DistanceSqr { get; set; }
+        bool Render(
+            Camera cam,
+            Canvas canvas,
+            RectTransform canvasRect,
+            Vector2 ellipseFrac,
+            Vector2 ptrSize,
+            float ptrAlpha,
+            Sprite ptrIcon,
+            bool allowPointer);
+        void Hide();
+    }
+
+    private class GemMarker : IRadarMarker
     {
         public Gem gem;
         public Image icon;
         public Image pointer;
         public float distanceSqr;
+        public Sprite iconSprite;
+        public Vector2 iconSize;
+
+        public float DistanceSqr { get => distanceSqr; set => distanceSqr = value; }
+
+        public bool Render(
+            Camera cam,
+            Canvas canvas,
+            RectTransform canvasRect,
+            Vector2 ellipseFrac,
+            Vector2 ptrSize,
+            float ptrAlpha,
+            Sprite ptrIcon,
+            bool allowPointer)
+        {
+            if (gem == null)
+                return false;
+
+            Vector3 worldPos =
+                GetBoundsCenter(gem.gameObject);
+
+            Color ptrColor =
+                gem.gemColor;
+
+            // Gems are the only radar targets that use the
+            // off-screen directional pointer.
+            return UpdateTarget(
+                worldPos,
+                iconSprite,
+                ptrColor,
+                icon,
+                pointer,
+                iconSize,
+                ptrSize,
+                ptrAlpha,
+                ptrIcon,
+                true,
+                cam,
+                canvas,
+                canvasRect,
+                ellipseFrac);
+        }
+
+        public void Hide()
+        {
+            if (icon) icon.gameObject.SetActive(false);
+            if (pointer) pointer.gameObject.SetActive(false);
+        }
     }
 
-    private readonly List<GemMarker> gemMarkers =
-        new List<GemMarker>();
+    private class GenericMarker : IRadarMarker
+    {
+        public MonoBehaviour target;
+        public Image icon;
+        public Image pointer;
+        public float distanceSqr;
+        public Sprite iconSprite;
+        public Vector2 iconSize;
+        public Color pointerColor = Color.white;
 
-    private readonly List<GemMarker> validGemsBuffer =
-        new List<GemMarker>();
+        public float DistanceSqr { get => distanceSqr; set => distanceSqr = value; }
 
+        public bool Render(
+            Camera cam,
+            Canvas canvas,
+            RectTransform canvasRect,
+            Vector2 ellipseFrac,
+            Vector2 ptrSize,
+            float ptrAlpha,
+            Sprite ptrIcon,
+            bool allowPointer)
+        {
+            if (target == null)
+                return false;
+
+            Vector3 worldPos =
+                GetBoundsCenter(target.gameObject);
+
+            // Non-gem targets are icon-only. They never display
+            // the off-screen directional pointer.
+            return UpdateTarget(
+                worldPos,
+                iconSprite,
+                pointerColor,
+                icon,
+                pointer,
+                iconSize,
+                ptrSize,
+                ptrAlpha,
+                ptrIcon,
+                false,
+                cam,
+                canvas,
+                canvasRect,
+                ellipseFrac);
+        }
+
+        public void Hide()
+        {
+            if (icon) icon.gameObject.SetActive(false);
+            if (pointer) pointer.gameObject.SetActive(false);
+        }
+    }
+
+    // Marker tracking
+    private readonly List<GemMarker> gemMarkers = new List<GemMarker>();
+    private readonly List<GenericMarker> checkpointMarkers = new List<GenericMarker>();
+    private readonly List<GenericMarker> cannonMarkers = new List<GenericMarker>();
+    private readonly List<GenericMarker> powerupMarkers = new List<GenericMarker>();
+
+    // Unified buffer for PQ-style global distance limiting
+    private readonly List<IRadarMarker> globalValidBuffer = new List<IRadarMarker>();
+
+    // End Pad UI Elements
     private Image endPadIconImage;
     private Image endPadPointerImage;
 
+    // State
     private RectTransform canvasRect;
-
     private bool initialized;
-    private bool showingEndPad;
-
-    private const string RadarVisibleKey =
-        "RadarVisible";
-
     private bool radarVisible = true;
+    private const string RadarVisibleKey = "RadarVisible";
 
     private void Awake()
     {
         if (canvas != null)
-        {
-            canvasRect =
-                canvas.GetComponent<RectTransform>();
-        }
+            canvasRect = canvas.GetComponent<RectTransform>();
 
-        radarVisible =
-            PlayerPrefs.GetInt(
-                RadarVisibleKey,
-                1
-            ) == 1;
-
-        maxVisibleGems = PlayerPrefs.GetInt("Graphics_MaxRadarItems", 25);
+        radarVisible = PlayerPrefs.GetInt(RadarVisibleKey, 1) == 1;
+        maxVisibleRadarItems = PlayerPrefs.GetInt("Graphics_MaxRadarItems", 25);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(ControlBinding.instance.toggleRadar))
+        if (ControlBinding.instance != null && Input.GetKeyDown(ControlBinding.instance.toggleRadar))
         {
-            radarVisible =
-                !radarVisible;
-
-            PlayerPrefs.SetInt(
-                RadarVisibleKey,
-                radarVisible ? 1 : 0
-            );
-
+            radarVisible = !radarVisible;
+            PlayerPrefs.SetInt(RadarVisibleKey, radarVisible ? 1 : 0);
             PlayerPrefs.Save();
 
-            if (!radarVisible)
-            {
-                HideEverything();
-            }
+            if (!radarVisible) HideEverything();
         }
     }
 
     private void LateUpdate()
     {
-        if (!radarVisible)
-            return;
+        if (!radarVisible || GameManager.instance == null) return;
 
-        if (GameManager.instance == null)
-            return;
+        if (playerCamera == null)
+            playerCamera = Camera.main;
 
-        if (playerCamera == null ||
-            canvas == null)
-            return;
+        if (playerCamera == null || canvas == null) return;
 
         if (!initialized)
         {
-            if (GameManager.instance.Gems == null)
-                return;
-
-            InitializeGemMarkers();
-            InitializeEndPadMarkers();
-
+            if (GameManager.instance.Gems == null) return;
+            InitializeMarkers();
             initialized = true;
         }
 
@@ -151,655 +244,628 @@ public class Radar : MonoBehaviour
             return;
         }
 
-        Gem[] gems = GameManager.instance.Gems;
+        globalValidBuffer.Clear();
 
-        // Determine whether there are actually any active gems.
-        bool hasActiveGems = false;
+        // 1. Mission Flags Check
+        bool radarGems = RadarContainsAny("gems", "gem");
+        bool radarEndPad = RadarContainsAny("endpad", "end_pad");
+        bool radarCheckpoints = RadarContainsAny("checkpoint", "checkpoints");
 
-        if (gems != null)
+        bool radarCannon = RadarContainsAny("cannon", "cannons", "defaultcannon", "cannon_custom");
+        bool radarCannonLow = RadarContainsAny("cannon_low");
+        bool radarCannonMid = RadarContainsAny("cannon_mid");
+        bool radarCannonHigh = RadarContainsAny("cannon_high");
+
+        bool radarPowerups = RadarContainsAny("powerups", "powerup");
+        bool radarAnvil = RadarContainsAny("anvil", "anvilitem");
+        bool radarBubble = RadarContainsAny("bubble", "bubbleitem");
+        bool radarFireball = RadarContainsAny("fireball", "fireballitem");
+        bool radarGravityModifier = RadarContainsAny("gravitymodifier", "gravity_modifier", "antigravity");
+        bool radarShockAbsorber = RadarContainsAny("shockabsorber", "shock_absorber", "shockabsorberitem");
+        bool radarSuperBounce = RadarContainsAny("superbounce", "super_bounce", "superbounceitem");
+        bool radarSuperJump = RadarContainsAny("superjump", "super_jump", "superjumpitem");
+        bool radarSuperSpeed = RadarContainsAny("superspeed", "super_speed", "superspeeditem");
+        bool radarTeleporter = RadarContainsAny("teleporter", "teleport", "teleportitem");
+        bool radarTimeTravel = RadarContainsAny("timetravel", "time_travel", "timepenalty", "time_penalty", "sundial", "respawningtimetravel", "respawning_time_travel");
+
+        // 2. Gem Requirement Calculation
+        bool noGems = GameManager.instance.TotalGems <= 0;
+        bool allGemsCollected = GameManager.instance.CheckForAllGems();
+        bool quotaReached = MissionInfo.instance != null && MissionInfo.instance.gemQuota >= 0 && GameManager.instance.CurrentGems >= MissionInfo.instance.gemQuota;
+        bool gemRequirementSatisfied = noGems || allGemsCollected || quotaReached;
+
+        // 3. Collect active items into unified buffer
+        if (radarGems && !gemRequirementSatisfied) CollectGems(); else HideAllGemMarkers();
+        if (radarCheckpoints) CollectCheckpoints(); else HideAllCheckpointMarkers();
+
+        CollectCannons(radarCannon, radarCannonLow, radarCannonMid, radarCannonHigh);
+        CollectPowerups(radarPowerups, radarAnvil, radarBubble, radarFireball, radarGravityModifier, radarShockAbsorber, radarSuperBounce, radarSuperJump, radarSuperSpeed, radarTeleporter, radarTimeTravel);
+
+        // 4. PQ-style Global Limit Sorting
+        globalValidBuffer.Sort((a, b) => a.DistanceSqr.CompareTo(b.DistanceSqr));
+
+        int drawLimit = globalValidBuffer.Count;
+        if (maxVisibleRadarItems > 0 && drawLimit > maxVisibleRadarItems)
         {
-            foreach (Gem gem in gems)
+            for (int i = maxVisibleRadarItems; i < drawLimit; i++)
             {
-                if (gem != null && gem.gameObject.activeInHierarchy)
-                {
-                    hasActiveGems = true;
-                    break;
-                }
+                globalValidBuffer[i].Hide();
             }
+            drawLimit = maxVisibleRadarItems;
         }
 
-        bool allGemsCollected =
-            GameManager.instance.CheckForAllGems();
-
-        // Show the finish pad when:
-        // - there are no active gems, OR
-        // - all gems have been collected.
-        bool showFinishPad =
-            !hasActiveGems || allGemsCollected;
-
-        bool hasEndPad =
-            GameManager.instance.finishPad != null;
-
-        // --------------------------------------------------------
-        // GEMS
-        // --------------------------------------------------------
-
-        if (!showFinishPad)
+        // 5. Render visible items
+        for (int i = 0; i < drawLimit; i++)
         {
-            UpdateGems();
-        }
-        else
-        {
-            HideAllGemMarkers();
+            globalValidBuffer[i].Render(
+                playerCamera,
+                canvas,
+                canvasRect,
+                ellipseScreenFraction,
+                pointerSize,
+                pointerAlpha,
+                pointerIcon,
+                globalValidBuffer[i] is GemMarker);
         }
 
-        // --------------------------------------------------------
-        // END PAD
-        // --------------------------------------------------------
-
-        if (showFinishPad && hasEndPad)
+        // 6. Handle End Pad independently
+        bool hasEndPad = GameManager.instance.finishPad != null;
+        if (radarEndPad && gemRequirementSatisfied && hasEndPad)
         {
             UpdateEndPad();
         }
         else
         {
             HideEndPad();
-            showingEndPad = false;
         }
     }
 
     // ============================================================
-    // INITIALIZATION
+    // COLLECTION METHODS
     // ============================================================
 
-    private void InitializeGemMarkers()
+    private void CollectGems()
     {
-        Gem[] gems =
-            GameManager.instance.Gems;
+        Vector3 camPos = playerCamera.transform.position;
+        float maxSqr = maxRadarDistance * maxRadarDistance;
 
-        if (gems == null)
+        foreach (GemMarker m in gemMarkers)
+        {
+            if (m.gem == null || !m.gem.gameObject.activeInHierarchy) { m.Hide(); continue; }
+            float distSqr = (GetBoundsCenter(m.gem.gameObject) - camPos).sqrMagnitude;
+            if (distSqr > maxSqr) { m.Hide(); continue; }
+
+            int idx = m.gem.gemColorIndex;
+            if (gemRadarIcons == null || idx < 0 || idx >= gemRadarIcons.Length || gemRadarIcons[idx] == null)
+            {
+                m.Hide();
+                continue;
+            }
+
+            m.iconSprite = gemRadarIcons[idx];
+            m.iconSize = gemIconSize;
+            m.distanceSqr = distSqr;
+            globalValidBuffer.Add(m);
+        }
+    }
+
+    private void CollectCheckpoints()
+    {
+        Vector3 camPos = playerCamera.transform.position;
+        float maxSqr = maxRadarDistance * maxRadarDistance;
+
+        foreach (GenericMarker m in checkpointMarkers)
+        {
+            if (m.target == null || !m.target.gameObject.activeInHierarchy) { m.Hide(); continue; }
+            float distSqr = (GetBoundsCenter(m.target.gameObject) - camPos).sqrMagnitude;
+            if (distSqr > maxSqr) { m.Hide(); continue; }
+
+            m.iconSprite = checkpointIcon;
+            m.iconSize = checkpointIconSize;
+            m.distanceSqr = distSqr;
+            globalValidBuffer.Add(m);
+        }
+    }
+
+    private void CollectCannons(bool rCannon, bool rLow, bool rMid, bool rHigh)
+    {
+        if (!rCannon && !rLow && !rMid && !rHigh) { HideAllCannonMarkers(); return; }
+
+        Vector3 camPos = playerCamera.transform.position;
+        float maxSqr = maxRadarDistance * maxRadarDistance;
+
+        foreach (GenericMarker m in cannonMarkers)
+        {
+            Cannon cannon = m.target as Cannon;
+            if (cannon == null || !cannon.gameObject.activeInHierarchy) { m.Hide(); continue; }
+
+            string typeStr = (cannon.radarCannonType ?? "").Trim().ToLowerInvariant();
+            Sprite icon = cannonIcon;
+
+            if (typeStr == "cannon_low") { if (!rCannon && !rLow) { m.Hide(); continue; } icon = cannonLowIcon; }
+            else if (typeStr == "cannon_mid") { if (!rCannon && !rMid) { m.Hide(); continue; } icon = cannonMidIcon; }
+            else if (typeStr == "cannon_high") { if (!rCannon && !rHigh) { m.Hide(); continue; } icon = cannonHighIcon; }
+            else if (!rCannon) { m.Hide(); continue; }
+
+            float distSqr = (GetBoundsCenter(cannon.gameObject) - camPos).sqrMagnitude;
+            if (distSqr > maxSqr || icon == null) { m.Hide(); continue; }
+
+            m.iconSprite = icon;
+            m.iconSize = cannonIconSize;
+            m.distanceSqr = distSqr;
+            globalValidBuffer.Add(m);
+        }
+    }
+
+    private void CollectPowerups(bool rPow, bool rAnvil, bool rBubble, bool rFireball, bool rGrav, bool rShock, bool rBounce, bool rJump, bool rSpeed, bool rTele, bool rTime)
+    {
+        if (!rPow && !rAnvil && !rBubble && !rFireball && !rGrav && !rShock && !rBounce && !rJump && !rSpeed && !rTele && !rTime)
+        {
+            HideAllPowerupMarkers();
             return;
-
-        foreach (Gem gem in gems)
-        {
-            if (gem == null)
-                continue;
-
-            GemMarker marker =
-                new GemMarker();
-
-            marker.gem =
-                gem;
-
-            marker.icon =
-                CreateImage(
-                    "Radar Gem Icon"
-                );
-
-            marker.pointer =
-                CreateImage(
-                    "Radar Gem Pointer"
-                );
-
-            marker.pointer.preserveAspect =
-                true;
-
-            marker.icon.gameObject.SetActive(false);
-            marker.pointer.gameObject.SetActive(false);
-
-            gemMarkers.Add(marker);
         }
-    }
 
-    private void InitializeEndPadMarkers()
-    {
-        endPadIconImage =
-            CreateImage(
-                "Radar End Pad Icon"
-            );
+        Vector3 camPos = playerCamera.transform.position;
+        float maxSqr = maxRadarDistance * maxRadarDistance;
 
-        endPadPointerImage =
-            CreateImage(
-                "Radar End Pad Pointer"
-            );
+        foreach (GenericMarker m in powerupMarkers)
+        {
+            if (m.target == null ||
+                !m.target.gameObject.activeInHierarchy)
+            {
+                m.Hide();
+                continue;
+            }
 
-        endPadPointerImage.preserveAspect =
-            true;
+            // Powerups remain in the scene after being collected.
+            // Powerups.isActive is the real pickup/respawn state.
+            Powerups powerup =
+                m.target as Powerups;
 
-        endPadIconImage.gameObject.SetActive(false);
-        endPadPointerImage.gameObject.SetActive(false);
-    }
+            if (powerup == null)
+                powerup =
+                    m.target.GetComponent<Powerups>();
 
-    private Image CreateImage(
-        string objectName)
-    {
-        GameObject obj =
-            new GameObject(
-                objectName
-            );
+            if (powerup == null ||
+                !powerup.isActive)
+            {
+                m.Hide();
+                continue;
+            }
 
-        obj.transform.SetParent(
-            transform,
-            false
-        );
+            string name = m.target.GetType().Name;
+            Sprite icon = null;
+            bool allowed = rPow;
 
-        Image image =
-            obj.AddComponent<Image>();
+            if (Matches(name, "Anvil", "AnvilItem")) { allowed |= rAnvil; icon = anvilIcon; }
+            else if (Matches(name, "Bubble", "BubbleItem")) { allowed |= rBubble; icon = bubbleIcon; }
+            else if (Matches(name, "Fireball", "FireballItem")) { allowed |= rFireball; icon = fireballIcon; }
+            else if (Matches(name, "GravityModifier", "AntiGravity", "AntiGravityItem")) { allowed |= rGrav; icon = gravityModifierIcon; }
+            else if (Matches(name, "ShockAbsorber", "ShockAbsorberItem")) { allowed |= rShock; icon = shockAbsorberIcon; }
+            else if (Matches(name, "SuperBounce", "SuperBounceItem")) { allowed |= rBounce; icon = superBounceIcon; }
+            else if (Matches(name, "SuperJump", "SuperJumpItem")) { allowed |= rJump; icon = superJumpIcon; }
+            else if (Matches(name, "SuperSpeed", "SuperSpeedItem")) { allowed |= rSpeed; icon = superSpeedIcon; }
+            else if (Matches(name, "Teleporter", "TeleporterItem", "TeleportItem")) { allowed |= rTele; icon = teleporterIcon; }
+            else if (Matches(name, "TimeTravel", "TimeTravelItem", "RespawningTimeTravel", "RespawningTimeTravelItem", "TimePenalty", "TimePenaltyItem", "Sundial", "SundialItem")) { allowed |= rTime; icon = timeTravelIcon; }
 
-        image.raycastTarget =
-            false;
+            if (!allowed || icon == null) { m.Hide(); continue; }
 
-        return image;
+            float distSqr = (GetBoundsCenter(m.target.gameObject) - camPos).sqrMagnitude;
+            if (distSqr > maxSqr) { m.Hide(); continue; }
+
+            m.iconSprite = icon;
+            m.iconSize = powerupIconSize;
+            m.distanceSqr = distSqr;
+            globalValidBuffer.Add(m);
+        }
     }
 
     // ============================================================
-    // GEM RADAR
-    // ============================================================
-
-    private void UpdateGems()
-    {
-        Vector3 cameraPos =
-            playerCamera.transform.position;
-
-        float maxDistSqr =
-            maxRadarDistance *
-            maxRadarDistance;
-
-        validGemsBuffer.Clear();
-
-        // --------------------------------------------------------
-        // Collect uncollected gems within radar distance.
-        // --------------------------------------------------------
-
-        foreach (GemMarker marker in gemMarkers)
-        {
-            Gem gem =
-                marker.gem;
-
-            if (gem == null ||
-                !gem.gameObject.activeInHierarchy)
-            {
-                HideMarker(marker);
-                continue;
-            }
-
-            Vector3 gemPos =
-                GetGemWorldPosition(gem);
-
-            float distSqr =
-                (gemPos - cameraPos).sqrMagnitude;
-
-            if (distSqr > maxDistSqr)
-            {
-                HideMarker(marker);
-                continue;
-            }
-
-            marker.distanceSqr =
-                distSqr;
-
-            validGemsBuffer.Add(
-                marker
-            );
-        }
-
-        // --------------------------------------------------------
-        // Closest gems first.
-        // --------------------------------------------------------
-
-        validGemsBuffer.Sort(
-            (a, b) =>
-                a.distanceSqr.CompareTo(
-                    b.distanceSqr
-                )
-        );
-
-        // --------------------------------------------------------
-        // Maximum radar dot count.
-        // --------------------------------------------------------
-
-        int gemsToRenderCount =
-            validGemsBuffer.Count;
-
-        if (maxVisibleGems > 0 &&
-            gemsToRenderCount > maxVisibleGems)
-        {
-            for (
-                int i = maxVisibleGems;
-                i < gemsToRenderCount;
-                i++)
-            {
-                HideMarker(
-                    validGemsBuffer[i]
-                );
-            }
-
-            gemsToRenderCount =
-                maxVisibleGems;
-        }
-
-        // --------------------------------------------------------
-        // Render active gem markers.
-        // --------------------------------------------------------
-
-        for (
-            int i = 0;
-            i < gemsToRenderCount;
-            i++)
-        {
-            GemMarker marker =
-                validGemsBuffer[i];
-
-            Gem gem =
-                marker.gem;
-
-            int index =
-                gem.gemColorIndex;
-
-            if (index < 0 ||
-                index >= gemRadarIcons.Length)
-            {
-                HideMarker(marker);
-                continue;
-            }
-
-            Sprite gemIcon =
-                gemRadarIcons[index];
-
-            if (gemIcon == null)
-            {
-                HideMarker(marker);
-                continue;
-            }
-
-            Color pointerColor =
-                gem.gemColor;
-
-            UpdateTarget(
-                GetGemWorldPosition(gem),
-                gemIcon,
-                pointerColor,
-                marker.icon,
-                marker.pointer,
-                gemIconSize
-            );
-        }
-    }
-
-    private Vector3 GetGemWorldPosition(
-        Gem gem)
-    {
-        Collider collider =
-            gem.GetComponent<Collider>();
-
-        if (collider != null)
-            return collider.bounds.center;
-
-        return gem.transform.position;
-    }
-
-    // ============================================================
-    // END PAD RADAR
+    // UTILITIES & RENDERING
     // ============================================================
 
     private void UpdateEndPad()
     {
-        if (!showingEndPad)
-        {
-            HideAllGemMarkers();
-            showingEndPad = true;
-        }
+        GameObject finishPad = GameManager.instance.finishPad;
+        if (finishPad == null) { HideEndPad(); return; }
 
-        GameObject finishPad =
-            GameManager.instance.finishPad;
-
-        // No active finish pad.
-        if (finishPad == null)
-        {
-            HideEndPad();
-            showingEndPad = false;
-            return;
-        }
-
-        // --------------------------------------------------------
-        // Distance check.
-        // --------------------------------------------------------
-
-        Vector3 padPos =
-            finishPad.transform.position;
-
-        float distSqr =
-            (padPos -
-             playerCamera.transform.position).sqrMagnitude;
-
-        if (distSqr >
-            maxRadarDistance *
-            maxRadarDistance)
+        Vector3 padPos = GetBoundsCenter(finishPad);
+        if ((padPos - playerCamera.transform.position).sqrMagnitude > maxRadarDistance * maxRadarDistance)
         {
             HideEndPad();
             return;
         }
-
-        Color endPadPointerColor =
-            new Color32(
-                0xE6,
-                0xE6,
-                0xE6,
-                0xFF
-            );
 
         UpdateTarget(
             padPos,
             endPadIcon,
-            endPadPointerColor,
+            new Color32(0xE6, 0xE6, 0xE6, 0xFF),
             endPadIconImage,
             endPadPointerImage,
-            endPadIconSize
-        );
+            endPadIconSize,
+            pointerSize,
+            pointerAlpha,
+            pointerIcon,
+            false,
+            playerCamera,
+            canvas,
+            canvasRect,
+            ellipseScreenFraction);
     }
 
-    // ============================================================
-    // TARGET
-    // ============================================================
-
-    private void UpdateTarget(
-        Vector3 worldPosition,
+    private static bool UpdateTarget(
+        Vector3 worldPos,
         Sprite icon,
-        Color pointerColor,
-        Image iconImage,
-        Image pointerImage,
-        Vector2 iconSize)
+        Color ptrColor,
+        Image iconImg,
+        Image ptrImg,
+        Vector2 iconSize,
+        Vector2 ptrSize,
+        float ptrAlpha,
+        Sprite ptrIcon,
+        bool allowPointer,
+        Camera cam,
+        Canvas canvas,
+        RectTransform canvasRect,
+        Vector2 ellipseFrac)
     {
-        if (icon == null)
+        if (iconImg == null ||
+            ptrImg == null ||
+            canvas == null ||
+            canvasRect == null ||
+            cam == null)
         {
-            iconImage.gameObject.SetActive(false);
-            pointerImage.gameObject.SetActive(false);
-            return;
+            return false;
         }
 
-        Vector3 screenPosition =
-            playerCamera.WorldToScreenPoint(
-                worldPosition
-            );
+        iconImg.sprite = icon;
+        ptrImg.sprite = ptrIcon;
 
-        Vector3 viewport =
-            playerCamera.WorldToViewportPoint(
-                worldPosition
-            );
+        Vector3 screenPos =
+            cam.WorldToScreenPoint(worldPos);
+
+        Vector3 vp =
+            cam.WorldToViewportPoint(worldPos);
 
         bool visible =
-            viewport.z > 0f &&
-            viewport.x >= 0f &&
-            viewport.x <= 1f &&
-            viewport.y >= 0f &&
-            viewport.y <= 1f;
+            vp.z > 0f &&
+            vp.x >= 0f &&
+            vp.x <= 1f &&
+            vp.y >= 0f &&
+            vp.y <= 1f;
 
         if (visible)
         {
-            ShowIcon(
-                iconImage,
-                icon,
-                screenPosition,
-                iconSize
-            );
+            if (icon == null)
+            {
+                iconImg.gameObject.SetActive(false);
+                ptrImg.gameObject.SetActive(false);
+                return false;
+            }
 
-            pointerImage.gameObject.SetActive(false);
+            iconImg.sprite = icon;
+            iconImg.color = Color.white;
+
+            iconImg.rectTransform.sizeDelta =
+                iconSize;
+
+            SetUIPos(
+                iconImg.rectTransform,
+                screenPos,
+                canvas,
+                canvasRect);
+
+            iconImg.rectTransform.rotation =
+                Quaternion.identity;
+
+            iconImg.gameObject.SetActive(true);
+            ptrImg.gameObject.SetActive(false);
+
+            return true;
         }
-        else
+
+        // Hide the normal icon whenever the target is off-screen.
+        iconImg.gameObject.SetActive(false);
+
+        // Only gems are allowed to use the off-screen pointer.
+        // All other target types remain completely hidden.
+        ptrImg.gameObject.SetActive(false);
+
+        if (!allowPointer ||
+            ptrIcon == null)
         {
-            iconImage.gameObject.SetActive(false);
-
-            ShowPointer(
-                pointerImage,
-                screenPosition,
-                pointerColor
-            );
+            return false;
         }
-    }
 
-    // ============================================================
-    // ICON
-    // ============================================================
-
-    private void ShowIcon(
-        Image image,
-        Sprite sprite,
-        Vector3 screenPosition,
-        Vector2 size)
-    {
-        image.sprite =
-            sprite;
-
-        image.color =
-            Color.white;
-
-        image.rectTransform.sizeDelta =
-            size;
-
-        SetUIPosition(
-            image.rectTransform,
-            screenPosition
-        );
-
-        image.rectTransform.rotation =
-            Quaternion.identity;
-
-        image.gameObject.SetActive(true);
-    }
-
-    // ============================================================
-    // POINTER
-    // ============================================================
-
-    private void ShowPointer(
-        Image pointer,
-        Vector3 screenPosition,
-        Color pointerColor)
-    {
         Vector2 screenSize =
             new Vector2(
                 Screen.width,
-                Screen.height
-            );
+                Screen.height);
 
-        Vector2 screenCenter =
-            screenSize * 0.5f;
-
-        Vector2 projectedPosition =
+        Vector2 dir =
             new Vector2(
-                screenPosition.x,
-                screenPosition.y
-            );
+                screenPos.x,
+                screenPos.y) -
+            (screenSize * 0.5f);
 
-        Vector2 direction =
-            projectedPosition -
-            screenCenter;
+        if (screenPos.z < 0f)
+            dir *= -1f;
 
-        bool behindCamera =
-            screenPosition.z < 0f;
-
-        if (direction.sqrMagnitude <
-            0.0001f)
-        {
-            direction =
-                Vector2.up;
-        }
-        else
-        {
-            direction.Normalize();
-        }
-
-        if (behindCamera)
-            direction *= -1f;
+        dir =
+            dir.sqrMagnitude < 0.0001f
+                ? Vector2.up
+                : dir.normalized;
 
         float theta =
-            Mathf.Atan2(
-                direction.y,
-                direction.x
-            );
+            Mathf.Atan2(dir.y, dir.x);
 
-        Vector2 ellipsePosition =
+        Vector2 ellipsePos =
             new Vector2(
                 screenSize.x *
-                (
-                    ellipseScreenFraction.x *
-                    Mathf.Cos(theta) +
-                    1f
-                ) / 2f,
-
+                    (ellipseFrac.x *
+                        Mathf.Cos(theta) + 1f) *
+                    0.5f,
                 screenSize.y *
-                (
-                    ellipseScreenFraction.y *
-                    Mathf.Sin(theta) +
-                    1f
-                ) / 2f
+                    (ellipseFrac.y *
+                        Mathf.Sin(theta) + 1f) *
+                    0.5f
             );
 
-        float angle =
-            Mathf.Atan2(
-                direction.y,
-                direction.x
-            ) *
-            Mathf.Rad2Deg;
-
-        pointer.sprite =
-            pointerIcon;
-
-        pointer.color =
+        ptrImg.sprite = ptrIcon;
+        ptrImg.color =
             new Color(
-                pointerColor.r,
-                pointerColor.g,
-                pointerColor.b,
-                pointerAlpha
-            );
+                ptrColor.r,
+                ptrColor.g,
+                ptrColor.b,
+                ptrAlpha);
 
-        pointer.rectTransform.sizeDelta =
-            pointerSize;
+        ptrImg.rectTransform.sizeDelta =
+            ptrSize;
 
-        SetUIPosition(
-            pointer.rectTransform,
-            ellipsePosition
-        );
+        SetUIPos(
+            ptrImg.rectTransform,
+            ellipsePos,
+            canvas,
+            canvasRect);
 
-        pointer.rectTransform.rotation =
+        ptrImg.rectTransform.rotation =
             Quaternion.Euler(
                 0f,
                 0f,
-                angle
-            );
+                theta * Mathf.Rad2Deg);
 
-        pointer.gameObject.SetActive(true);
+        ptrImg.gameObject.SetActive(true);
+
+        return true;
     }
 
-    // ============================================================
-    // UI POSITION
-    // ============================================================
-
-    private void SetUIPosition(
-        RectTransform rect,
-        Vector3 screenPosition)
+    private static void SetUIPos(RectTransform rect, Vector3 screenPos, Canvas canvas, RectTransform canvasRect)
     {
-        Camera uiCamera = null;
-
-        if (canvas.renderMode !=
-            RenderMode.ScreenSpaceOverlay)
-        {
-            uiCamera =
-                canvas.worldCamera;
-        }
-
-        if (
-            RectTransformUtility
-                .ScreenPointToLocalPointInRectangle(
-                    canvasRect,
-                    screenPosition,
-                    uiCamera,
-                    out Vector2 localPoint
-                )
-        )
-        {
-            rect.anchoredPosition =
-                localPoint;
-        }
+        Camera uiCamera = canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPos, uiCamera, out Vector2 localPoint))
+            rect.anchoredPosition = localPoint;
     }
 
-    // ============================================================
-    // HIDING
-    // ============================================================
-
-    private void HideMarker(
-        GemMarker marker)
+    private static Vector3 GetBoundsCenter(GameObject obj)
     {
-        marker.icon.gameObject.SetActive(false);
-        marker.pointer.gameObject.SetActive(false);
+        if (obj == null) return Vector3.zero;
+        Collider col = obj.GetComponent<Collider>();
+        return col != null ? col.bounds.center : obj.transform.position;
     }
 
-    private void HideAllGemMarkers()
+    private bool Matches(string input, params string[] options)
     {
-        foreach (GemMarker marker in gemMarkers)
-        {
-            HideMarker(marker);
-        }
+        foreach (string opt in options)
+            if (string.Equals(input, opt, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
     }
 
-    private void HideEndPad()
+    private bool RadarContainsAny(
+        params string[] flags)
     {
-        if (endPadIconImage != null)
+        if (MissionInfo.instance == null)
+            return false;
+
+        // MBP uses CustomRadarRule for these flags.
+        // Fall back to Radar for older/plain-text missions.
+        string radarRule =
+            !string.IsNullOrWhiteSpace(
+                MissionInfo.instance.customRadarRule)
+                ? MissionInfo.instance.customRadarRule
+                : MissionInfo.instance.radar;
+
+        if (string.IsNullOrWhiteSpace(radarRule))
+            return false;
+
+        foreach (string flag in flags)
         {
-            endPadIconImage.gameObject.SetActive(false);
+            if (string.IsNullOrWhiteSpace(flag))
+                continue;
+
+            string normalizedFlag =
+                flag.Trim().ToLowerInvariant();
+
+            string mbpFlag = null;
+
+            switch (normalizedFlag)
+            {
+                case "gem":
+                case "gems":
+                    mbpFlag = "$Radar::Flags::Gems";
+                    break;
+
+                case "timetravel":
+                case "time_travel":
+                case "timepenalty":
+                case "time_penalty":
+                case "sundial":
+                case "respawningtimetravel":
+                case "respawning_time_travel":
+                    mbpFlag = "$Radar::Flags::TimeTravels";
+                    break;
+
+                case "endpad":
+                case "end_pad":
+                    mbpFlag = "$Radar::Flags::EndPad";
+                    break;
+
+                case "checkpoint":
+                case "checkpoints":
+                    mbpFlag = "$Radar::Flags::Checkpoints";
+                    break;
+
+                case "cannon":
+                case "cannons":
+                case "defaultcannon":
+                case "cannon_custom":
+                case "cannon_low":
+                case "cannon_mid":
+                case "cannon_high":
+                    mbpFlag = "$Radar::Flags::Cannons";
+                    break;
+
+                case "powerup":
+                case "powerups":
+                case "anvil":
+                case "anvilitem":
+                case "bubble":
+                case "bubbleitem":
+                case "fireball":
+                case "fireballitem":
+                case "gravitymodifier":
+                case "gravity_modifier":
+                case "antigravity":
+                case "shockabsorber":
+                case "shock_absorber":
+                case "shockabsorberitem":
+                case "superbounce":
+                case "super_bounce":
+                case "superbounceitem":
+                case "superjump":
+                case "super_jump":
+                case "superjumpitem":
+                case "superspeed":
+                case "super_speed":
+                case "superspeeditem":
+                case "teleporter":
+                case "teleport":
+                case "teleportitem":
+                    mbpFlag = "$Radar::Flags::Powerups";
+                    break;
+            }
+
+            if (mbpFlag != null &&
+                radarRule.IndexOf(
+                    mbpFlag,
+                    StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            // Also support simple Unity/plain-text radar rules.
+            string[] activeFlags =
+                radarRule.Split(
+                    new[]
+                    {
+                        ' ',
+                        ',',
+                        ';',
+                        '|',
+                        '\t',
+                        '\r',
+                        '\n'
+                    },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string active in activeFlags)
+            {
+                string cleaned =
+                    active.Trim()
+                        .TrimStart('$')
+                        .Replace(
+                            "Radar::Flags::",
+                            "")
+                        .Replace(
+                            "Radar.Flags.",
+                            "")
+                        .ToLowerInvariant();
+
+                if (cleaned == normalizedFlag)
+                    return true;
+            }
         }
 
-        if (endPadPointerImage != null)
-        {
-            endPadPointerImage.gameObject.SetActive(false);
-        }
+        return false;
     }
+
+    private Image CreateImage(string name)
+    {
+        GameObject obj = new GameObject(name);
+        obj.transform.SetParent(transform, false);
+        Image img = obj.AddComponent<Image>();
+        img.raycastTarget = false;
+        return img;
+    }
+
+    private void InitializeMarkers()
+    {
+        if (GameManager.instance.Gems != null)
+        {
+            foreach (Gem g in GameManager.instance.Gems)
+            {
+                if (!g) continue;
+                GemMarker m = new GemMarker { gem = g, icon = CreateImage("Gem Icon"), pointer = CreateImage("Gem Pointer") };
+                m.pointer.preserveAspect = true; m.Hide(); gemMarkers.Add(m);
+            }
+        }
+
+        foreach (Checkpoint c in FindObjectsOfType<Checkpoint>(true))
+        {
+            GenericMarker m = new GenericMarker { target = c, icon = CreateImage("CP Icon"), pointer = CreateImage("CP Pointer") };
+            m.pointer.preserveAspect = true; m.Hide(); checkpointMarkers.Add(m);
+        }
+
+        foreach (Cannon c in FindObjectsOfType<Cannon>(true))
+        {
+            GenericMarker m = new GenericMarker { target = c, icon = CreateImage("Cannon Icon"), pointer = CreateImage("Cannon Pointer") };
+            m.pointer.preserveAspect = true; m.Hide(); cannonMarkers.Add(m);
+        }
+
+        foreach (MonoBehaviour b in FindObjectsOfType<MonoBehaviour>(true))
+        {
+            if (b == null) continue;
+            string n = b.GetType().Name;
+            if (Matches(n, "Anvil", "AnvilItem", "Bubble", "BubbleItem", "Fireball", "FireballItem", "GravityModifier", "AntiGravity", "AntiGravityItem", "ShockAbsorber", "ShockAbsorberItem", "SuperBounce", "SuperBounceItem", "SuperJump", "SuperJumpItem", "SuperSpeed", "SuperSpeedItem", "Teleporter", "TeleporterItem", "TeleportItem", "TimeTravel", "TimeTravelItem", "RespawningTimeTravel", "RespawningTimeTravelItem", "TimePenalty", "TimePenaltyItem", "Sundial", "SundialItem"))
+            {
+                GenericMarker m = new GenericMarker { target = b, icon = CreateImage("Powerup Icon"), pointer = CreateImage("Powerup Pointer") };
+                m.pointer.preserveAspect = true; m.Hide(); powerupMarkers.Add(m);
+            }
+        }
+
+        endPadIconImage = CreateImage("EndPad Icon");
+        endPadPointerImage = CreateImage("EndPad Pointer");
+        endPadPointerImage.preserveAspect = true;
+        HideEndPad();
+    }
+
+    private void HideAllGemMarkers() { foreach (var m in gemMarkers) m.Hide(); }
+    private void HideAllCheckpointMarkers() { foreach (var m in checkpointMarkers) m.Hide(); }
+    private void HideAllCannonMarkers() { foreach (var m in cannonMarkers) m.Hide(); }
+    private void HideAllPowerupMarkers() { foreach (var m in powerupMarkers) m.Hide(); }
+    private void HideEndPad() { if (endPadIconImage) endPadIconImage.gameObject.SetActive(false); if (endPadPointerImage) endPadPointerImage.gameObject.SetActive(false); }
 
     private void HideEverything()
     {
-        HideAllGemMarkers();
-        HideEndPad();
-        showingEndPad = false;
+        HideAllGemMarkers(); HideAllCheckpointMarkers(); HideAllCannonMarkers(); HideAllPowerupMarkers(); HideEndPad();
     }
-
-    // ============================================================
-    // CLEANUP
-    // ============================================================
 
     private void OnDestroy()
     {
-        foreach (GemMarker marker in gemMarkers)
-        {
-            if (marker.icon != null)
-            {
-                Destroy(
-                    marker.icon.gameObject
-                );
-            }
-
-            if (marker.pointer != null)
-            {
-                Destroy(
-                    marker.pointer.gameObject
-                );
-            }
-        }
-
-        gemMarkers.Clear();
-        validGemsBuffer.Clear();
-
-        if (endPadIconImage != null)
-        {
-            Destroy(
-                endPadIconImage.gameObject
-            );
-        }
-
-        if (endPadPointerImage != null)
-        {
-            Destroy(
-                endPadPointerImage.gameObject
-            );
-        }
+        foreach (var m in gemMarkers) { if (m.icon) Destroy(m.icon.gameObject); if (m.pointer) Destroy(m.pointer.gameObject); }
+        foreach (var m in checkpointMarkers) { if (m.icon) Destroy(m.icon.gameObject); if (m.pointer) Destroy(m.pointer.gameObject); }
+        foreach (var m in cannonMarkers) { if (m.icon) Destroy(m.icon.gameObject); if (m.pointer) Destroy(m.pointer.gameObject); }
+        foreach (var m in powerupMarkers) { if (m.icon) Destroy(m.icon.gameObject); if (m.pointer) Destroy(m.pointer.gameObject); }
+        if (endPadIconImage) Destroy(endPadIconImage.gameObject);
+        if (endPadPointerImage) Destroy(endPadPointerImage.gameObject);
     }
 }

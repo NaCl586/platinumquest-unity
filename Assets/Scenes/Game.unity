@@ -534,6 +534,7 @@ MonoBehaviour:
   bassPunch: {fileID: 8300000, guid: eaf31113c95f37b45926b33bd70aa365, type: 3}
   platformSurpriseSfx: {fileID: 8300000, guid: c3ddb49c8fb0e904e8de62c71a7958eb, type: 3}
   helpTutorialSfx: {fileID: 8300000, guid: 0adda215a8ae8e948aee466c67ba31ce, type: 3}
+  fireballBlast: {fileID: 8300000, guid: 6f86170ec6cfa4d44897c0eb09ffa3ce, type: 3}
   pauseMenu: {fileID: 2617693736690512310}
   finishMenu: {fileID: 2617693738300280073}
   enterNameMenu: {fileID: 2617693737966993587}

@@ -33,8 +33,14 @@ public class Marble : MonoBehaviour
     public GameObject bubble;
     public GameObject frozenIce;
 
+    //particles
     public GameObject bounceParticle;
-    [SerializeField] private ParticleSystem trailParticle;
+    public ParticleSystem trailParticle;
+    public ParticleSystem bubbleParticle;
+    public GameObject waterSplash;
+    public GameObject fireballParticle;
+    public GameObject fireballBlastParticle;
+
     public float trailSpeedThreshold = 10f;
 
     public Movement movement;
@@ -64,6 +70,7 @@ public class Marble : MonoBehaviour
 
     // Water State
     private bool wasInWater;
+    private WaterPhysicsTrigger lastWaterTrigger;
     private List<PhysicsAttributeOverride> waterPhysicsLayer;
 
     // Bubble State
@@ -125,6 +132,14 @@ public class Marble : MonoBehaviour
     private readonly Dictionary<string, float> physicsBaseValues =
         new Dictionary<string, float>();
 
+    // Per-marble PhysMod time scale.
+    // 1.0 = normal speed. Other values are supplied by the PhysMod.
+    private float physicsTimeScale = 1f;
+    private float cameraSpeedMultiplier = 1f;
+
+    public float PhysicsTimeScale => physicsTimeScale;
+    public float CameraSpeedMultiplier => cameraSpeedMultiplier;
+
     // Gyrocopter state guard/cooldown.
     // Prevents duplicate UseGyrocopter/CancelGyrocopter calls from
     // stacking gravity changes or repeatedly starting/stopping audio.
@@ -157,6 +172,7 @@ public class Marble : MonoBehaviour
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
+
         Transform sounds = transform.Find("Sounds");
         if (sounds != null)
         {
@@ -167,6 +183,7 @@ public class Marble : MonoBehaviour
                 if (bubbleUseAudio != null) bubbleUseAudio.loop = true;
             }
         }
+
     }
 
     private void Update()
@@ -227,7 +244,7 @@ public class Marble : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(ControlBinding.instance.blast)) 
+        if (Input.GetKeyDown(ControlBinding.instance.blast))
             FireBlast();
 
         UpdateFireball();
@@ -389,21 +406,27 @@ public class Marble : MonoBehaviour
         }
     }
 
+    // Called when the marble's overall water-trigger state changes.
     public void OnWaterTriggerChanged()
     {
         bool inWater = IsInWater();
 
         if (inWater && !wasInWater)
         {
-            WaterPhysicsTrigger trigger = WaterPhysicsTrigger.GetClosestTrigger(this);
+            WaterPhysicsTrigger trigger =
+                WaterPhysicsTrigger.GetClosestTrigger(this);
+
+            lastWaterTrigger = trigger;
+
+            SetBubbleParticle(true);
+
+            EnterWater();
 
             if (trigger != null && movement != null)
             {
                 movement.marbleVelocity *=
                     1f - trigger.GetVelocityMultiplier();
             }
-
-            EnterWater();
 
             waterPhysicsLayer = PushPhysicsLayer(
                 BuildWaterPhysicsLayer()
@@ -412,6 +435,8 @@ public class Marble : MonoBehaviour
 
         if (!inWater && wasInWater)
         {
+            SetBubbleParticle(false);
+
             if (isUsingBubble)
                 DeactivateBubble();
 
@@ -420,9 +445,153 @@ public class Marble : MonoBehaviour
                 PopPhysicsLayer(waterPhysicsLayer);
                 waterPhysicsLayer = null;
             }
+
+            lastWaterTrigger = null;
         }
 
         wasInWater = inWater;
+    }
+
+    // Called directly by WaterPhysicsTrigger only for a real physical
+    // trigger entry. Teleports/state refreshes never call this method.
+    public void OnWaterTriggerEntered(WaterPhysicsTrigger trigger)
+    {
+        if (trigger == null)
+            return;
+
+        lastWaterTrigger = trigger;
+
+        // Play the splash before OnWaterTriggerChanged() modifies velocity.
+        PlayWaterSplash(trigger, "Enter");
+    }
+
+    // Called directly by WaterPhysicsTrigger only for a real physical
+    // trigger exit. Teleports/state refreshes never call this method.
+    public void OnWaterTriggerExited(WaterPhysicsTrigger trigger)
+    {
+        if (trigger == null)
+            return;
+
+        // Play the splash while the exact trigger is still known.
+        PlayWaterSplash(trigger, "Exit");
+    }
+
+    private void SetBubbleParticle(bool active)
+    {
+        if (bubbleParticle == null)
+            return;
+
+        if (active)
+        {
+            if (!bubbleParticle.gameObject.activeSelf)
+                bubbleParticle.gameObject.SetActive(true);
+
+            if (!bubbleParticle.isPlaying)
+                bubbleParticle.Play();
+        }
+        else
+        {
+            if (bubbleParticle.isPlaying)
+            {
+                bubbleParticle.Stop(
+                    true,
+                    ParticleSystemStopBehavior.StopEmittingAndClear
+                );
+            }
+
+            if (bubbleParticle.gameObject.activeSelf)
+                bubbleParticle.gameObject.SetActive(false);
+        }
+    }
+
+    private void PlayWaterSplash(WaterPhysicsTrigger trigger, string debug)
+    {
+        // Consume the respawn suppression flag immediately.
+        // This prevents isRespawn from becoming permanently stuck if
+        // the splash cannot be played for another reason.
+        bool suppressSplash = isRespawn;
+        isRespawn = false;
+
+        if (suppressSplash)
+            return;
+
+        if (waterSplash == null || trigger == null)
+            return;
+
+        Collider waterCollider = trigger.GetComponent<Collider>();
+
+        if (waterCollider == null)
+            return;
+
+        Bounds bounds = waterCollider.bounds;
+
+        Vector3 position = transform.position;
+
+        // Find the distance from the marble to each face of the cube.
+        float distanceLeft = Mathf.Abs(position.x - bounds.min.x);
+        float distanceRight = Mathf.Abs(bounds.max.x - position.x);
+        float distanceBottom = Mathf.Abs(position.y - bounds.min.y);
+        float distanceTop = Mathf.Abs(bounds.max.y - position.y);
+        float distanceBack = Mathf.Abs(position.z - bounds.min.z);
+        float distanceFront = Mathf.Abs(bounds.max.z - position.z);
+
+        float minDistance = distanceLeft;
+        Vector3 normal = Vector3.left;
+
+        if (distanceRight < minDistance)
+        {
+            minDistance = distanceRight;
+            normal = Vector3.right;
+        }
+
+        if (distanceBottom < minDistance)
+        {
+            minDistance = distanceBottom;
+            normal = Vector3.down;
+        }
+
+        if (distanceTop < minDistance)
+        {
+            minDistance = distanceTop;
+            normal = Vector3.up;
+        }
+
+        if (distanceBack < minDistance)
+        {
+            minDistance = distanceBack;
+            normal = Vector3.back;
+        }
+
+        if (distanceFront < minDistance)
+        {
+            minDistance = distanceFront;
+            normal = Vector3.forward;
+        }
+
+        GameObject splash = Instantiate(
+            waterSplash,
+            transform.position,
+            Quaternion.FromToRotation(Vector3.up, normal) *
+            Quaternion.Euler(-90f, 0f, 0f)
+        );
+
+        splash.name = "Water Splash " + debug;
+
+        ParticleSystem particleSystem =
+            splash.GetComponent<ParticleSystem>();
+
+        if (particleSystem != null)
+        {
+            Destroy(
+                splash,
+                particleSystem.main.duration +
+                particleSystem.main.startLifetime.constantMax
+            );
+        }
+        else
+        {
+            Destroy(splash, 2f);
+        }
     }
 
     private List<PhysicsAttributeOverride> BuildWaterPhysicsLayer()
@@ -466,6 +635,8 @@ public class Marble : MonoBehaviour
         );
     }
 
+    private bool firstRespawn = true;
+    private bool isRespawn = false;
     private bool IsInWater() => WaterPhysicsTrigger.IsMarbleInWater(this);
 
     private void PlayBubbleEndSound()
@@ -870,6 +1041,14 @@ public class Marble : MonoBehaviour
 
     public void Respawn()
     {
+        // The first initialization/respawn is not considered a normal
+        // player-triggered respawn for water-splash suppression.
+        isRespawn = !firstRespawn;
+        firstRespawn = false;
+
+        SetBubbleParticle(false);
+        lastWaterTrigger = null;
+
         DeactivateBubble();
         DeactivateFireball();
 
@@ -905,6 +1084,7 @@ public class Marble : MonoBehaviour
         PhysModTrigger.ForgetAllMarbleLayers(this);
 
         wasInWater = false;
+        lastWaterTrigger = null;
         waterPhysicsLayer = null;
         bubblePhysicsLayer = null;
 
@@ -917,7 +1097,7 @@ public class Marble : MonoBehaviour
         PhysModTrigger.RefreshAllTriggers(this);
         WaterPhysicsTrigger.RefreshMarbleWaterState(this);
     }
-    
+
     void UnfreezeTrue() => Unfreeze(true);
 
     public void PlaySound(PowerupType _powerup)
@@ -1152,6 +1332,9 @@ public class Marble : MonoBehaviour
         fireballStartTime = Time.time;
         fireballTotalTime = time;
 
+        if (fireballParticle != null)
+            fireballParticle.SetActive(true);
+
         if (isUsingBubble)
         {
             GameUIManager.instance.SetBubbleTimer(-1, bubbleTotalTime);
@@ -1161,14 +1344,26 @@ public class Marble : MonoBehaviour
 
     public void DeactivateFireball()
     {
+        if (blastParticle)
+        {
+            Destroy(blastParticle.gameObject);
+            blastParticle = null;
+        }
+
         fireball = false;
         fireballTime = 0f;
         fireballStartTime = 0f;
+
+        if (fireballParticle != null)
+            fireballParticle.SetActive(false);
     }
 
     private void UpdateFireball()
     {
         if (!fireball) return;
+
+        if (blastParticle != null)
+            blastParticle.transform.position = transform.position;
 
         GameUIManager.instance.SetFireballTimer(GetFireballTime(), fireballTotalTime);
 
@@ -1194,7 +1389,7 @@ public class Marble : MonoBehaviour
     }
 
     public bool canBlast => (Time.time > nextFireBlastTime && GetFireballTime() > 1f);
-
+    GameObject blastParticle;
     public void FireBlast()
     {
         if (!fireball) return;
@@ -1208,6 +1403,10 @@ public class Marble : MonoBehaviour
         float impulseStrength = (blastAmount > 1f ? blastAmount : Mathf.Sqrt(blastAmount)) * 10f;
 
         movement.marbleVelocity += -GravitySystem.GravityDir.normalized * impulseStrength;
+
+        blastParticle = Instantiate(fireballBlastParticle, transform.position, Quaternion.identity);
+        GameManager.instance.PlayFireballBlastSfx();
+        Destroy(blastParticle.gameObject, 1f);
 
         float radius = blastAmount * 1.5f + 1.5f;
         Collider[] hits = Physics.OverlapSphere(transform.position, radius);
@@ -1422,6 +1621,13 @@ public class Marble : MonoBehaviour
             case "trailspeedthreshold":
                 value = trailSpeedThreshold;
                 return true;
+
+            case "timescale":
+                value = physicsTimeScale;
+                return true;
+            case "cameraspeedmultiplier":
+                value = cameraSpeedMultiplier;
+                return true;
         }
 
         return false;
@@ -1495,6 +1701,13 @@ public class Marble : MonoBehaviour
             case "trailspeedthreshold":
                 trailSpeedThreshold = value;
                 return true;
+
+            case "timescale":
+                physicsTimeScale = Mathf.Max(0f, value);
+                return true;
+            case "cameraspeedmultiplier":
+                cameraSpeedMultiplier = Mathf.Max(0f, value);
+                return true;
         }
 
         Debug.LogWarning(
@@ -1535,7 +1748,8 @@ public class Marble : MonoBehaviour
             "minbouncevel",
             "bouncerestitution",
             "bounce",
-            "trailspeedthreshold"
+            "trailspeedthreshold",
+            "timescale"
         };
 
         foreach (string attribute in attributes)

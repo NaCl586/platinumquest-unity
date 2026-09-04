@@ -367,12 +367,12 @@ namespace TS
         private void ImportSun(TSObject obj)
         {
             var direction = ConvertDirection(ParseVectorString(obj.GetField("direction")));
-            sunColor = ParseVectorString(obj.GetField("color"));
-            var ambient = ParseVectorString(obj.GetField("ambient"));
+            //sunColor = ParseVectorString(obj.GetField("color"));
+            //var ambient = ParseVectorString(obj.GetField("ambient"));
 
             directionalLight.transform.localRotation = direction;
-            directionalLight.color = new Color(sunColor[0], sunColor[1], sunColor[2], 1f);
-            RenderSettings.ambientLight = new Color(ambient[0], ambient[1], ambient[2], 1f);
+            //directionalLight.color = new Color(sunColor[0], sunColor[1], sunColor[2], 1f);
+            //RenderSettings.ambientLight = new Color(ambient[0], ambient[1], ambient[2], 1f);
         }
 
         private void ImportItem(TSObject obj)
@@ -380,7 +380,7 @@ namespace TS
             string objectName = obj.GetField("dataBlock");
 
             if (objectName.StartsWith("GemItem", StringComparison.OrdinalIgnoreCase) ||
-    objectName.StartsWith("FancyGemItem", StringComparison.OrdinalIgnoreCase))
+                objectName.StartsWith("FancyGemItem", StringComparison.OrdinalIgnoreCase))
             {
                 bool isFancy =
                     objectName.StartsWith(
@@ -424,6 +424,8 @@ namespace TS
                     }
 
                     gem.SetGemColor(gemColor);
+
+                    gem.noParticle = ParseBoolField(obj, "noParticle", false);
                 }
 
                 RegisterImportedObject(
@@ -569,7 +571,7 @@ namespace TS
                 emitter.transform.rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
                 emitter.transform.localScale = Vector3.Scale(Vector3.one, ConvertScale(ParseVectorString(obj.GetField("scale"))));
 
-                //jangan lupa parse noParticles (bool)
+                emitter.transform.Find("particle").gameObject.SetActive(!ParseBoolField(obj, "noEmitters", false));
 
                 RegisterImportedObject(obj, emitter, Quaternion.Euler(-90f, 0f, 0f));
                 CheckForPath(obj, emitter);
@@ -701,6 +703,8 @@ namespace TS
                 if (!string.IsNullOrEmpty(skin))
                     gobj.GetComponent<IceShard>().SetSkin(skin);
 
+                gobj.GetComponent<IceShard>().noParticles = ParseBoolField(obj, "noParticles", false);
+
                 ApplySkins(gobj, obj.GetField("skin"));
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
                 CheckForPath(obj, gobj);
@@ -715,13 +719,13 @@ namespace TS
                 gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
 
                 var ductFan = gobj.GetComponent<DuctFan>();
-                if(hazardName == "SmallDuctFan")
+                if (hazardName == "SmallDuctFan")
                 {
                     ductFan.radius = 5f;
                     ductFan.strength = 10f;
                     ductFan.arc = 0.7f;
                 }
-                else if(hazardName == "VVDuctFan")
+                else if (hazardName == "VVDuctFan")
                 {
                     ductFan.radius = 9f;
                     ductFan.strength = 40f * 0.8f;
@@ -2308,6 +2312,10 @@ namespace TS
                 return;
             }
 
+            // Preserve the original Torque datablock so the radar can
+            // distinguish the specific cannon type later.
+            cannon.radarCannonType = objectName.ToLowerInvariant();
+
             var cpas = cannon.transform.Find("CPAS");
             cpas.parent = transform;
             gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
@@ -2531,6 +2539,8 @@ namespace TS
                 emitter.transform.position = worldCorners[i];
                 emitter.transform.rotation = Quaternion.identity;
                 emitter.transform.localScale = Vector3.one;
+
+                emitter.transform.Find("particle").gameObject.SetActive(!ParseBoolField(obj, "noEmitters", false));
             }
         }
 
@@ -3469,8 +3479,8 @@ namespace TS
             GameManager.instance.SetSoundVolumes();
             GameManager.instance.PlayLevelMusic();
 
-            directionalLight.GetComponent<Light>().shadows = PlayerPrefs.GetInt("Graphics_Shadow", 1) == 1 ? LightShadows.Soft : LightShadows.None;
-            directionalLight.intensity *= (sunColor != null && sunColor.Length >= 3) ? Mathf.Max(sunColor[0], sunColor[1], sunColor[2]) : 1f;
+            //directionalLight.GetComponent<Light>().shadows = PlayerPrefs.GetInt("Graphics_Shadow", 1) == 1 ? LightShadows.Soft : LightShadows.None;
+            //directionalLight.intensity *= (sunColor != null && sunColor.Length >= 3) ? Mathf.Max(sunColor[0], sunColor[1], sunColor[2]) : 1f;
 
             Scene loadingScene = SceneManager.GetSceneByName("Loading");
             if (loadingScene.IsValid() && loadingScene.isLoaded)
@@ -3484,7 +3494,7 @@ namespace TS
             GameUIManager.instance.GetComponent<Canvas>().enabled = true;
 
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false; 
+            Cursor.visible = false;
 
             Marble.instance.GetComponent<SphereCollider>().enabled = true;
             Invoke(nameof(EnableSounds), 0.1f);

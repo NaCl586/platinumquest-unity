@@ -86,7 +86,9 @@ public class WaterPhysicsTrigger : MonoBehaviour
         if (marble == null)
             return;
 
-        if (!localOverlaps.TryGetValue(marble, out HashSet<Collider> overlaps))
+        if (!localOverlaps.TryGetValue(
+                marble,
+                out HashSet<Collider> overlaps))
         {
             overlaps = new HashSet<Collider>();
             localOverlaps.Add(marble, overlaps);
@@ -106,11 +108,18 @@ public class WaterPhysicsTrigger : MonoBehaviour
             activeWaterTriggers.Add(marble, triggers);
         }
 
+        bool wasAlreadyInWater = triggers.Count > 0;
+
         if (!triggers.Contains(this))
             triggers.Add(this);
 
+        // Only the first trigger entered is a real water entry.
+        // RefreshMarbleWaterState() never calls this method, so teleports
+        // into water do not produce a splash.
+        if (!wasAlreadyInWater)
+            marble.OnWaterTriggerEntered(this);
+
         marble.OnWaterTriggerChanged();
-        marble.EnterWater();
     }
 
     private void OnTriggerExit(Collider other)
@@ -137,8 +146,17 @@ public class WaterPhysicsTrigger : MonoBehaviour
 
         triggers.Remove(this);
 
+        // Only play an exit splash when this was the last water trigger.
+        // If another water trigger is still active, the marble is still
+        // in water and has not actually exited water yet.
         if (triggers.Count == 0)
+        {
+            // Tell the marble which exact trigger boundary was crossed
+            // before removing the final active trigger.
+            marble.OnWaterTriggerExited(this);
+
             activeWaterTriggers.Remove(marble);
+        }
 
         marble.OnWaterTriggerChanged();
     }

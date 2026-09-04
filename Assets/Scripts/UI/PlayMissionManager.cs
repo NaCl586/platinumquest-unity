@@ -431,7 +431,7 @@ public class PlayMissionManager : MonoBehaviour
             currentlySelectedType = Type.tutorial;
 
         string dif = currentlySelectedType.ToString();
-        categoryText.text = char.ToUpper(dif[0]) + dif.Substring(1);
+        categoryText.text = (currentlySelectedType == Type.dc) ? "Director's Cut" : char.ToUpper(dif[0]) + dif.Substring(1);
 
         LoadMissions(currentlySelectedType);
 
@@ -615,7 +615,7 @@ public class PlayMissionManager : MonoBehaviour
         }
 
         string dif = difficulty.ToString();
-        categoryText.text = char.ToUpper(dif[0]) + dif.Substring(1);
+        categoryText.text = (currentlySelectedType == Type.dc) ? "Director's Cut" : char.ToUpper(dif[0]) + dif.Substring(1);
 
         SetLevelInfo(ClampSelectedLevel());
     }

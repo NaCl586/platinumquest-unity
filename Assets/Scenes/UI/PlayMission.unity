@@ -17041,7 +17041,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: DC
+  m_text: Director's Cut
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0f758fc230a0cda44a50b76a5a7accfd, type: 2}
   m_sharedMaterial: {fileID: -641943365424412254, guid: 0f758fc230a0cda44a50b76a5a7accfd,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -383,8 +383,20 @@ public class Movement : MonoBehaviour
         if (angularSpeed <= 0.0000001f)
             return;
 
+        float physicsTimeScale = 1f;
+
+        if (Marble.instance != null)
+            physicsTimeScale =
+                Mathf.Max(0f, Marble.instance.PhysicsTimeScale);
+
+        if (physicsTimeScale <= 0f)
+            return;
+
         Quaternion rotation = Quaternion.AngleAxis(
-            Time.fixedDeltaTime * angularSpeed * Mathf.Rad2Deg,
+            Time.fixedDeltaTime
+                * physicsTimeScale
+                * angularSpeed
+                * Mathf.Rad2Deg,
             angularVelocity / angularSpeed
         );
 
@@ -430,7 +442,17 @@ public class Movement : MonoBehaviour
 
         wasCanMove = canMove;
 
-        float timeRemaining = Time.fixedDeltaTime;
+        // Apply the PhysMod timeScale only to this marble's custom physics.
+        // Do NOT use UnityEngine.Time.timeScale here, because that would
+        // affect the entire game.
+        float physicsTimeScale = 1f;
+
+        if (Marble.instance != null)
+            physicsTimeScale =
+                Mathf.Max(0f, Marble.instance.PhysicsTimeScale);
+
+        float timeRemaining =
+            Time.fixedDeltaTime * physicsTimeScale;
 
         // Keep the normal custom physics step, but subdivide further when
         // the marble is moving fast enough to travel a large distance in

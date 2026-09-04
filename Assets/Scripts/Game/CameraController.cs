@@ -58,6 +58,14 @@ public class CameraController : MonoBehaviour
     public bool IsCannonCameraActive => cannonCameraActive;
     public bool CameraInputLocked => cameraInputLocked;
 
+    private float GetCameraSpeedMultiplier()
+    {
+        if (Marble.instance == null)
+            return 1f;
+
+        return Mathf.Max(0f, Marble.instance.CameraSpeedMultiplier);
+    }
+
     // ============================================================
     // 2D Camera State
     // ============================================================
@@ -306,18 +314,18 @@ public class CameraController : MonoBehaviour
         if (!cameraInputLocked && !GameManager.gameFinish && Time.timeScale > 0.01f && !ReplayRecorder.loadReplay)
         {
             int invert = controls.invertMouseYAxis ? -1 : 1;
-            mouseX = Input.GetAxis("Mouse X") * controls.mouseSensitivity;
+            mouseX = Input.GetAxis("Mouse X") * controls.mouseSensitivity * GetCameraSpeedMultiplier();
 
             if (controls.alwaysFreeLook || Input.GetKey(controls.freelookKey))
             {
-                mouseY = Input.GetAxis("Mouse Y") * controls.mouseSensitivity * invert;
+                mouseY = Input.GetAxis("Mouse Y") * controls.mouseSensitivity * invert * GetCameraSpeedMultiplier();
             }
             else
             {
                 mouseY = 0f;
             }
 
-            float keyRotationStep = Time.deltaTime * 0.25f * 90f * controls.keyboardSensitivity;
+            float keyRotationStep = Time.deltaTime * 0.25f * 90f * controls.keyboardSensitivity * GetCameraSpeedMultiplier();
 
             if (Input.GetKey(controls.rotateCameraRight) || Input.GetKeyDown(controls.rotateCameraRight))
                 mouseX += keyRotationStep;

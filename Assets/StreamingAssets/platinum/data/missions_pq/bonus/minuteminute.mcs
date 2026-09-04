@@ -524,7 +524,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Turquoise";
 		};
 		new Item() {
@@ -535,7 +535,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Green";
 		};
 		new Item() {
@@ -546,7 +546,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Purple";
 		};
 		new Item() {
@@ -557,7 +557,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Turquoise";
 		};
 		new Item() {
@@ -568,7 +568,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Green";
 		};
 		new Item() {
@@ -579,7 +579,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Purple";
 		};
 		new Item() {
@@ -590,7 +590,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Platinum";
 		};
@@ -602,7 +602,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Yellow";
 		};
 		new Item() {
@@ -613,7 +613,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Red";
 		};
 		new Item() {
@@ -624,7 +624,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Blue";
 		};
 		new Item() {
@@ -635,7 +635,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Red";
 		};
 		new Item() {
@@ -646,7 +646,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Base";
 		};
 		new Item() {
@@ -657,7 +657,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Platinum";
 		};
 		new Item() {
@@ -668,7 +668,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Black";
 		};
@@ -680,7 +680,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Orange";
 		};
@@ -692,7 +692,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Orange";
 		};
@@ -704,7 +704,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Base";
 		};
@@ -716,7 +716,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Blue";
 		};
@@ -728,7 +728,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				noRespawn = "0";
 				skin = "Black";
 		};
@@ -740,7 +740,7 @@ new SimGroup(MissionGroup) {
 			collideable = "0";
 			static = "1";
 			rotate = "1";
-				noParticles = "0";
+				noParticles = "1";
 				skin = "Yellow";
 		};
 		new Item() {

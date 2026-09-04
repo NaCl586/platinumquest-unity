@@ -3097,10 +3097,29 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e004e082c57d7dc438891d7c8b555e8a, type: 3}
   - {fileID: 21300000, guid: f01ef9422666c3b40bd1672dee5b3f12, type: 3}
   endPadIcon: {fileID: 21300000, guid: 0eb3b2ad214cd3242a817fb3fafb95db, type: 3}
+  checkpointIcon: {fileID: 21300000, guid: 5b6a14ac58890f2428a62bf626df3ac0, type: 3}
   pointerIcon: {fileID: 21300000, guid: cfcb92afec6ebad49a11063f25b15b5a, type: 3}
+  cannonIcon: {fileID: 21300000, guid: 6be981addb0b7f5488a4812cd430fc00, type: 3}
+  cannonLowIcon: {fileID: 21300000, guid: be05508025de76341bf142f92e639b54, type: 3}
+  cannonMidIcon: {fileID: 21300000, guid: 667422f94b006d7419f017d1ac6d7a6c, type: 3}
+  cannonHighIcon: {fileID: 21300000, guid: 343121b7e095c8649910bec752f3e3cd, type: 3}
+  anvilIcon: {fileID: 21300000, guid: 8ceddc523479b5445ba924ef42ba4a04, type: 3}
+  bubbleIcon: {fileID: 21300000, guid: a4cc843bbc729be48b6f6131ce95cdbe, type: 3}
+  fireballIcon: {fileID: 21300000, guid: dab6ec86f459c2d44b9e2066648d56f1, type: 3}
+  gravityModifierIcon: {fileID: 21300000, guid: 7cf1e919620dfb34384c62c4b4d64ac8,
+    type: 3}
+  shockAbsorberIcon: {fileID: 21300000, guid: 6152f5ee80f0cc448974143bce653f92, type: 3}
+  superBounceIcon: {fileID: 21300000, guid: 4a13cca5139dfea469e31876c581a5b6, type: 3}
+  superJumpIcon: {fileID: 21300000, guid: d9eacceefcab00042bfac1e70ce7a934, type: 3}
+  superSpeedIcon: {fileID: 21300000, guid: d71b6a93b8fcd0941954e1a1f684f965, type: 3}
+  teleporterIcon: {fileID: 21300000, guid: 9d85cd7e1b6a0774a9f2271288b36230, type: 3}
+  timeTravelIcon: {fileID: 21300000, guid: d9714b1f67dbc424ea3470453c586fc8, type: 3}
   ellipseScreenFraction: {x: 0.9, y: 0.9}
   gemIconSize: {x: 24, y: 21.33333}
   endPadIconSize: {x: 32, y: 32}
+  checkpointIconSize: {x: 32, y: 32}
+  cannonIconSize: {x: 32, y: 32}
+  powerupIconSize: {x: 32, y: 32}
   pointerSize: {x: 60, y: 60}
   pointerAlpha: 1
 --- !u!1 &1772334355037591066

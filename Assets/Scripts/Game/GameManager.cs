@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Audio Clips")]
     [SerializeField] private AudioClip jump, puSpawn, puReady, puSet, puGo, puFinish, puOutOfBounds, puHelp, puMissingGems;
-    [SerializeField] private AudioClip checkpointSfx, overParTimeSfx, bassPunch, platformSurpriseSfx, helpTutorialSfx;
+    [SerializeField] private AudioClip checkpointSfx, overParTimeSfx, bassPunch, platformSurpriseSfx, helpTutorialSfx, fireballBlast;
 
     [Header("UI Menu")]
     public GameObject pauseMenu, finishMenu;
@@ -64,6 +64,11 @@ public class GameManager : MonoBehaviour
 
     private Coroutine alarmCoroutine;
     private bool isSubmitInProgress, startTimer, canPressEnter = true, huntRestartRequested;
+
+    // Pause temporarily forces Unity's global timeScale to zero.
+    // Preserve the previous value so unpausing does not overwrite another
+    // system's global time scale.
+    private float timeScaleBeforePause = 1f;
     private int? serverRating;
 
     private string[] oobRandom, oobSpecial;
@@ -263,6 +268,7 @@ public class GameManager : MonoBehaviour
     public void PlayBassPunchAudio() => audioSource.PlayOneShot(bassPunch);
     public void PlayHelpTriggerAudio() => audioSource.PlayOneShot(helpTutorialSfx);
     public void PlayPlatformSurpriseSfx() => audioSource.PlayOneShot(platformSurpriseSfx);
+    public void PlayFireballBlastSfx() => audioSource.PlayOneShot(fireballBlast);
     public void PlayAudioClip(AudioClip clip) => audioSource.PlayOneShot(clip);
 
     public void PlayLevelMusic()
@@ -447,8 +453,24 @@ public class GameManager : MonoBehaviour
     public void TogglePause()
     {
         if (GameUIManager.instance.isInitialized && (GameUIManager.instance.oobInsultMenu.activeSelf || GameUIManager.instance.saveReplayMenu.activeSelf)) return;
-        isPaused = !isPaused;
-        Time.timeScale = isPaused ? 0f : 1f;
+
+        if (!isPaused)
+        {
+            // Remember the current global time scale before pausing.
+            // The marble's PhysMod timeScale is handled separately by
+            // Movement.cs and is therefore not lost here.
+            timeScaleBeforePause = Time.timeScale;
+            isPaused = true;
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            isPaused = false;
+
+            // Restore whatever global time scale was active before pause.
+            Time.timeScale = Mathf.Max(0f, timeScaleBeforePause);
+        }
+
         pauseMenu.SetActive(isPaused);
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isPaused;
@@ -603,8 +625,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            activeCheckpoint = startPad.transform.Find("Spawn"); 
-            activeCheckpointGravityDir = Vector3.down; 
+            activeCheckpoint = startPad.transform.Find("Spawn");
+            activeCheckpointGravityDir = Vector3.down;
             useCheckpoint = false;
         }
     }
@@ -630,11 +652,11 @@ public class GameManager : MonoBehaviour
 
     public void Respawn()
     {
-        if (!spawnAudioPlayed) 
-        { 
-            PlaySpawnAudio(); 
-            spawnAudioPlayed = true; 
-            StartCoroutine(ResetSpawnAudio()); 
+        if (!spawnAudioPlayed)
+        {
+            PlaySpawnAudio();
+            spawnAudioPlayed = true;
+            StartCoroutine(ResetSpawnAudio());
         }
         CancelInvoke();
 
@@ -648,7 +670,7 @@ public class GameManager : MonoBehaviour
         HuntMode huntMode = GetGameMode<HuntMode>();
         bool fullReset = huntMode != null ? huntRestartRequested : !useCheckpoint;
 
-        if (huntMode != null) 
+        if (huntMode != null)
             WasFullReset = fullReset;
 
         TotalTimeTracker.instance?.RecordRespawn();
@@ -662,7 +684,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if (huntMode == null) 
+            if (huntMode == null)
                 Marble.instance.InactivateTimeTravel();
 
             ForEachGameMode(mode => mode.OnRespawn());
@@ -908,7 +930,7 @@ public class GameManager : MonoBehaviour
         {
             TotalTimeTracker.instance?.StopLevelTracking();
 
-            if (OnlineManager.Instance?.Auth?.IsLoggedIn == true) 
+            if (OnlineManager.Instance?.Auth?.IsLoggedIn == true)
                 OnlineManager.Instance.Chat.SetStatus("Level Select").Forget();
 
             LoadSceneByAuth("PlayMission", "LBPlayMission");
@@ -1657,7 +1679,7 @@ public class GameManager : MonoBehaviour
         if (isHunt || (isMadness && !gotAllGems))
         {
             finalTime.text = leaderboardValue.ToString();
-            finalTimeCaption.text = "Your Score:"; 
+            finalTimeCaption.text = "Your Score:";
         }
         else
         {

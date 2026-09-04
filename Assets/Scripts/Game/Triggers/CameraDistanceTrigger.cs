@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -251,11 +252,77 @@ public class CameraDistanceTrigger : MonoBehaviour
                 states.Remove(marble);
         }
     }
-
     public void ResetTrigger()
     {
         previousDistances.Clear();
         states.Clear();
+
+        // If the marble is still inside this trigger after a restart/respawn,
+        // Unity may not fire OnTriggerEnter again.
+        //
+        // Restore the trigger's camera distance immediately rather than
+        // playing the normal transition animation.
+        Marble marble = Marble.instance;
+
+        if (marble == null || triggerCollider == null)
+            return;
+
+        if (!IsMarbleInsideTrigger(marble))
+            return;
+
+        StartCoroutine(ReapplyAfterReset(marble));
+    }
+
+    private bool IsMarbleInsideTrigger(Marble marble)
+    {
+        if (marble == null || triggerCollider == null)
+            return false;
+
+        Collider marbleCollider = marble.GetComponent<Collider>();
+
+        if (marbleCollider == null)
+            return triggerCollider.bounds.Contains(marble.transform.position);
+
+        return Physics.ComputePenetration(
+            marbleCollider,
+            marble.transform.position,
+            marble.transform.rotation,
+            triggerCollider,
+            triggerCollider.transform.position,
+            triggerCollider.transform.rotation,
+            out _,
+            out _
+        );
+    }
+
+    private IEnumerator ReapplyAfterReset(Marble marble)
+    {
+        // Wait one frame so the normal respawn/reset process can finish
+        // resetting the camera first.
+        yield return null;
+
+        if (marble == null || marble != Marble.instance)
+            yield break;
+
+        CameraController camera = CameraController.instance;
+
+        if (camera == null)
+            yield break;
+
+        if (!IsMarbleInsideTrigger(marble))
+            yield break;
+
+        float targetDistance = distance;
+
+        if (float.IsNaN(targetDistance))
+            targetDistance = 2.5f;
+
+        // Immediately restore the trigger distance.
+        // Do NOT use StartTransition() here.
+        SetCameraDistance(camera, targetDistance);
+
+        // Store the resulting distance as the current previous distance.
+        previousDistances[marble] = targetDistance;
     }
 
     private void OnDisable()

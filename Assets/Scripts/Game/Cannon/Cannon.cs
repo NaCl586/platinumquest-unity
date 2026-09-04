@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Cannon : MonoBehaviour
 {
+    [HideInInspector]
+    public string radarCannonType;
     // ============================================================
     // Cannon Properties
     // ============================================================
