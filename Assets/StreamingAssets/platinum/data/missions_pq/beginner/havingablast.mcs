@@ -105,10 +105,10 @@ new SimGroup(MissionGroup) {
 	new SimGroup(InteriorGroup) {
 	
 		new InteriorInstance() {
-			position = "-149 -117 -39.5";
+			position = "0 0 0";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
-			interiorFile = "~/data/interiors_pq/beginner/HavingABlast0.dif";
+			interiorFile = "~/data/interiors_pq/beginner/havingablast.dif";
 			showTerrainInside = "0";
 		};
 	};

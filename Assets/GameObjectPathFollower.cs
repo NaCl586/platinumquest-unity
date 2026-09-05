@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameObjectPathFollower
@@ -24,6 +24,7 @@ public class GameObjectPathFollower
     private readonly Vector3 initialPosition;
     private readonly Quaternion initialRotation;
     private readonly Vector3 initialScale;
+    private readonly Vector3 originalObjectScale;
 
     private Vector3 linearVelocity;
     private Vector3 angularVelocity;
@@ -63,6 +64,16 @@ public class GameObjectPathFollower
     {
         this.target = target;
         this.pathManager = pathManager;
+
+        PathOriginalScale originalScaleComponent =
+            target != null
+                ? target.GetComponent<PathOriginalScale>()
+                : null;
+
+        originalObjectScale =
+            originalScaleComponent != null
+                ? originalScaleComponent.scale
+                : target.transform.localScale;
 
         initialPosition =
             initialPathPosition ?? target.transform.position;
@@ -414,9 +425,19 @@ public class GameObjectPathFollower
             ? GetPathRotation(node, next, localT)
             : baseRotation;
 
-        Vector3 scaleResult = node.useScale
-            ? Vector3.Lerp(node.localScale, next.localScale, adjustedT)
-            : baseScale;
+        Vector3 pathScale = node.useScale
+            ? Vector3.Lerp(
+                node.localScale,
+                next.localScale,
+                adjustedT
+            )
+            : Vector3.one;
+
+        Vector3 scaleResult =
+            Vector3.Scale(
+                originalObjectScale,
+                pathScale
+            );
 
         return new PathFollowerState
         {

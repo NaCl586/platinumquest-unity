@@ -21523,7 +21523,7 @@ MonoBehaviour:
   raycastBlocker2: {fileID: 2052818643}
   raycastBlockerCategoryWindow: {fileID: 1365553645}
   raycastBlockerMoreWindow: {fileID: 1390737174}
-  debug: 1
+  debug: 0
   selectedLevelNum: 0
 --- !u!114 &1996103272
 MonoBehaviour:

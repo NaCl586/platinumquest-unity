@@ -201,6 +201,8 @@ public class Cannon : MonoBehaviour
         if (!useBase)
             transform.parent.Find("base").Find("Col").GetComponent<Renderer>().enabled = false;
 
+        initRotation = transform.parent.rotation;
+
         ResetCannon();
     }
 
@@ -440,6 +442,8 @@ public class Cannon : MonoBehaviour
         float pitchRad
     )
     {
+        transform.parent.rotation = Quaternion.identity;
+
         Vector3 up =
             -GravitySystem.GravityDir.normalized;
 

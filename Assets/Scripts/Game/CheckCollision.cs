@@ -84,7 +84,7 @@ public class CheckCollision : MonoBehaviour
     {
         if (collider.TryGetComponent<Powerups>(out var p)) p.PickupItem();
         if (collider.TryGetComponent<Gem>(out var g)) g.PickupItem();
-        if (collider.TryGetComponent<HelpTrigger>(out var ht)) ht.TriggerEnter();
+        if (collider.TryGetComponent<HelpTrigger>(out var ht) && !ht.transform.GetComponentInParent<HelpBubble>()) ht.TriggerEnter();
         if (collider.TryGetComponent<CannonBase>(out var cannonBase)) cannonBase.EnterTrigger(gameObject.GetComponent<Collider>());
 
         if (collider.CompareTag("OutOfBounds"))

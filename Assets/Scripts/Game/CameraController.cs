@@ -77,6 +77,38 @@ public class CameraController : MonoBehaviour
     // Unity Lifecycle
     // ============================================================
 
+    private bool cameraDistanceOverride;
+    private float overriddenCameraDistance;
+
+    public bool CameraDistanceOverrideActive => cameraDistanceOverride;
+
+    public void SetCameraDistanceOverride(float distance)
+    {
+        if (float.IsNaN(distance) || float.IsInfinity(distance))
+            return;
+
+        overriddenCameraDistance = Mathf.Max(0.001f, distance);
+        cameraDistanceOverride = true;
+
+        ApplyCameraDistanceOverride();
+    }
+
+    public void ClearCameraDistanceOverride()
+    {
+        cameraDistanceOverride = false;
+    }
+
+    private void ApplyCameraDistanceOverride()
+    {
+        if (!cameraDistanceOverride)
+            return;
+
+        if (offset.sqrMagnitude < 0.0001f)
+            return;
+
+        offset = offset.normalized * overriddenCameraDistance;
+    }
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -126,7 +158,8 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (marble == null) return;
+        if (marble == null)
+            return;
 
         bool marbleInCannon = Marble.instance != null &&
             (Marble.instance.IsInCannon || Marble.instance.CannonCameraLocked());
@@ -153,6 +186,12 @@ public class CameraController : MonoBehaviour
         {
             HandleLook();
         }
+
+        // IMPORTANT:
+        // Apply the distance override AFTER all normal camera processing.
+        // This prevents camera movement/pan/reset logic from changing
+        // the distance while the CameraDistanceTrigger is active.
+        ApplyCameraDistanceOverride();
     }
 
     // ============================================================

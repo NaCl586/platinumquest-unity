@@ -50,9 +50,11 @@ public class Teleport : MonoBehaviour
         marbleRenderer = null;
         marbleMaterial = null;
         originallyTransparent = false;
+    }
 
-        if (Marble.instance != null &&
-            Marble.instance.normalMesh != null)
+    public void InitMeshMaterial()
+    {
+        if (Marble.instance.normalMesh != null)
         {
             marbleRenderer =
                 Marble.instance.normalMesh.GetComponent<MeshRenderer>();
@@ -64,7 +66,6 @@ public class Teleport : MonoBehaviour
             }
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         Marble marble = other.GetComponent<Marble>();
@@ -392,82 +393,70 @@ public class Teleport : MonoBehaviour
         if (marbleMaterial == null)
             return;
 
-        if (marbleMaterial.HasProperty("_Surface"))
-        {
-            marbleMaterial.SetFloat(
-                "_Surface",
-                transparent ? 1f : 0f
-            );
-        }
-
         if (transparent)
         {
-            if (marbleMaterial.HasProperty("_SrcBlend"))
-            {
-                marbleMaterial.SetFloat(
-                    "_SrcBlend",
-                    (float)UnityEngine.Rendering.BlendMode.SrcAlpha
-                );
-            }
+            marbleMaterial.SetFloat("_Surface", 1f);
 
-            if (marbleMaterial.HasProperty("_DstBlend"))
-            {
-                marbleMaterial.SetFloat(
-                    "_DstBlend",
-                    (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha
-                );
-            }
-
-            if (marbleMaterial.HasProperty("_ZWrite"))
-                marbleMaterial.SetFloat("_ZWrite", 0f);
-
-            marbleMaterial.EnableKeyword(
-                "_SURFACE_TYPE_TRANSPARENT"
+            marbleMaterial.SetFloat(
+                "_Blend",
+                (float)UnityEngine.Rendering.BlendMode.SrcAlpha
             );
 
-            marbleMaterial.DisableKeyword(
-                "_SURFACE_TYPE_OPAQUE"
+            marbleMaterial.SetFloat(
+                "_SrcBlend",
+                (float)UnityEngine.Rendering.BlendMode.SrcAlpha
             );
+
+            marbleMaterial.SetFloat(
+                "_DstBlend",
+                (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha
+            );
+
+            marbleMaterial.SetFloat("_ZWrite", 0f);
+
+            marbleMaterial.DisableKeyword("_SURFACE_TYPE_OPAQUE");
+            marbleMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
 
             marbleMaterial.renderQueue =
                 (int)UnityEngine.Rendering.RenderQueue.Transparent;
         }
         else
         {
-            if (marbleMaterial.HasProperty("_SrcBlend"))
-            {
-                marbleMaterial.SetFloat(
-                    "_SrcBlend",
-                    (float)UnityEngine.Rendering.BlendMode.One
-                );
-            }
+            marbleMaterial.SetFloat("_Surface", 0f);
 
-            if (marbleMaterial.HasProperty("_DstBlend"))
-            {
-                marbleMaterial.SetFloat(
-                    "_DstBlend",
-                    (float)UnityEngine.Rendering.BlendMode.Zero
-                );
-            }
-
-            if (marbleMaterial.HasProperty("_ZWrite"))
-                marbleMaterial.SetFloat("_ZWrite", 1f);
-
-            marbleMaterial.EnableKeyword(
-                "_SURFACE_TYPE_OPAQUE"
+            marbleMaterial.SetFloat(
+                "_Blend",
+                (float)UnityEngine.Rendering.BlendMode.One
             );
 
-            marbleMaterial.DisableKeyword(
-                "_SURFACE_TYPE_TRANSPARENT"
+            marbleMaterial.SetFloat(
+                "_SrcBlend",
+                (float)UnityEngine.Rendering.BlendMode.One
             );
+
+            marbleMaterial.SetFloat(
+                "_DstBlend",
+                (float)UnityEngine.Rendering.BlendMode.Zero
+            );
+
+            marbleMaterial.SetFloat("_ZWrite", 1f);
+
+            marbleMaterial.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            marbleMaterial.EnableKeyword("_SURFACE_TYPE_OPAQUE");
 
             marbleMaterial.renderQueue =
                 (int)UnityEngine.Rendering.RenderQueue.Geometry;
         }
+
+        // Make sure the material gets re-evaluated.
+        marbleMaterial.globalIlluminationFlags =
+            MaterialGlobalIlluminationFlags.None;
     }
 
     private IEnumerator TeleportFade()
     {
+        InitMeshMaterial();
+
         while (teleporting)
         {
             teleportTime -= Time.deltaTime;

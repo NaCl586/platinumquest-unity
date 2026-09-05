@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,6 +6,16 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+public class PathOriginalScale : MonoBehaviour
+{
+    public Vector3 scale;
+
+    public void SetScale(Vector3 value)
+    {
+        scale = value;
+    }
+}
 
 namespace TS
 {
@@ -235,6 +245,8 @@ namespace TS
             public GameObject gameObject;
             public string pathName;
 
+            public Vector3 originalObjectScale;
+
             public Vector3? initialPathPosition;
             public Quaternion? initialPathRotation;
             public Vector3? initialPathScale;
@@ -251,6 +263,7 @@ namespace TS
         private readonly List<PendingMultipleTGTTEntry> pendingMultipleTGTTEntries = new List<PendingMultipleTGTTEntry>();
         private readonly List<PendingPathEntry> pendingPathEntries = new List<PendingPathEntry>();
         private readonly List<PendingCheckpointTriggerEntry> pendingCheckpointTriggerEntries = new List<PendingCheckpointTriggerEntry>();
+        private readonly Dictionary<GameObject, Vector3> initialObjectScales = new Dictionary<GameObject, Vector3>();
 
         private GameObject finishSign;
 
@@ -295,6 +308,7 @@ namespace TS
             pendingPathTriggerEntries.Clear();
             pendingMultipleTGTTEntries.Clear();
             pendingCheckpointTriggerEntries.Clear();
+            initialObjectScales.Clear();
 
             checkpoints.Clear();
             destinationTriggers.Clear();
@@ -400,6 +414,8 @@ namespace TS
 
                 gobj.name = isFancy ? "FancyGem" : "Gem";
 
+                gobj.transform.Find("Particle System").gameObject.SetActive(false);
+
                 SetTransforms(
                     gobj,
                     obj,
@@ -439,6 +455,8 @@ namespace TS
                 );
 
                 CheckForPath(obj, gobj);
+
+                gobj.transform.Find("Particle System").gameObject.SetActive(true);
             }
             else if (IsPowerup(objectName, out GameObject prefab, out string defaultName))
             {
@@ -675,6 +693,18 @@ namespace TS
                 gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
                 Vector3 scale = ConvertScaleXZY(ParseVectorString(obj.GetField("scale")));
                 gobj.transform.localScale = Vector3.Scale(Vector3.Scale(scale, gobj.transform.localScale), new Vector3(3f, 0.0001f, 3f));
+
+                RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
+                CheckForPath(obj, gobj);
+            }
+            else if (objectName == "WaterCylinder")
+            {
+                GameObject gobj = Instantiate(waterPlanePrefab, transform, false);
+                gobj.name = string.IsNullOrEmpty(obj.Name) ? "WaterCylinder" : obj.Name;
+                gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
+                Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+                gobj.transform.localScale = new Vector3(scale.x * gobj.transform.localScale.x, scale.z * gobj.transform.localScale.y, scale.y * gobj.transform.localScale.z);
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
                 CheckForPath(obj, gobj);
@@ -1332,35 +1362,64 @@ namespace TS
                 }
             }
             else if (string.Equals(
-                         dataBlock,
-                         "RepetitiveTriggerGotoTarget",
-                         StringComparison.OrdinalIgnoreCase))
+             dataBlock,
+             "RepetitiveTriggerGotoTarget",
+             StringComparison.OrdinalIgnoreCase))
             {
-                GameObject rtgttObj =
-                    Instantiate(
-                        repetitiveTriggerGotoTargetPrefab != null
-                            ? repetitiveTriggerGotoTargetPrefab
-                            : triggerGoToTarget,
-                        transform,
-                        false);
+                // RepetitiveTriggerGotoTarget controls a single MovingPlatform,
+                // so create one trigger instance per platform in the SimGroup.
+                foreach (MovingPlatform movingPlatform in movingPlatforms)
+                {
+                    if (movingPlatform == null)
+                        continue;
 
-                rtgttObj.name =
-                    string.IsNullOrEmpty(trigger.Name)
-                        ? "RepetitiveTriggerGotoTarget"
-                        : trigger.Name;
+                    GameObject rtgttObj =
+                        Instantiate(
+                            repetitiveTriggerGotoTargetPrefab != null
+                                ? repetitiveTriggerGotoTargetPrefab
+                                : triggerGoToTarget,
+                            transform,
+                            false);
 
-                SetupTriggerTransform(
-                    rtgttObj,
-                    trigger);
+                    rtgttObj.name =
+                        string.IsNullOrEmpty(trigger.Name)
+                            ? "RepetitiveTriggerGotoTarget"
+                            : trigger.Name;
 
-                RegisterImportedObject(
-                    trigger,
-                    rtgttObj,
-                    Quaternion.Euler(-90f, 0f, 0f));
+                    SetupTriggerTransform(
+                        rtgttObj,
+                        trigger);
 
-                CheckForPath(
-                    trigger,
-                    rtgttObj);
+                    RepetitiveTriggerGotoTarget rtgtt =
+                        rtgttObj.GetComponent<RepetitiveTriggerGotoTarget>();
+
+                    if (rtgtt == null)
+                    {
+                        Debug.LogError(
+                            "RepetitiveTriggerGotoTarget prefab is missing " +
+                            "RepetitiveTriggerGotoTarget component.");
+
+                        Destroy(rtgttObj);
+                        continue;
+                    }
+
+                    // IMPORTANT:
+                    // This is the PathedInterior that this repetitive trigger controls.
+                    rtgtt.movingPlatform = movingPlatform;
+                    rtgtt.targetTime = int.Parse(trigger.GetField("targetTime"));
+                    rtgtt.numTimesToRepeat = int.Parse(trigger.GetField("NumTimesToRepeat"));
+                    rtgtt.numTimesToTrigger = int.Parse(trigger.GetField("NumTimesToTrigger"));
+                    rtgtt.triggerOnce = ParseBoolean(trigger.GetField("TriggerOnce"));
+
+                    RegisterImportedObject(
+                        trigger,
+                        rtgttObj,
+                        Quaternion.Euler(-90f, 0f, 0f));
+
+                    CheckForPath(
+                        trigger,
+                        rtgttObj);
+                }
             }
         }
 
@@ -1536,60 +1595,6 @@ namespace TS
             CheckForPath(obj, triggerObj);
         }
 
-        private void ImportPathedInteriorTrigger(TSObject trigger, MovingPlatform movingPlatform)
-        {
-            string dataBlock = trigger.GetField("dataBlock");
-
-            if (string.Equals(dataBlock, "TriggerGotoTarget", StringComparison.OrdinalIgnoreCase))
-            {
-                string targetTime = trigger.GetField("targetTime");
-                if (string.IsNullOrEmpty(targetTime)) return;
-
-                var tgttObj = Instantiate(triggerGoToTarget, transform, false);
-                tgttObj.name = string.IsNullOrEmpty(trigger.Name) ? "TriggerGotoTarget" : trigger.Name;
-                SetupTriggerTransform(tgttObj, trigger);
-
-                TriggerGoToTarget tgtt = tgttObj.GetComponent<TriggerGoToTarget>();
-                tgtt.AddMovingPlatform(movingPlatform);
-                tgtt.targetTime = (float)int.Parse(targetTime) / 1000f;
-
-                string instant = trigger.GetField("instant");
-                if (!string.IsNullOrEmpty(instant))
-                {
-                    tgtt.instantReturn = int.TryParse(instant, out int instantValue) && instantValue == 1;
-                }
-                else
-                {
-                    string instantReturn = trigger.GetField("instantReturn");
-                    tgtt.instantReturn = !string.IsNullOrEmpty(instantReturn) && int.TryParse(instantReturn, out int instantReturnValue) && instantReturnValue == 1;
-                }
-
-                RegisterImportedObject(trigger, tgttObj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(trigger, tgttObj);
-            }
-            else if (string.Equals(dataBlock, "TriggerGotoDelayTarget", StringComparison.OrdinalIgnoreCase))
-            {
-                var tgtdObj = Instantiate(triggerGotoDelayTargetPrefab, transform, false);
-                tgtdObj.name = string.IsNullOrEmpty(trigger.Name) ? "TriggerGotoDelayTarget" : trigger.Name;
-                SetupTriggerTransform(tgtdObj, trigger);
-
-                TriggerGotoDelayTarget tgtd = tgtdObj.GetComponent<TriggerGotoDelayTarget>();
-                tgtd.movingPlatform = movingPlatform;
-
-                RegisterImportedObject(trigger, tgtdObj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(trigger, tgtdObj);
-            }
-            else if (string.Equals(dataBlock, "RepetitiveTriggerGotoTarget", StringComparison.OrdinalIgnoreCase))
-            {
-                var rtgttObj = Instantiate(repetitiveTriggerGotoTargetPrefab != null ? repetitiveTriggerGotoTargetPrefab : triggerGoToTarget, transform, false);
-                rtgttObj.name = string.IsNullOrEmpty(trigger.Name) ? "RepetitiveTriggerGotoTarget" : trigger.Name;
-                SetupTriggerTransform(rtgttObj, trigger);
-
-                RegisterImportedObject(trigger, rtgttObj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(trigger, rtgttObj);
-            }
-        }
-
         private void ImportCheckpoint(TSObject obj)
         {
             var cp = Instantiate(checkpointPrefab, transform, false);
@@ -1617,7 +1622,11 @@ namespace TS
 
             cp.transform.localScale = Vector3.Scale(scale, cp.transform.localScale);
 
-            checkpoint.checkpointGravityDir = -checkpoint.transform.up;
+            string down = obj.GetField("down");
+            if (!string.IsNullOrEmpty(down) && down == "1")
+                checkpoint.checkpointGravityDir = Vector3.down;
+            else
+                checkpoint.checkpointGravityDir = -checkpoint.transform.up;
 
             string offset = obj.GetField("add");
             string subOffset = obj.GetField("sub");
@@ -2025,16 +2034,6 @@ namespace TS
                             obj.GetField("destination");
                     }
                     break;
-                case "repetitivetriggergototarget":
-                    if (triggerObj.TryGetComponent<RepetitiveTriggerGotoTarget>(out var repTgtt))
-                    {
-                        repTgtt.numTimesToTrigger = Mathf.RoundToInt(ParseFloatField(obj, "NumTimesToTrigger", 0f));
-                        repTgtt.triggerOnce = ParseBoolField(obj, "TriggerOnce", true);
-                        repTgtt.numTimesToRepeat = Mathf.RoundToInt(ParseFloatField(obj, "NumTimesToRepeat", 0f));
-                        repTgtt.targetTime = ParseFloatField(obj, "targetTime", 999999f);
-                        repTgtt.movingPlatform = ResolveMovingPlatform(obj.GetField("target"));
-                    }
-                    break;
                 case "setvelocitytrigger":
                     if (triggerObj.TryGetComponent<SetVelocityTrigger>(out var setVel))
                     {
@@ -2079,7 +2078,7 @@ namespace TS
                         else
                         {
                             spawnTrigger.hasAddOrSub = false;
-                            spawnTrigger.offset = new Vector3(0f, 3f, 0f);
+                            spawnTrigger.offset = new Vector3(0f, 0f, 0f);
                         }
                         spawnTrigger.InitSpawnTrigger();
                     }
@@ -2963,6 +2962,18 @@ namespace TS
             if (string.IsNullOrEmpty(pathName))
                 return;
 
+            // The object's current local scale here is the fully imported
+            // scale, including the mission object's scale and the prefab's
+            // original scale where applicable. Preserve it so the path
+            // follower can multiply its path scale by this initial size.
+            Vector3 originalObjectScale = go.transform.localScale;
+
+            PathOriginalScale originalScaleComponent =
+                go.GetComponent<PathOriginalScale>() ??
+                go.AddComponent<PathOriginalScale>();
+
+            originalScaleComponent.SetScale(originalObjectScale);
+
             Vector3? initialPathPosition = null;
             Quaternion? initialPathRotation = null;
             Vector3? initialPathScale = null;
@@ -2999,11 +3010,11 @@ namespace TS
 
                     float[] rotationParts =
                     {
-                parts[3],
-                parts[4],
-                parts[5],
-                parts[6]
-            };
+                        parts[3],
+                        parts[4],
+                        parts[5],
+                        parts[6]
+                    };
 
                     Quaternion rotation = ConvertRotation(rotationParts);
 
@@ -3035,9 +3046,9 @@ namespace TS
                     initialPathScale = ConvertScale(
                         new float[]
                         {
-                    parts[0],
-                    parts[1],
-                    parts[2]
+                        parts[0],
+                        parts[1],
+                        parts[2]
                         }
                     );
                 }
@@ -3056,6 +3067,8 @@ namespace TS
                 {
                     gameObject = go,
                     pathName = pathName,
+
+                    originalObjectScale = originalObjectScale,
 
                     initialPathPosition = initialPathPosition,
                     initialPathRotation = initialPathRotation,
@@ -3229,7 +3242,6 @@ namespace TS
                 "mustchangetrigger" => mustChangeTriggerPrefab,
                 "nomovementkeystrigger" => noMovementKeysTriggerPrefab,
                 "relativetptrigger" => relativeTPTriggerPrefab,
-                "repetitivetriggergototarget" => repetitiveTriggerGotoTargetPrefab,
                 "setvelocitytrigger" => setVelocityTriggerPrefab,
                 "smbtrigger" => smbTriggerPrefab,
                 "soundtrigger" => soundTriggerPrefab,
@@ -3728,6 +3740,21 @@ namespace TS
                 torqueRotation;
 
             return true;
+        }
+
+        private GameObject InstantiatePathObject(
+            GameObject prefab,
+            Transform parent
+        )
+        {
+            GameObject go = Instantiate(prefab, parent, false);
+
+            if (go != null)
+            {
+                initialObjectScales[go] = go.transform.localScale;
+            }
+
+            return go;
         }
     }
 }

@@ -199,8 +199,10 @@ public class GameManager : MonoBehaviour
                 case Mode.Madness: gameModes.Add(new MadnessMode(this)); guim.ShowMadnessHuntGemCountUI(true); break;
                 case Mode.Hunt: gameModes.Add(new HuntMode(this)); guim.ShowMadnessHuntGemCountUI(true); huntRestartRequested = true; break;
             }
-        }
 
+            Debug.Log(mode);
+        }
+        
         if (gameModes.Count == 0) gameModes.Add(new NullMode(this));
     }
 
@@ -703,8 +705,10 @@ public class GameManager : MonoBehaviour
 
     private void FullReset()
     {
-        if (GetGameMode<HuntMode>() == null) GravityModifier.ResetGravityGlobal(Vector3.down);
-        else GravityModifier.ResetGravityGlobal(activeCheckpointGravityDir);
+        if (GetGameMode<HuntMode>() == null) 
+            GravityModifier.ResetGravityGlobal(Vector3.down);
+        else 
+            GravityModifier.ResetGravityGlobal(activeCheckpointGravityDir);
 
         Movement.instance.StopAllMovement();
         Movement.instance.StopAllbutJumping();
@@ -766,6 +770,13 @@ public class GameManager : MonoBehaviour
         ResetAll<GravityPointTrigger>(gpt => gpt.ResetTrigger());
         ResetAll<Teleport>(tp => tp.ResetTeleporter());
         ResetAll<Teleporter>(tp => tp.ResetTeleporter());
+
+        //I have no idea ini kenapa harus dua2 nya
+        GravityModifier.ResetGravityGlobal(activeCheckpointGravityDir);
+        GravityModifier.onGravityChanged?.Invoke(
+                activeCheckpointGravityDir,
+                activeCheckpointGravityDir
+            );
     }
 
     private static void ResetAll<T>(Action<T> resetAction) where T : UnityEngine.Object

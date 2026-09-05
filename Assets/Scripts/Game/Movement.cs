@@ -561,7 +561,26 @@ public class Movement : MonoBehaviour
             if (!_meshCollider.bounds.Intersects(bounds))
                 continue;
 
-            UpdateMeshTransform(_mesh);
+            // PathMover platforms can rotate through their movement system,
+            // so their effective transform may change without the collider
+            // transform cache detecting it reliably.
+            if (_mesh.pathMover != null)
+            {
+                Transform t = _meshCollider.transform;
+
+                _mesh.localToWorld = t.localToWorldMatrix;
+                _mesh.worldToLocal = t.worldToLocalMatrix;
+
+                _mesh.lastPosition = t.position;
+                _mesh.lastRotation = t.rotation;
+                _mesh.lastScale = t.lossyScale;
+
+                RebuildWorldMeshData(_mesh);
+            }
+            else
+            {
+                UpdateMeshTransform(_mesh);
+            }
 
             int _length = _mesh.triangles.Length;
 
@@ -604,7 +623,7 @@ public class Movement : MonoBehaviour
 
                             PathMover pathMover = _mesh.pathMover;
 
-                            if (pathMover != null)
+                            if (pathMover != null && pathMover.pathFollower != null)
                             {
                                 colliderVelocity =
                                     pathMover.pathFollower.GetPointVelocity(

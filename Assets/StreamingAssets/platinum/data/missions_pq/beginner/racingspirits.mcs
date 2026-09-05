@@ -22,6 +22,7 @@ new ScriptObject() {
 		CustomRadarRule = $Radar::Flags::None;
 		cameraPitch = "0.1";
 		cameraPlane = "yz";
+		invertCameraPlane = "1";
 		easterEgg = "1";
 		gems = "0";
 		initialCameraDistance = "15";
@@ -1815,18 +1816,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-	};
-	new TSStatic() {
-		position = "20 89.457 -17.6668";
-		rotation = "-1 0 0 63.5983";
-		scale = "2 0.25 16";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "20 -23.125 10.125";
-		rotation = "1 0 0 0";
-		scale = "2 0.25 2.5";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
 	};
 	new InteriorInstance(loopExit2) {
 		position = "0 -32 0";

@@ -29,7 +29,7 @@ Material:
     - _DistortionScale: 12
     - _DistortionSpeed: 1.19
     - _DistortionStrength: 0.0183
-    - _Intensity: 1
+    - _Intensity: 0
     m_Colors:
     - _Tint: {r: 0, g: 0.31631523, b: 0.4245283, a: 1}
   m_BuildTextureStacks: []

@@ -103,6 +103,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: b5cd3f29f43f26345a2ead2ff14f571d, type: 3}
   - {fileID: 2800000, guid: e3ebe2254a02a17408e395019bccd94c, type: 3}
   - {fileID: 2800000, guid: 98f7a9db310932c479f5df3614f8758e, type: 3}
+  normals: []
   materialIndex: 0
 --- !u!1 &3446623387245049177
 GameObject:

@@ -46,6 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   filePath: 
   DefaultMaterial: {fileID: 2100000, guid: 3ad662118ff794fed9fcbf828afdca2c, type: 2}
-  maxTrianglesPerChunk: 250
+  maxTrianglesPerChunk: 1000
   normalStrength: 2.5
-  specularStrength: 1

@@ -682,11 +682,14 @@ public class PlayMissionManager : MonoBehaviour
             next.interactable =
                 number < missions.Count - 1;
 
+        string keySuffix =
+            $"{CapitalizeFirst(currentlySelectedType.ToString())}";
+
         int lastQualifiedLevel =
             Mathf.Min(number, qualifiedLevel);
 
         PlayerPrefs.SetInt(
-            "SelectedLevel",
+            $"SelectedLevel{keySuffix}",
             lastQualifiedLevel
         );
 
@@ -778,16 +781,16 @@ public class PlayMissionManager : MonoBehaviour
             {
                 if (mission.gameModes.Contains(Mode.Hunt))
                 {
-                    if (time != -1 && time < mission.awesomeTime)
+                    if (time != -1 && time >= mission.awesomeTime)
                     {
                         awesomeTimeGameObject.SetActive(true);
                         bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#FF3333>{Mathf.RoundToInt(time)}</color>";
                     }
-                    else if (time != -1 && time < mission.ultimateTime)
+                    else if (time != -1 && time >= mission.ultimateTime)
                     {
                         bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#FFCC33>{Mathf.RoundToInt(time)}</color>";
                     }
-                    else if (time != -1 && time < mission.platinumTime)
+                    else if (time != -1 && time >= mission.platinumTime)
                     {
                         bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#CCCCCC>{Mathf.RoundToInt(time)}</color>";
                     }
@@ -800,16 +803,16 @@ public class PlayMissionManager : MonoBehaviour
                 {
                     if (time < 1000)
                     {
-                        if (time != -1 && time < mission.awesomeTime)
+                        if (time != -1 && time >= mission.awesomeTime)
                         {
                             awesomeTimeGameObject.SetActive(true);
                             bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#FF3333>{Mathf.RoundToInt(time)}</color>";
                         }
-                        else if (time != -1 && time < mission.ultimateTime)
+                        else if (time != -1 && time >= mission.ultimateTime)
                         {
                             bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#FFCC33>{Mathf.RoundToInt(time)}</color>";
                         }
-                        else if (time != -1 && time < mission.platinumTime)
+                        else if (time != -1 && time >= mission.platinumTime)
                         {
                             bestTimeToggleText.text = bestTimeToggleString = "Best Score: " + $"<color=#CCCCCC>{Mathf.RoundToInt(time)}</color>";
                         }
@@ -865,17 +868,17 @@ public class PlayMissionManager : MonoBehaviour
 
             if (mission.gameModes.Contains(Mode.Hunt))
             {
-                if (time != - 1 && time < mission.awesomeTime)
+                if (time != - 1 && time >= mission.awesomeTime)
                 {
                     bestTimeScores.text +=
                         $"<color=#FF3333>{Mathf.RoundToInt(time)}</color>\n";
                 }
-                else if (time != -1 && time < mission.ultimateTime)
+                else if (time != -1 && time >= mission.ultimateTime)
                 {
                     bestTimeScores.text +=
                         $"<color=#FFCC33>{Mathf.RoundToInt(time)}</color>\n";
                 }
-                else if (time != -1 && time < mission.platinumTime)
+                else if (time != -1 && time >= mission.platinumTime)
                 {
                     bestTimeScores.text +=
                         $"<color=#CCCCCC>{Mathf.RoundToInt(time)}</color>\n";
@@ -890,17 +893,17 @@ public class PlayMissionManager : MonoBehaviour
             {
                 if(time < 1000)
                 {
-                    if (time != -1 && time < mission.awesomeTime)
+                    if (time != -1 && time >= mission.awesomeTime)
                     {
                         bestTimeScores.text +=
                             $"<color=#FF3333>{Mathf.RoundToInt(time)}</color>\n";
                     }
-                    else if (time != -1 && time < mission.ultimateTime)
+                    else if (time != -1 && time >= mission.ultimateTime)
                     {
                         bestTimeScores.text +=
                             $"<color=#FFCC33>{Mathf.RoundToInt(time)}</color>\n";
                     }
-                    else if (time != -1 && time < mission.platinumTime)
+                    else if (time != -1 && time >= mission.platinumTime)
                     {
                         bestTimeScores.text +=
                             $"<color=#CCCCCC>{Mathf.RoundToInt(time)}</color>\n";
@@ -1032,8 +1035,11 @@ public class PlayMissionManager : MonoBehaviour
     {
         int qualifiedLevel = GetQualifiedLevel();
 
+        string keySuffix =
+            $"{CapitalizeFirst(currentlySelectedType.ToString())}";
+
         int savedLevel = PlayerPrefs.GetInt(
-            $"SelectedLevel",
+            $"SelectedLevel{keySuffix}",
             qualifiedLevel
         );
 

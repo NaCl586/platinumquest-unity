@@ -250,12 +250,7 @@ public class Marble : MonoBehaviour
 
         UpdateFireball();
         UpdateBubble();
-
-        if (isFrozen)
-        {
-            if (Time.time >= lastFreezeTime + IceShard.FREEZE_TIME) Unfreeze();
-            return;
-        }
+        UpdateFreeze();
 
         if (Input.GetKey(ControlBinding.instance.usePowerup) && !GameManager.isPaused &&
             !GameManager.gameFinish && movement.canMove && !ReplayRecorder.loadReplay &&
@@ -275,6 +270,15 @@ public class Marble : MonoBehaviour
 
             UsePowerup();
         }
+    }
+
+    private void UpdateFreeze()
+    {
+        if (!isFrozen)
+            return;
+
+        if (Time.time >= lastFreezeTime + IceShard.FREEZE_TIME)
+            Unfreeze(true);
     }
 
     private void FixedUpdate()
@@ -983,10 +987,14 @@ public class Marble : MonoBehaviour
         instantCannonFireTime = Mathf.NegativeInfinity;
     }
 
+    // ============================================================
     // Ice Shard
+    // ============================================================
+
     public void Freeze(IceShard shard)
     {
-        if (isFrozen) return;
+        if (isFrozen)
+            return;
 
         isFrozen = true;
         iceShard = shard;
@@ -995,17 +1003,23 @@ public class Marble : MonoBehaviour
         movement.StopAllMovement();
         movement.StopMoving();
 
-        frozenIce.SetActive(true);
-        GameUIManager.instance.SetPowerupLocked(true);
+        if (frozenIce != null)
+            frozenIce.SetActive(true);
 
-        if (iceShard != null) iceShard.PlayFreezeSound(this);
+        if (GameUIManager.instance != null)
+            GameUIManager.instance.SetPowerupLocked(true);
+
+        if (iceShard != null)
+            iceShard.PlayFreezeSound(this);
     }
 
     public void Unfreeze(bool cancel = false)
     {
-        if (!isFrozen) return;
+        if (!isFrozen)
+            return;
 
         isFrozen = false;
+
         if (cancel)
         {
             iceShard = null;
@@ -1014,17 +1028,55 @@ public class Marble : MonoBehaviour
 
         movement.StartMoving();
 
-        Vector3 away = transform.position - (iceShard != null ? iceShard.transform.position : transform.position);
-        if (away.sqrMagnitude > 0.0001f) away.Normalize();
-        else away = Vector3.right;
+        Vector3 away =
+            transform.position -
+            (iceShard != null
+                ? iceShard.transform.position
+                : transform.position);
 
-        movement.marbleVelocity += away * 3f + transform.up * 5f;
+        if (away.sqrMagnitude > 0.0001f)
+            away.Normalize();
+        else
+            away = Vector3.right;
 
-        frozenIce.SetActive(false);
-        GameUIManager.instance.SetPowerupLocked(false);
+        movement.marbleVelocity +=
+            away * 3f +
+            transform.up * 5f;
 
-        if (iceShard != null) iceShard.PlayCrackSound(this);
+        if (frozenIce != null)
+            frozenIce.SetActive(false);
+
+        if (GameUIManager.instance != null)
+            GameUIManager.instance.SetPowerupLocked(false);
+
+        if (iceShard != null)
+            iceShard.PlayCrackSound(this);
+
         iceShard = null;
+    }
+
+    /// <summary>
+    /// Completely clears the Ice Shard freeze state without performing
+    /// the normal unfreeze launch/velocity effect.
+    /// Used when the marble respawns.
+    /// </summary>
+    private IEnumerator ResetFreezeState()
+    {
+        while (isFrozen || iceShard != null || lastFreezeTime != Mathf.NegativeInfinity || frozenIce.activeSelf)
+        {
+            isFrozen = false;
+            iceShard = null;
+            lastFreezeTime = Mathf.NegativeInfinity;
+            frozenIce.SetActive(false);
+            GameUIManager.instance.SetPowerupLocked(false);
+
+            yield return null;
+        }
+
+        if (GameManager.instance.useCheckpoint)
+            movement.StartMoving();
+        else
+            movement.StopAllbutJumping();
     }
 
     // Powerup-use trigger locking
@@ -1087,6 +1139,10 @@ public class Marble : MonoBehaviour
 
     public void Respawn()
     {
+        // Completely cancel any existing Ice Shard freeze.
+        // This must happen before anything else in the respawn process.
+        StartCoroutine(ResetFreezeState());
+
         // The first initialization/respawn is not considered a normal
         // player-triggered respawn for water-splash suppression.
         isRespawn = !firstRespawn;
@@ -1102,29 +1158,30 @@ public class Marble : MonoBehaviour
         {
             bubbleTime = 0f;
             bubbleInfinite = false;
-            GameUIManager.instance.SetBubbleTimer(-1, bubbleTotalTime);
+            GameUIManager.instance.SetBubbleTimer(
+                -1,
+                bubbleTotalTime
+            );
 
             fireballTime = 0f;
-            GameUIManager.instance.SetFireballTimer(-1, fireballTotalTime);
+            GameUIManager.instance.SetFireballTimer(
+                -1,
+                fireballTotalTime
+            );
 
-            GameManager.instance.activePowerup = PowerupType.None;
+            GameManager.instance.activePowerup =
+                PowerupType.None;
         }
 
         ResetCannonState();
 
-        gyrocopterNextTransitionTime = Mathf.NegativeInfinity;
+        gyrocopterNextTransitionTime =
+            Mathf.NegativeInfinity;
 
-        // Clear any LockPowerupTrigger state on respawn.
         powerupUseLockCount = 0;
+
         GameUIManager.instance.SetPowerupLocked(false);
         GameUIManager.instance.ShowCannonMenu(false);
-
-        Unfreeze(true);
-        Invoke(nameof(UnfreezeTrue), Time.deltaTime);
-        isFrozen = false;
-        iceShard = null;
-        lastFreezeTime = Mathf.NegativeInfinity;
-        frozenIce.SetActive(false);
 
         ClearPhysicsLayers();
         PhysModTrigger.ForgetAllMarbleLayers(this);
@@ -1134,17 +1191,18 @@ public class Marble : MonoBehaviour
         waterPhysicsLayer = null;
         bubblePhysicsLayer = null;
 
-        GameUIManager.instance.SetPowerupLocked(false);
-
-        movement.SetPosition(GameManager.instance.activeCheckpoint.position);
+        movement.SetPosition(
+            GameManager.instance.activeCheckpoint.position
+        );
 
         CameraController.instance?.ResetCam();
 
         PhysModTrigger.RefreshAllTriggers(this);
         WaterPhysicsTrigger.RefreshMarbleWaterState(this);
-    }
 
-    void UnfreezeTrue() => Unfreeze(true);
+        // Trigger refresh must not be allowed to leave the marble frozen.
+        StartCoroutine(ResetFreezeState());
+    }
 
     public void PlaySound(PowerupType _powerup)
     {

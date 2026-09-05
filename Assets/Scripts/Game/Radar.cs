@@ -140,6 +140,13 @@ public class Radar : MonoBehaviour
         }
     }
 
+    private class RadarPriorityEntry
+    {
+        public IRadarMarker marker;
+        public bool isEndPad;
+        public float distanceSqr;
+    }
+
     private class GenericMarker : IRadarMarker
     {
         public MonoBehaviour target;
@@ -223,6 +230,11 @@ public class Radar : MonoBehaviour
     // Unified buffer for PQ-style global distance limiting.
     private readonly List<IRadarMarker> globalValidBuffer =
         new List<IRadarMarker>();
+
+    // Global selection buffer. Gems have highest priority, followed by
+    // the End Pad, then all other radar targets.
+    private readonly List<RadarPriorityEntry> globalPriorityBuffer =
+        new List<RadarPriorityEntry>();
 
     // End Pad UI Elements.
     private Image endPadIconImage;
@@ -453,15 +465,88 @@ public class Radar : MonoBehaviour
         CollectTimeTravels(radarTimeTravel);
 
         // ========================================================
-        // 4. PQ-STYLE GLOBAL LIMIT SORTING
+        // 4. GLOBAL LIMIT SORTING
+        //    Priority:
+        //      1. Gems
+        //      2. End Pad
+        //      3. All other radar targets
+        //
+        //    Within each priority group, nearest comes first.
         // ========================================================
 
-        globalValidBuffer.Sort(
+        globalPriorityBuffer.Clear();
+
+        // Add all normal radar markers.
+        foreach (IRadarMarker marker in globalValidBuffer)
+        {
+            globalPriorityBuffer.Add(
+                new RadarPriorityEntry
+                {
+                    marker = marker,
+                    isEndPad = false,
+                    distanceSqr = marker.DistanceSqr
+                });
+        }
+
+        // Add the End Pad to the same global selection.
+        // It only becomes eligible under the same conditions that
+        // normally allow the End Pad to be displayed.
+        bool endPadEligible =
+            radarEndPad &&
+            gemRequirementSatisfied &&
+            GameManager.instance.finishPad != null;
+
+        if (endPadEligible)
+        {
+            Vector3 padPos =
+                GetBoundsCenter(GameManager.instance.finishPad);
+
+            float endPadDistanceSqr =
+                (padPos -
+                 playerCamera.transform.position).sqrMagnitude;
+
+            if (endPadDistanceSqr <=
+                maxRadarDistance * maxRadarDistance)
+            {
+                globalPriorityBuffer.Add(
+                    new RadarPriorityEntry
+                    {
+                        marker = null,
+                        isEndPad = true,
+                        distanceSqr = endPadDistanceSqr
+                    });
+            }
+        }
+
+        // Gems always come first, followed by the End Pad, followed
+        // by all other radar targets. Within each group, nearest
+        // targets come first.
+        globalPriorityBuffer.Sort(
             (a, b) =>
-                a.DistanceSqr.CompareTo(b.DistanceSqr));
+            {
+                int aPriority =
+                    a.marker is GemMarker
+                        ? 0
+                        : a.isEndPad
+                            ? 1
+                            : 2;
+
+                int bPriority =
+                    b.marker is GemMarker
+                        ? 0
+                        : b.isEndPad
+                            ? 1
+                            : 2;
+
+                if (aPriority != bPriority)
+                    return aPriority.CompareTo(bPriority);
+
+                return a.distanceSqr.CompareTo(
+                    b.distanceSqr);
+            });
 
         int drawLimit =
-            globalValidBuffer.Count;
+            globalPriorityBuffer.Count;
 
         if (maxVisibleRadarItems > 0 &&
             drawLimit > maxVisibleRadarItems)
@@ -470,7 +555,13 @@ public class Radar : MonoBehaviour
                  i < drawLimit;
                  i++)
             {
-                globalValidBuffer[i].Hide();
+                RadarPriorityEntry entry =
+                    globalPriorityBuffer[i];
+
+                if (entry.isEndPad)
+                    HideEndPad();
+                else
+                    entry.marker.Hide();
             }
 
             drawLimit =
@@ -481,9 +572,22 @@ public class Radar : MonoBehaviour
         // 5. RENDER VISIBLE ITEMS
         // ========================================================
 
+        bool endPadRendered =
+            false;
+
         for (int i = 0; i < drawLimit; i++)
         {
-            globalValidBuffer[i].Render(
+            RadarPriorityEntry entry =
+                globalPriorityBuffer[i];
+
+            if (entry.isEndPad)
+            {
+                UpdateEndPad();
+                endPadRendered = true;
+                continue;
+            }
+
+            entry.marker.Render(
                 playerCamera,
                 canvas,
                 canvasRect,
@@ -491,26 +595,17 @@ public class Radar : MonoBehaviour
                 pointerSize,
                 pointerAlpha,
                 pointerIcon,
-                globalValidBuffer[i] is GemMarker);
+                entry.marker is GemMarker);
         }
 
         // ========================================================
-        // 6. HANDLE END PAD INDEPENDENTLY
+        // 6. HANDLE END PAD VISIBILITY
         // ========================================================
 
-        bool hasEndPad =
-            GameManager.instance.finishPad != null;
-
-        if (radarEndPad &&
-            gemRequirementSatisfied &&
-            hasEndPad)
-        {
-            UpdateEndPad();
-        }
-        else
-        {
+        // The End Pad is rendered by the global selection above.
+        // If it was not selected, make sure it remains hidden.
+        if (!endPadRendered)
             HideEndPad();
-        }
     }
 
     // ============================================================

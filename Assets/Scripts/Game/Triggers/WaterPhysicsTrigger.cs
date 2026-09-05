@@ -40,9 +40,8 @@ public class WaterPhysicsTrigger : MonoBehaviour
             yield break;
 
         // Use the water collider's bounds to find possible overlaps.
-        // This may return some false positives for oddly shaped colliders,
-        // but ProcessTriggerEnter performs the same registration logic
-        // used by normal trigger events.
+        // This is only a broad-phase query. The actual collider overlap
+        // is verified with ComputePenetration below.
         Bounds bounds = waterCollider.bounds;
 
         Collider[] colliders = Physics.OverlapBox(
@@ -66,12 +65,37 @@ public class WaterPhysicsTrigger : MonoBehaviour
             if (marble == null)
                 continue;
 
-            // Make sure the collider actually overlaps the water collider.
-            if (!waterCollider.bounds.Intersects(other.bounds))
+            // Verify that the actual colliders overlap.
+            // bounds.Intersects() only compares axis-aligned bounds
+            // and can incorrectly report an overlap.
+            if (!CollidersActuallyOverlap(waterCollider, other))
                 continue;
 
             ProcessTriggerEnter(other);
         }
+    }
+
+    private static bool CollidersActuallyOverlap(Collider a, Collider b)
+    {
+        if (a == null || b == null)
+            return false;
+
+        if (!a.enabled || !b.enabled)
+            return false;
+
+        Vector3 direction;
+        float distance;
+
+        return Physics.ComputePenetration(
+            a,
+            a.transform.position,
+            a.transform.rotation,
+            b,
+            b.transform.position,
+            b.transform.rotation,
+            out direction,
+            out distance
+        );
     }
 
     private void OnTriggerEnter(Collider other)
@@ -366,7 +390,10 @@ public class WaterPhysicsTrigger : MonoBehaviour
                 !trigger.waterCollider.enabled)
                 continue;
 
-            if (!trigger.waterCollider.bounds.Intersects(marbleCollider.bounds))
+            // Use the actual collider geometry rather than AABB bounds.
+            if (!CollidersActuallyOverlap(
+                    trigger.waterCollider,
+                    marbleCollider))
                 continue;
 
             if (!trigger.localOverlaps.TryGetValue(

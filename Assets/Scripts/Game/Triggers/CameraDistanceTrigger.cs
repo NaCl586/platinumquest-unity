@@ -11,6 +11,7 @@ public class CameraDistanceTrigger : MonoBehaviour
         public float startTime;
         public float duration;
         public bool smooth;
+        public bool restoring;
     }
 
     [Header("Camera Distance")]
@@ -28,6 +29,8 @@ public class CameraDistanceTrigger : MonoBehaviour
     [Tooltip("0 means restore the previous camera distance.")]
     public float forceExitValue = 0f;
 
+    private const float DistanceTolerance = 0.001f;
+
     private readonly Dictionary<Marble, float> previousDistances =
         new Dictionary<Marble, float>();
 
@@ -36,14 +39,22 @@ public class CameraDistanceTrigger : MonoBehaviour
 
     private Collider triggerCollider;
 
+    // Only one CameraDistanceTrigger should control the camera at a time.
+    private static CameraDistanceTrigger activeTrigger;
+
+    // True while this trigger owns the camera-distance effect.
+    private bool effectActive;
+
     private void Awake()
     {
-        triggerCollider = GetComponent<Collider>();
+        triggerCollider =
+            GetComponent<Collider>();
 
         if (triggerCollider == null)
         {
             Debug.LogError(
-                $"CameraDistanceTrigger on {gameObject.name} requires a Collider."
+                $"CameraDistanceTrigger on {gameObject.name} " +
+                "requires a Collider."
             );
 
             return;
@@ -52,41 +63,94 @@ public class CameraDistanceTrigger : MonoBehaviour
         triggerCollider.isTrigger = true;
     }
 
+    // ============================================================
+    // Trigger Enter
+    // ============================================================
+
     private void OnTriggerEnter(Collider other)
     {
-        Marble marble = other.GetComponent<Marble>();
+        Marble marble =
+            other.GetComponent<Marble>();
 
         if (marble == null)
             return;
 
-        // Original trigger only affects the level's main marble.
         if (marble != Marble.instance)
             return;
 
-        CameraController camera = CameraController.instance;
+        CameraController camera =
+            CameraController.instance;
 
         if (camera == null)
             return;
 
-        float currentDistance = GetCameraDistance(camera);
+        float currentDistance =
+            GetCameraDistance(camera);
 
-        previousDistances[marble] = currentDistance;
+        float targetDistance =
+            GetTargetDistance();
 
-        float targetDistance = distance;
+        // ---------------------------------------------------------
+        // Already at the requested distance.
+        //
+        // Do absolutely nothing:
+        // - Do not cancel another trigger.
+        // - Do not start an animation.
+        // - Do not take ownership of the camera.
+        // ---------------------------------------------------------
 
-        if (float.IsNaN(targetDistance))
-            targetDistance = 2.5f;
+        if (Mathf.Abs(
+                currentDistance -
+                targetDistance
+            ) <= DistanceTolerance)
+        {
+            return;
+        }
 
+        // ---------------------------------------------------------
+        // Cancel any other active camera-distance trigger.
+        // ---------------------------------------------------------
+
+        if (activeTrigger != null &&
+            activeTrigger != this)
+        {
+            activeTrigger.CancelForNewTrigger();
+        }
+
+        activeTrigger =
+            this;
+
+        effectActive =
+            true;
+
+        // The distance before entering this trigger is what should
+        // be restored when leaving, unless forceExitValue is used.
+        previousDistances[marble] =
+            currentDistance;
+
+        states.Clear();
+
+        // Start from the CURRENT camera distance.
+        //
+        // This is important when another camera-distance trigger
+        // was already animating. The new trigger takes over from
+        // wherever the camera currently is.
         StartTransition(
             marble,
             currentDistance,
-            targetDistance
+            targetDistance,
+            false
         );
     }
 
+    // ============================================================
+    // Trigger Exit
+    // ============================================================
+
     private void OnTriggerExit(Collider other)
     {
-        Marble marble = other.GetComponent<Marble>();
+        Marble marble =
+            other.GetComponent<Marble>();
 
         if (marble == null)
             return;
@@ -94,112 +158,280 @@ public class CameraDistanceTrigger : MonoBehaviour
         if (marble != Marble.instance)
             return;
 
+        // If this trigger no longer owns the effect, it was
+        // cancelled by another CameraDistanceTrigger.
+        //
+        // In that case it must not restore the old camera distance.
+        if (!effectActive ||
+            activeTrigger != this)
+        {
+            return;
+        }
+
         if (keepEffectOnLeave)
             return;
 
-        CameraController camera = CameraController.instance;
+        CameraController camera =
+            CameraController.instance;
 
         if (camera == null)
             return;
 
         float targetDistance;
 
+        // A non-zero forceExitValue explicitly overrides the
+        // saved previous distance.
         if (Mathf.Abs(forceExitValue) > Mathf.Epsilon)
         {
-            targetDistance = forceExitValue;
+            targetDistance =
+                forceExitValue;
         }
         else if (previousDistances.TryGetValue(
                      marble,
                      out float previousDistance))
         {
-            targetDistance = previousDistance;
+            targetDistance =
+                previousDistance;
         }
         else
         {
-            targetDistance = GetCameraDistance(camera);
+            targetDistance =
+                GetCameraDistance(camera);
         }
+
+        float currentDistance =
+            GetCameraDistance(camera);
+
+        // Already at the restore distance.
+        if (Mathf.Abs(
+                currentDistance -
+                targetDistance
+            ) <= DistanceTolerance)
+        {
+            SetCameraDistance(
+                camera,
+                targetDistance
+            );
+
+            effectActive =
+                false;
+
+            if (activeTrigger == this)
+                activeTrigger = null;
+
+            ClearCameraDistanceOverride();
+
+            return;
+        }
+
+        states.Clear();
 
         StartTransition(
             marble,
-            GetCameraDistance(camera),
-            targetDistance
+            currentDistance,
+            targetDistance,
+            true
         );
     }
 
-    private void StartTransition(
-        Marble marble,
-        float startDistance,
-        float targetDistance)
+    // ============================================================
+    // Distance Helpers
+    // ============================================================
+
+    private float GetTargetDistance()
     {
-        states[marble] = new CameraDistanceState
+        if (float.IsNaN(distance) ||
+            float.IsInfinity(distance))
         {
-            startDistance = startDistance,
-            targetDistance = targetDistance,
-            startTime = Time.time,
-            duration = GetDuration(),
-            smooth = smooth
-        };
+            return 2.5f;
+        }
+
+        return Mathf.Max(
+            0.001f,
+            distance
+        );
     }
 
     private float GetDuration()
     {
-        // Original:
-        // time defaults to 1000 ms
-        // time / 1000 = seconds
-        // invalid or <= 0 becomes 1 second.
-
-        if (float.IsNaN(time) || time <= 0f)
+        if (float.IsNaN(time) ||
+            float.IsInfinity(time) ||
+            time <= 0f)
+        {
             return 1f;
+        }
 
         return time / 1000f;
     }
 
-    private float GetCameraDistance(CameraController camera)
+    private float GetCameraDistance(
+        CameraController camera)
     {
-        Vector3 offset = camera.GetOffset();
+        if (camera == null)
+            return 0f;
 
-        return offset.magnitude;
+        return camera.GetOffset().magnitude;
+    }
+
+    // ============================================================
+    // 2D Mode
+    // ============================================================
+
+    private TwoDMode GetActiveTwoDMode()
+    {
+        if (GameManager.instance == null)
+            return null;
+
+        foreach (IGameMode mode in
+                 GameManager.instance.GameModes)
+        {
+            if (mode is TwoDMode twoDMode &&
+                twoDMode.Active)
+            {
+                return twoDMode;
+            }
+        }
+
+        return null;
     }
 
     private void SetCameraDistance(
         CameraController camera,
         float targetDistance)
     {
-        Vector3 offset = camera.GetOffset();
+        if (camera == null)
+            return;
+
+        TwoDMode twoDMode =
+            GetActiveTwoDMode();
+
+        if (twoDMode != null)
+        {
+            twoDMode.SetCameraDistanceOverride(
+                targetDistance
+            );
+
+            return;
+        }
+
+        Vector3 offset =
+            camera.GetOffset();
 
         if (offset.sqrMagnitude < 0.000001f)
         {
-            // Avoid losing the camera direction if the offset somehow
-            // becomes zero.
-            offset = Vector3.back;
+            offset =
+                Vector3.back;
         }
 
-        offset = offset.normalized * targetDistance;
-
-        camera.SetOffset(offset);
+        camera.SetOffset(
+            offset.normalized *
+            targetDistance
+        );
     }
+
+    private void ClearCameraDistanceOverride()
+    {
+        TwoDMode twoDMode =
+            GetActiveTwoDMode();
+
+        if (twoDMode != null)
+        {
+            twoDMode.ClearCameraDistanceOverride();
+        }
+    }
+
+    // ============================================================
+    // Transition
+    // ============================================================
+
+    private void StartTransition(
+        Marble marble,
+        float startDistance,
+        float targetDistance,
+        bool restoring)
+    {
+        // No animation is necessary if the distances are already
+        // effectively identical.
+        if (Mathf.Abs(
+                startDistance -
+                targetDistance
+            ) <= DistanceTolerance)
+        {
+            SetCameraDistance(
+                CameraController.instance,
+                targetDistance
+            );
+
+            return;
+        }
+
+        states[marble] =
+            new CameraDistanceState
+            {
+                startDistance =
+                    startDistance,
+
+                targetDistance =
+                    targetDistance,
+
+                startTime =
+                    Time.time,
+
+                duration =
+                    GetDuration(),
+
+                smooth =
+                    smooth,
+
+                restoring =
+                    restoring
+            };
+    }
+
+    // ============================================================
+    // Update
+    // ============================================================
 
     private void Update()
     {
         if (states.Count == 0)
             return;
 
-        CameraController camera = CameraController.instance;
+        // This trigger was replaced by another trigger.
+        //
+        // Stop updating immediately. Do NOT clear the 2D override
+        // here because the new trigger may already be using it.
+        if (activeTrigger != this ||
+            !effectActive)
+        {
+            states.Clear();
+            return;
+        }
+
+        CameraController camera =
+            CameraController.instance;
 
         if (camera == null)
             return;
 
-        List<Marble> completed = null;
+        List<Marble> completed =
+            null;
 
-        foreach (KeyValuePair<Marble, CameraDistanceState> pair in states)
+        foreach (
+            KeyValuePair<Marble, CameraDistanceState>
+            pair in states)
         {
-            Marble marble = pair.Key;
-            CameraDistanceState state = pair.Value;
+            Marble marble =
+                pair.Key;
+
+            CameraDistanceState state =
+                pair.Value;
 
             if (marble == null)
             {
                 if (completed == null)
-                    completed = new List<Marble>();
+                    completed =
+                        new List<Marble>();
 
                 completed.Add(marble);
                 continue;
@@ -209,29 +441,29 @@ public class CameraDistanceTrigger : MonoBehaviour
                 continue;
 
             float t =
-                (Time.time - state.startTime) /
+                (Time.time -
+                 state.startTime) /
                 state.duration;
 
-            if (t >= 1f)
+            t =
+                Mathf.Clamp01(t);
+
+            float eased;
+
+            if (state.smooth)
             {
-                SetCameraDistance(
-                    camera,
-                    state.targetDistance
-                );
-
-                if (completed == null)
-                    completed = new List<Marble>();
-
-                completed.Add(marble);
-
-                continue;
+                eased =
+                    0.5f -
+                    0.5f *
+                    Mathf.Cos(
+                        t * Mathf.PI
+                    );
             }
-
-            t = Mathf.Clamp01(t);
-
-            float eased = state.smooth
-                ? 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI)
-                : t;
+            else
+            {
+                eased =
+                    t;
+            }
 
             float newDistance =
                 Mathf.Lerp(
@@ -244,67 +476,179 @@ public class CameraDistanceTrigger : MonoBehaviour
                 camera,
                 newDistance
             );
+
+            if (t >= 1f)
+            {
+                SetCameraDistance(
+                    camera,
+                    state.targetDistance
+                );
+
+                if (state.restoring)
+                {
+                    effectActive =
+                        false;
+
+                    if (activeTrigger == this)
+                        activeTrigger = null;
+
+                    ClearCameraDistanceOverride();
+                }
+                else
+                {
+                    // Keep the 2D override active after the
+                    // transition has finished.
+                    TwoDMode twoDMode =
+                        GetActiveTwoDMode();
+
+                    if (twoDMode != null)
+                    {
+                        twoDMode.SetCameraDistanceOverride(
+                            state.targetDistance
+                        );
+                    }
+                }
+
+                if (completed == null)
+                    completed =
+                        new List<Marble>();
+
+                completed.Add(marble);
+            }
         }
 
         if (completed != null)
         {
             foreach (Marble marble in completed)
+            {
                 states.Remove(marble);
+            }
         }
     }
+
+    // ============================================================
+    // Cancellation
+    // ============================================================
+
+    private void CancelForNewTrigger()
+    {
+        states.Clear();
+
+        effectActive =
+            false;
+
+        // IMPORTANT:
+        //
+        // Do NOT clear the TwoDMode camera-distance override here.
+        //
+        // The new trigger immediately replaces the value, so
+        // clearing it would cause a visible one-frame snap.
+    }
+
+    // ============================================================
+    // Reset
+    // ============================================================
+
     public void ResetTrigger()
     {
         previousDistances.Clear();
         states.Clear();
 
-        // If the marble is still inside this trigger after a restart/respawn,
-        // Unity may not fire OnTriggerEnter again.
-        //
-        // Restore the trigger's camera distance immediately rather than
-        // playing the normal transition animation.
-        Marble marble = Marble.instance;
+        Marble marble =
+            Marble.instance;
 
-        if (marble == null || triggerCollider == null)
+        if (marble == null ||
+            triggerCollider == null)
+        {
             return;
+        }
 
         if (!IsMarbleInsideTrigger(marble))
-            return;
+        {
+            if (activeTrigger == this)
+            {
+                effectActive =
+                    false;
 
-        StartCoroutine(ReapplyAfterReset(marble));
+                activeTrigger =
+                    null;
+
+                ClearCameraDistanceOverride();
+            }
+
+            return;
+        }
+
+        // Resetting an active trigger gives it ownership again.
+        if (activeTrigger != null &&
+            activeTrigger != this)
+        {
+            activeTrigger.CancelForNewTrigger();
+        }
+
+        activeTrigger =
+            this;
+
+        effectActive =
+            true;
+
+        StartCoroutine(
+            ReapplyAfterReset(marble)
+        );
     }
 
-    private bool IsMarbleInsideTrigger(Marble marble)
+    private bool IsMarbleInsideTrigger(
+        Marble marble)
     {
-        if (marble == null || triggerCollider == null)
+        if (marble == null ||
+            triggerCollider == null)
+        {
             return false;
+        }
 
-        Collider marbleCollider = marble.GetComponent<Collider>();
+        Collider marbleCollider =
+            marble.GetComponent<Collider>();
 
         if (marbleCollider == null)
-            return triggerCollider.bounds.Contains(marble.transform.position);
+        {
+            return triggerCollider.bounds.Contains(
+                marble.transform.position
+            );
+        }
 
         return Physics.ComputePenetration(
             marbleCollider,
             marble.transform.position,
             marble.transform.rotation,
+
             triggerCollider,
             triggerCollider.transform.position,
             triggerCollider.transform.rotation,
+
             out _,
             out _
         );
     }
 
-    private IEnumerator ReapplyAfterReset(Marble marble)
+    private IEnumerator ReapplyAfterReset(
+        Marble marble)
     {
-        // Wait one frame so the normal respawn/reset process can finish
-        // resetting the camera first.
         yield return null;
 
-        if (marble == null || marble != Marble.instance)
+        if (marble == null ||
+            marble != Marble.instance)
+        {
             yield break;
+        }
 
-        CameraController camera = CameraController.instance;
+        if (activeTrigger != this ||
+            !effectActive)
+        {
+            yield break;
+        }
+
+        CameraController camera =
+            CameraController.instance;
 
         if (camera == null)
             yield break;
@@ -312,22 +656,38 @@ public class CameraDistanceTrigger : MonoBehaviour
         if (!IsMarbleInsideTrigger(marble))
             yield break;
 
-        float targetDistance = distance;
+        float targetDistance =
+            GetTargetDistance();
 
-        if (float.IsNaN(targetDistance))
-            targetDistance = 2.5f;
+        SetCameraDistance(
+            camera,
+            targetDistance
+        );
 
-        // Immediately restore the trigger distance.
-        // Do NOT use StartTransition() here.
-        SetCameraDistance(camera, targetDistance);
-
-        // Store the resulting distance as the current previous distance.
-        previousDistances[marble] = targetDistance;
+        previousDistances[marble] =
+            targetDistance;
     }
+
+    // ============================================================
+    // Disable
+    // ============================================================
 
     private void OnDisable()
     {
         previousDistances.Clear();
         states.Clear();
+
+        // Only the trigger that currently owns the effect is
+        // allowed to clear the 2D override.
+        if (activeTrigger == this)
+        {
+            effectActive =
+                false;
+
+            activeTrigger =
+                null;
+
+            ClearCameraDistanceOverride();
+        }
     }
 }

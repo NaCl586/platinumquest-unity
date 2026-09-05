@@ -9,6 +9,9 @@ public class HelpTrigger : MonoBehaviour
 
     public void TriggerEnter()
     {
+        if (GameUIManager.instance == null)
+            return;
+
         GameManager.instance.PlayHelpTriggerAudio();
         GameUIManager.instance.SetCenterText(helpText);
     }

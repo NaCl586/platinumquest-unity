@@ -540,7 +540,28 @@ new SimGroup(MissionGroup) {
 		position = "0 0 0";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
-		interiorFile = "~/data/interiors_pq/intermediate/Mountain.dif";
+		interiorFile = "~/data/interiors_pq/intermediate/mountain0.dif";
+		showTerrainInside = "0";
+	};
+	new InteriorInstance() {
+		position = "0 0 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		interiorFile = "~/data/interiors_pq/intermediate/mountain1.dif";
+		showTerrainInside = "0";
+	};
+	new InteriorInstance() {
+		position = "0 0 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		interiorFile = "~/data/interiors_pq/intermediate/mountain2.dif";
+		showTerrainInside = "0";
+	};
+	new InteriorInstance() {
+		position = "0 0 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		interiorFile = "~/data/interiors_pq/intermediate/mountain3.dif";
 		showTerrainInside = "0";
 	};
 	new Sun() {
@@ -990,6 +1011,7 @@ new SimGroup(MissionGroup) {
 		scale = "0.5 0.5 0.5";
 		shapeName = "~/data/shapes_pq/Gameplay/pads/checkpoint.dts";
 			add = "0 0 2";
+			down = "1";
 	};
 	new TSStatic() {
 		position = "17.8339 7.0131 34.0651";
@@ -1188,6 +1210,7 @@ new SimGroup(MissionGroup) {
 		scale = "0.5 0.5 0.5";
 		shapeName = "~/data/shapes_pq/Gameplay/pads/checkpoint.dts";
 			add = "0 0 1.25";
+			down = "1";
 	};
 	new TSStatic() {
 		position = "1.73836 -1.0355 43.374";

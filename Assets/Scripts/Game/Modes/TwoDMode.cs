@@ -24,28 +24,19 @@ public class TwoDMode : NullMode
     private bool missionChangesPitch;
     private float missionTargetPitch;
 
-    // ============================================================
-    // Current runtime 2D state
-    // ============================================================
-
     private float currentYaw;
     private float currentCameraDistance = float.NaN;
     private float currentPitch;
     private bool currentChangesPitch;
 
-    // ============================================================
-    // 2D state saved at the active checkpoint
-    // ============================================================
+    private bool cameraDistanceOverride;
+    private float overriddenCameraDistance = float.NaN;
 
     private bool checkpointHas2DState;
     private float checkpointYaw;
     private float checkpointCameraDistance = float.NaN;
     private float checkpointPitch;
     private bool checkpointChangesPitch;
-
-    // ============================================================
-    // Runtime state
-    // ============================================================
 
     private bool active;
 
@@ -58,20 +49,15 @@ public class TwoDMode : NullMode
 
     public bool Active => active;
 
-    /// <summary>
-    /// False = left was most recently pressed.
-    /// True  = right was most recently pressed.
-    /// </summary>
+    public bool CameraDistanceOverrideActive =>
+        cameraDistanceOverride;
+
     public bool LastPressedLR { get; private set; }
 
     public TwoDMode(GameManager gameManager)
         : base(gameManager)
     {
     }
-
-    // ============================================================
-    // Plane conversion
-    // ============================================================
 
     public static float PlaneToYaw(
         string plane,
@@ -84,12 +70,10 @@ public class TwoDMode : NullMode
 
         switch (plane.Trim().ToLowerInvariant())
         {
-            // Haxe XZ -> Unity YZ
             case "xz":
                 yaw = Mathf.PI * 0.5f;
                 break;
 
-            // Haxe YZ -> Unity XZ
             case "yz":
                 yaw = 0f;
                 break;
@@ -110,9 +94,7 @@ public class TwoDMode : NullMode
                 }
                 else
                 {
-                    yaw =
-                        degrees *
-                        Mathf.Deg2Rad;
+                    yaw = degrees * Mathf.Deg2Rad;
                 }
 
                 break;
@@ -124,53 +106,78 @@ public class TwoDMode : NullMode
         return yaw;
     }
 
-    // ============================================================
-    // Mission loading
-    // ============================================================
-
     public override void OnMissionLoad()
     {
         base.OnMissionLoad();
 
+        if (pendingMissionActivation != null &&
+            GameManager.instance != null)
+        {
+            GameManager.instance.StopCoroutine(
+                pendingMissionActivation
+            );
+
+            pendingMissionActivation = null;
+        }
+
         active = false;
+
         targetYaw = 0f;
         targetPitch = 0f;
+
         currentYaw = 0f;
         currentCameraDistance = float.NaN;
         currentPitch = 0f;
         currentChangesPitch = false;
 
-        if (MissionInfo.instance == null)
-        {
-            hasMissionPlane = false;
-            return;
-        }
+        hasMissionPlane = false;
 
-        string plane = MissionInfo.instance.cameraPlane;
+        missionYaw = 0f;
+        missionCameraDistance = float.NaN;
+
+        missionChangesPitch = false;
+        missionTargetPitch = 0f;
+
+        checkpointHas2DState = false;
+
+        cameraDistanceOverride = false;
+        overriddenCameraDistance = float.NaN;
+
+        if (MissionInfo.instance == null)
+            return;
+
+        string plane =
+            MissionInfo.instance.cameraPlane;
 
         if (string.IsNullOrWhiteSpace(plane))
-        {
-            hasMissionPlane = false;
             return;
-        }
 
         hasMissionPlane = true;
 
-        missionYaw = PlaneToYaw(
-            plane,
-            MissionInfo.instance.invertCameraPlane
-        );
+        missionYaw =
+            PlaneToYaw(
+                plane,
+                MissionInfo.instance.invertCameraPlane
+            );
 
-        missionCameraDistance =
-            MissionInfo.instance.hasInitialCameraDistance
-                ? MissionInfo.instance.initialCameraDistance
-                : float.NaN;
+        if (MissionInfo.instance.hasInitialCameraDistance)
+        {
+            missionCameraDistance =
+                MissionInfo.instance.initialCameraDistance;
+        }
+        else
+        {
+            missionCameraDistance =
+                float.NaN;
+        }
 
         if (MissionInfo.instance.hasCameraPitch)
         {
             missionChangesPitch = true;
+
             missionTargetPitch =
-                MissionInfo.instance.cameraPitch * Mathf.Deg2Rad;
+                MissionInfo.instance.cameraPitch *
+                Mathf.Deg2Rad;
         }
         else
         {
@@ -178,7 +185,13 @@ public class TwoDMode : NullMode
             missionTargetPitch = 0f;
         }
 
-        checkpointHas2DState = false;
+        if (GameManager.instance != null)
+        {
+            pendingMissionActivation =
+                GameManager.instance.StartCoroutine(
+                    ActivateMissionWhenCameraReady()
+                );
+        }
     }
 
     private IEnumerator ActivateMissionWhenCameraReady()
@@ -198,38 +211,41 @@ public class TwoDMode : NullMode
         CameraController camera =
             CameraController.instance;
 
-        float pitch;
-
-        if (missionChangesPitch)
+        if (GameManager.instance != null)
         {
-            pitch = missionTargetPitch;
-        }
-        else
-        {
-            pitch = camera.CameraPitch;
+            while (
+                GameManager.instance.activeCheckpoint == null)
+            {
+                yield return null;
+            }
         }
 
-        Activate(
-            missionYaw,
-            missionCameraDistance,
-            missionChangesPitch,
-            pitch
-        );
+        yield return null;
+
+        if (!active)
+        {
+            float pitch;
+
+            if (missionChangesPitch)
+            {
+                pitch = missionTargetPitch;
+            }
+            else
+            {
+                pitch = camera.CameraPitch;
+            }
+
+            Activate(
+                missionYaw,
+                missionCameraDistance,
+                missionChangesPitch,
+                pitch
+            );
+        }
 
         pendingMissionActivation = null;
     }
 
-    // ============================================================
-    // Checkpoint camera state
-    // ============================================================
-
-    /// <summary>
-    /// Saves the current 2D camera state as the state belonging
-    /// to the currently reached checkpoint.
-    ///
-    /// This is intentionally part of TwoDMode so other gameplay
-    /// systems do not need to inspect or compare game modes.
-    /// </summary>
     private void SaveCheckpointState()
     {
         if (!active)
@@ -240,92 +256,89 @@ public class TwoDMode : NullMode
 
         checkpointHas2DState = true;
 
-        checkpointYaw =
-            currentYaw;
-
-        checkpointCameraDistance =
-            currentCameraDistance;
-
-        checkpointPitch =
-            currentPitch;
-
-        checkpointChangesPitch =
-            currentChangesPitch;
+        checkpointYaw = currentYaw;
+        checkpointCameraDistance = currentCameraDistance;
+        checkpointPitch = currentPitch;
+        checkpointChangesPitch = currentChangesPitch;
     }
 
-    /// <summary>
-    /// Clears checkpoint-specific 2D state.
-    ///
-    /// Used when starting a completely new mission.
-    /// </summary>
     public void ClearCheckpointState()
     {
         checkpointHas2DState = false;
 
-        checkpointYaw =
-            missionYaw;
-
-        checkpointCameraDistance =
-            missionCameraDistance;
-
-        checkpointPitch =
-            missionTargetPitch;
-
-        checkpointChangesPitch =
-            missionChangesPitch;
+        checkpointYaw = missionYaw;
+        checkpointCameraDistance = missionCameraDistance;
+        checkpointPitch = missionTargetPitch;
+        checkpointChangesPitch = missionChangesPitch;
     }
-
-    // ============================================================
-    // Respawn
-    // ============================================================
 
     public override void OnRestart()
     {
         base.OnRestart();
 
+        RestoreMissionPlane();
+
         checkpointHas2DState = false;
 
-        checkpointYaw =
-            missionYaw;
+        checkpointYaw = missionYaw;
+        checkpointCameraDistance = missionCameraDistance;
+        checkpointPitch = missionTargetPitch;
+        checkpointChangesPitch = missionChangesPitch;
 
-        checkpointCameraDistance =
-            missionCameraDistance;
+        currentYaw = missionYaw;
+        currentCameraDistance = missionCameraDistance;
+        currentPitch = missionTargetPitch;
+        currentChangesPitch = missionChangesPitch;
 
-        checkpointPitch =
-            missionTargetPitch;
+        targetYaw = missionYaw;
+        targetPitch = missionTargetPitch;
+        changesPitch = missionChangesPitch;
 
-        checkpointChangesPitch =
-            missionChangesPitch;
+        cameraDistanceOverride = false;
+        overriddenCameraDistance = float.NaN;
     }
 
-    public override void OnRespawn()
+    public override void OnCheckpointReached()
     {
-        if (!hasMissionPlane)
+        if (!active)
             return;
 
-        if (checkpointHas2DState)
-        {
-            Activate(
-                checkpointYaw,
-                checkpointCameraDistance,
-                checkpointChangesPitch,
-                checkpointPitch
-            );
-        }
-        else
-        {
-            Activate(
-                missionYaw,
-                missionCameraDistance,
-                missionChangesPitch,
-                missionTargetPitch
-            );
-        }
+        checkpointHas2DState = true;
+        checkpointYaw = currentYaw;
+        checkpointCameraDistance = currentCameraDistance;
+        checkpointPitch = currentPitch;
+        checkpointChangesPitch = currentChangesPitch;
     }
 
-    // ============================================================
-    // Activation
-    // ============================================================
+    public void SetCameraDistanceOverride(float distance)
+    {
+        if (float.IsNaN(distance) ||
+            float.IsInfinity(distance))
+        {
+            return;
+        }
+
+        cameraDistanceOverride = true;
+        overriddenCameraDistance =
+            Mathf.Max(0.001f, distance);
+    }
+
+    public void ClearCameraDistanceOverride()
+    {
+        cameraDistanceOverride = false;
+        overriddenCameraDistance = float.NaN;
+    }
+
+    private float GetEffectiveCameraDistance()
+    {
+        if (cameraDistanceOverride &&
+            !float.IsNaN(overriddenCameraDistance))
+        {
+            return overriddenCameraDistance;
+        }
+
+        return currentCameraDistance;
+    }
 
     public void Activate(
         float yaw,
@@ -335,18 +348,14 @@ public class TwoDMode : NullMode
     {
         active = true;
 
-        targetYaw =
-            yaw;
+        targetYaw = yaw;
+        this.changesPitch = changesPitch;
 
-        this.changesPitch =
-            changesPitch;
+        cameraDistanceOverride = false;
+        overriddenCameraDistance = float.NaN;
 
-        // Save the current runtime 2D side.
-        currentYaw =
-            yaw;
-
-        currentChangesPitch =
-            changesPitch;
+        currentYaw = yaw;
+        currentChangesPitch = changesPitch;
 
         CameraController camera =
             CameraController.instance;
@@ -354,50 +363,30 @@ public class TwoDMode : NullMode
         if (camera == null)
             return;
 
-        camera.TwoDModeLocked =
-            true;
-
-        // ---------------------------------------------------------
-        // Pitch
-        // ---------------------------------------------------------
+        camera.TwoDModeLocked = true;
 
         if (changesPitch)
         {
-            targetPitch =
-                pitch;
+            targetPitch = pitch;
         }
         else
         {
-            // Preserve the current camera pitch.
-            targetPitch =
-                camera.CameraPitch;
+            targetPitch = camera.CameraPitch;
         }
 
-        currentPitch =
-            targetPitch;
-
-        // ---------------------------------------------------------
-        // Camera distance
-        // ---------------------------------------------------------
+        currentPitch = targetPitch;
 
         if (!float.IsNaN(cameraDistance))
         {
-            currentCameraDistance =
-                cameraDistance;
+            currentCameraDistance = cameraDistance;
         }
         else if (float.IsNaN(currentCameraDistance))
         {
-            currentCameraDistance =
-                camera.CameraDistance;
+            currentCameraDistance = camera.CameraDistance;
         }
 
-        // ---------------------------------------------------------
-        // Apply camera orientation
-        // ---------------------------------------------------------
-
         float cameraYaw =
-            yaw +
-            Mathf.PI * 0.5f;
+            yaw + Mathf.PI * 0.5f;
 
         camera.SetCameraAngles(
             cameraYaw,
@@ -406,31 +395,16 @@ public class TwoDMode : NullMode
             true
         );
 
-        // ---------------------------------------------------------
-        // Apply camera distance
-        // ---------------------------------------------------------
-
         if (!float.IsNaN(currentCameraDistance))
         {
             camera.CameraDistance =
                 currentCameraDistance;
         }
 
-        // ---------------------------------------------------------
-        // 2D FOV
-        //
-        // Default = PlayerPrefs.GetFloat("Graphics_FieldOfView", 70f);
-        // If camerafov exists in the MCS, use that value.
-        // ---------------------------------------------------------
-
         camera.SetFovX(
             GetBaseFov()
         );
     }
-
-    // ============================================================
-    // Deactivation
-    // ============================================================
 
     public void Deactivate()
     {
@@ -439,39 +413,41 @@ public class TwoDMode : NullMode
 
         active = false;
 
+        cameraDistanceOverride = false;
+        overriddenCameraDistance = float.NaN;
+
         CameraController camera =
             CameraController.instance;
 
         if (camera == null)
             return;
 
-        camera.TwoDModeLocked =
-            false;
+        camera.TwoDModeLocked = false;
 
         camera.SetFovX(
             GetBaseFov()
         );
     }
 
-    // ============================================================
-    // Base FOV
-    // ============================================================
-
     private float GetBaseFov()
     {
-        float savedFov = PlayerPrefs.GetFloat("Graphics_FieldOfView", 70f);
+        float savedFov =
+            PlayerPrefs.GetFloat(
+                "Graphics_FieldOfView",
+                70f
+            );
+
         if (MissionInfo.instance != null &&
             MissionInfo.instance.hasCameraFov)
         {
-            return MissionInfo.instance.cameraFov * savedFov / 70f;
+            return
+                MissionInfo.instance.cameraFov *
+                savedFov /
+                70f;
         }
 
         return savedFov;
     }
-
-    // ============================================================
-    // Update
-    // ============================================================
 
     public override void OnUpdate()
     {
@@ -482,7 +458,6 @@ public class TwoDMode : NullMode
 
         UpdateLastPressedLR();
 
-        // Let OOB / finish camera take control.
         if (GameManager.gameFinish)
             return;
 
@@ -499,11 +474,16 @@ public class TwoDMode : NullMode
             true,
             true
         );
-    }
 
-    // ============================================================
-    // Left / Right tracking
-    // ============================================================
+        float effectiveDistance =
+            GetEffectiveCameraDistance();
+
+        if (!float.IsNaN(effectiveDistance))
+        {
+            camera.CameraDistance =
+                effectiveDistance;
+        }
+    }
 
     private void UpdateLastPressedLR()
     {
@@ -523,29 +503,16 @@ public class TwoDMode : NullMode
         }
     }
 
-    // ============================================================
-    // Movement filtering
-    // ============================================================
-
     public override Vector2 FilterMovementInput(
         Vector2 input)
     {
         if (!active)
             return input;
 
-        // Unity:
-        // X = left/right
-        // Y = forward/backward
-        //
-        // 2D mode removes forward/backward movement.
         input.y = 0f;
 
         return input;
     }
-
-    // ============================================================
-    // Cannon restoration
-    // ============================================================
 
     public void RestoreAfterCannon()
     {
@@ -558,8 +525,7 @@ public class TwoDMode : NullMode
         if (camera == null)
             return;
 
-        camera.TwoDModeLocked =
-            true;
+        camera.TwoDModeLocked = true;
 
         camera.SetCameraAngles(
             targetYaw +
@@ -569,14 +535,18 @@ public class TwoDMode : NullMode
             true
         );
 
+        float effectiveDistance =
+            GetEffectiveCameraDistance();
+
+        if (!float.IsNaN(effectiveDistance))
+        {
+            camera.CameraDistance =
+                effectiveDistance;
+        }
+
         camera.SetFovX(
             GetBaseFov()
         );
-    }
-
-    public override void OnCheckpointReached()
-    {
-        SaveCheckpointState();
     }
 
     public override void OnCameraReady()
@@ -584,14 +554,22 @@ public class TwoDMode : NullMode
         if (!hasMissionPlane)
             return;
 
-        CameraController camera = CameraController.instance;
+        CameraController camera =
+            CameraController.instance;
 
         if (camera == null)
             return;
 
-        float pitch = missionChangesPitch
-            ? missionTargetPitch
-            : camera.CameraPitch;
+        float pitch;
+
+        if (missionChangesPitch)
+        {
+            pitch = missionTargetPitch;
+        }
+        else
+        {
+            pitch = camera.CameraPitch;
+        }
 
         Activate(
             missionYaw,
@@ -601,9 +579,11 @@ public class TwoDMode : NullMode
         );
     }
 
-    public override Vector3 GetSuperSpeedDirection(Vector3 defaultDirection)
+    public override Vector3 GetSuperSpeedDirection(
+        Vector3 defaultDirection)
     {
-        Movement movement = Movement.instance;
+        Movement movement =
+            Movement.instance;
 
         if (movement == null)
             return defaultDirection;
@@ -614,17 +594,56 @@ public class TwoDMode : NullMode
             out Vector3 upDir
         );
 
-        // Haxe:
-        //
-        // movementVector = marbleAxis[1]
-        //                 * (lastPressedLR ? 1 : -1);
-        //
-        // In our Unity implementation marbleAxis[1]
-        // corresponds to sideDir.
-
         Vector3 direction =
-            sideDir * (LastPressedLR ? 1f : -1f);
+            sideDir *
+            (LastPressedLR ? 1f : -1f);
 
         return direction;
+    }
+
+    private void RestoreMissionPlane()
+    {
+        if (MissionInfo.instance == null)
+            return;
+
+        string plane =
+            MissionInfo.instance.cameraPlane;
+
+        if (string.IsNullOrWhiteSpace(plane))
+            return;
+
+        missionYaw =
+            PlaneToYaw(
+                plane,
+                MissionInfo.instance.invertCameraPlane
+            );
+
+        targetYaw = missionYaw;
+        currentYaw = missionYaw;
+
+        CameraController camera =
+            CameraController.instance;
+
+        if (camera == null)
+            return;
+
+        camera.TwoDModeLocked = true;
+
+        camera.SetCameraAngles(
+            missionYaw +
+                Mathf.PI * 0.5f,
+            targetPitch,
+            true,
+            true
+        );
+
+        float effectiveDistance =
+            GetEffectiveCameraDistance();
+
+        if (!float.IsNaN(effectiveDistance))
+            camera.CameraDistance =
+                effectiveDistance;
+
+        camera.SetFovX(GetBaseFov());
     }
 }

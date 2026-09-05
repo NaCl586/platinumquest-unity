@@ -3082,7 +3082,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
   canvas: {fileID: 1535437742724973689}
-  maxRadarDistance: 250
+  maxRadarDistance: 500
   maxVisibleRadarItems: 25
   gemRadarIcons:
   - {fileID: 21300000, guid: ddd2c92e4c2994d46a1a4fa841034837, type: 3}

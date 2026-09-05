@@ -507,7 +507,7 @@ new SimGroup(MissionGroup) {
 		};
 		new Item() {
 			position = "20.331 -2.37126e-07 18.5";
-			rotation = "-0.57735 0.57735 0.57735 119.88";
+			rotation = "0 1 0 90";
 			scale = "1.2 1.2 1.2";
 			dataBlock = "AnvilItem";
 			collideable = "0";
