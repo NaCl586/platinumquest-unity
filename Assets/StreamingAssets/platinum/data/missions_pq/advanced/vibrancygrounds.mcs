@@ -510,7 +510,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "90 0 0";
 				placed = "1";
 		};
 		new StaticShape(TrianglePath3) {
@@ -525,7 +525,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "90 0 0";
 				placed = "1";
 		};
 		new StaticShape(TrianglePath2) {
@@ -540,7 +540,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "90 0 0";
 				placed = "1";
 		};
 		new StaticShape(TrianglePath1) {
@@ -555,7 +555,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "90 0 0";
 				placed = "1";
 		};
 		new StaticShape(TrianglePathg) {
@@ -665,7 +665,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(MovingTriangleConstructionPath3) {
 			position = "-38.75 18.25 -0.5";
-			rotation = "1 0 0 0";
+			rotation = "0 0 1 0";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "MovingTriangleConstructionPath1";
@@ -675,7 +675,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "1";
 				RotationMultiplier = "0.35";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingTriangleConstructionPath2) {
@@ -690,12 +690,12 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "1";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingTriangleConstructionPath1) {
 			position = "-38.75 18.25 -0.5";
-			rotation = "1 0 0 0";
+			rotation = "0 0 1 0";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "MovingTriangleConstructionPath2";
@@ -705,7 +705,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "1";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPath4) {
@@ -720,12 +720,12 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPath3) {
 			position = "-46.263 15.3 -0.271281";
-			rotation = "0.0418673 -0.0191609 0.998939 130.863";
+			rotation = "-0.039558 -0.328066 -0.943826 14.5606";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "MovingBumperConstructionPath4";
@@ -735,12 +735,12 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPath2) {
 			position = "-49.6511 16.4 0.0132241";
-			rotation = "0.0417269 -0.0842203 0.995573 52.9146";
+			rotation = "-0.039558 -0.328066 -0.943826 14.5606";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "MovingBumperConstructionPath3";
@@ -750,7 +750,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPath1) {
@@ -765,7 +765,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPathd) {
@@ -780,7 +780,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPathc) {
@@ -795,7 +795,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPathb) {
@@ -810,7 +810,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(MovingBumperConstructionPatha) {
@@ -825,7 +825,7 @@ new SimGroup(MissionGroup) {
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-270 0 0";
 				placed = "1";
 		};
 		new StaticShape(CameraPath1) {
@@ -2114,7 +2114,7 @@ new SimGroup(MissionGroup) {
 			gravity = "0";
 	};
 	new Trigger() {
-		position = "25 9 1.5";
+		position = "25 9 2";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "SpawnTrigger";

@@ -217,7 +217,7 @@ new SimGroup(MissionGroup) {
 
 		new StaticShape(pathe) {
 			position = "25.0553 20.4251 -0.272572";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathf";
@@ -232,7 +232,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathd) {
 			position = "21.5493 18.8213 -0.272095";
-			rotation = "0 0 -1 90";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathe";
@@ -247,7 +247,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathf) {
 			position = "23.0191 17.8466 -0.272794";
-			rotation = "0 0 1 90";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathg";
@@ -262,7 +262,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathc) {
 			position = "18.8238 20.2055 -0.272558";
-			rotation = "0 0 1 180";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathd";
@@ -277,7 +277,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathb) {
 			position = "20.0132 20.9947 -0.272791";
-			rotation = "0 0 1 90";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathc";
@@ -320,7 +320,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathg) {
 			position = "25.3174 18.4854 -0.27575";
-			rotation = "0 0 1 180";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathh";
@@ -335,7 +335,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(pathh) {
 			position = "23.3346 20.9093 -0.27502";
-			rotation = "0 0 -1 90";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "patha";
@@ -350,7 +350,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(patha) {
 			position = "19.0238 18.4202 -0.273903";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "pathb";

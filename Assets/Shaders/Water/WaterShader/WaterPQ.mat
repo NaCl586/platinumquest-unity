@@ -70,7 +70,7 @@ Material:
     - _QueueOffset: -50
     - _ReflectionRefraction: 0.2
     - _Refraction: 0.1
-    - _RippleHeight: 0
+    - _RippleHeight: 0.000001
     - _RippleRefractionStrength: 5
     - _RipplesNormalsMultiplier: 0
     - _Smoothness: 0.2

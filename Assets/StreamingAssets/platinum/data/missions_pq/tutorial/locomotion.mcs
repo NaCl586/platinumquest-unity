@@ -323,13 +323,13 @@ new SimGroup(MissionGroup) {
 		new StaticShape(path7b) {
 			position = "5 61 1";
 			rotation = "1 0 0 90";
-			scale = "1 1 1";
+			scale = "2 2 2";
 			dataBlock = "PathNode";
 				nextNode = "path7a";
 				timeToNext = "2000";
 				usePosition = "1";
 				useRotation = "1";
-				useScale = "0";
+				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
 				placed = "1";
@@ -337,13 +337,13 @@ new SimGroup(MissionGroup) {
 		new StaticShape(path7a) {
 			position = "-5 61 1";
 			rotation = "1 0 0 90";
-			scale = "1 1 1";
+			scale = "2 2 2";
 			dataBlock = "PathNode";
 				nextNode = "path7b";
 				timeToNext = "2000";
 				usePosition = "1";
 				useRotation = "1";
-				useScale = "0";
+				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
 				placed = "1";

@@ -78,13 +78,40 @@ public class GameUIManager : MonoBehaviour
     public GameObject bubbleTimerGameObject;
     public TextMeshProUGUI bubbleTimerText;
     public Image bubbleTimerBar;
+
     public GameObject bubbleInfiniteGameObject;
+
     public GameObject fireballunlitTimerGameObject;
     public TextMeshProUGUI fireballunlitTimerText;
     public Image fireballunlitTimerBar;
+
     public GameObject fireballlitTimerGameObject;
     public TextMeshProUGUI fireballlitTimerText;
     public Image fireballlitTimerBar;
+
+    public GameObject shockAbsorberTimerGameObject;
+    public TextMeshProUGUI shockAbsorberTimerText;
+    public Image shockAbsorberTimerBar;
+
+    public GameObject superBounceTimerGameObject;
+    public TextMeshProUGUI superBounceTimerText;
+    public Image superBounceTimerBar;
+
+    public GameObject gyrocopterTimerGameObject;
+    public TextMeshProUGUI gyrocopterTimerText;
+    public Image gyrocopterTimerBar;
+
+    public GameObject teleporterTimerGameObject;
+    public TextMeshProUGUI teleporterTimerText;
+    public Image teleporterTimerBar;
+
+    public GameObject teleportTriggerTimerGameObject;
+    public TextMeshProUGUI teleportTriggerTimerText;
+    public Image teleportTriggerTimerBar;
+
+    public GameObject transporterTimerGameObject;
+    public TextMeshProUGUI transporterTimerText;
+    public Image transporterTimerBar;
 
     [Header("Time Travel")]
     [SerializeField] private GameObject timeTravelTimer;
@@ -951,6 +978,72 @@ public class GameUIManager : MonoBehaviour
             UpdatePowerupBar(time, fullTime, fireballlitTimerGameObject, fireballlitTimerText, fireballlitTimerBar);
         else
             UpdatePowerupBar(time, fullTime, fireballunlitTimerGameObject, fireballunlitTimerText, fireballunlitTimerBar);
+    }
+
+    public void SetShockAbsorberTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            shockAbsorberTimerGameObject,
+            shockAbsorberTimerText,
+            shockAbsorberTimerBar
+        );
+    }
+
+    public void SetSuperBounceTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            superBounceTimerGameObject,
+            superBounceTimerText,
+            superBounceTimerBar
+        );
+    }
+
+    public void SetGyrocopterTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            gyrocopterTimerGameObject,
+            gyrocopterTimerText,
+            gyrocopterTimerBar
+        );
+    }
+
+    public void SetTeleporterTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            teleporterTimerGameObject,
+            teleporterTimerText,
+            teleporterTimerBar
+        );
+    }
+
+    public void SetTeleportTriggerTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            teleportTriggerTimerGameObject,
+            teleportTriggerTimerText,
+            teleportTriggerTimerBar
+        );
+    }
+
+    public void SetTransporterTimer(float time, float fullTime)
+    {
+        UpdatePowerupBar(
+            time,
+            fullTime,
+            transporterTimerGameObject,
+            transporterTimerText,
+            transporterTimerBar
+        );
     }
 
     private static void UpdatePowerupBar(float time, float fullTime, GameObject obj, TextMeshProUGUI text, Image bar)

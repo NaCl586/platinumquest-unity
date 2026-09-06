@@ -634,7 +634,7 @@ new SimGroup(MissionGroup) {
 	new SimGroup(SpawnPointGroup) {
 
 		new Trigger() {
-			position = "11.5 21 -0.5";
+			position = "11.5 21 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -642,7 +642,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "-4.75 21 -0.5";
+			position = "-4.75 21 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -650,7 +650,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "-21 11.5 -0.5";
+			position = "-21 11.5 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -658,7 +658,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "-21 -16.25 -0.5";
+			position = "-21 -16.25 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -666,7 +666,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "-12.75 -21 -0.5";
+			position = "-12.75 -21 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -674,7 +674,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "0 -21 -0.5";
+			position = "0 -21 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -682,7 +682,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "13.25 -21 -0.5";
+			position = "13.25 -21 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -690,7 +690,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "21 -10.25 -0.5";
+			position = "21 -10.25 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";
@@ -698,7 +698,7 @@ new SimGroup(MissionGroup) {
 				gravity = "0";
 		};
 		new Trigger() {
-			position = "21 15.25 -0.5";
+			position = "21 15.25 1.5";
 			rotation = "1 0 0 0";
 			scale = "1 1 1";
 			dataBlock = "SpawnTrigger";

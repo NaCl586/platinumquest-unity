@@ -2229,7 +2229,7 @@ new SimGroup(MissionGroup) {
 	};
 	new StaticShape(bumper4c) {
 		position = "-4.5 -37.2318 49.3009";
-		rotation = "1 0 0 13.808";
+		rotation = "-1 0 0 13.808";
 		scale = "1 1 1";
 		dataBlock = "RoundBumper_PQ";
 			parent = "BumperFInale";
@@ -2275,6 +2275,7 @@ new SimGroup(MissionGroup) {
 		scale = "1 1 1";
 		dataBlock = "Sign01";
 			skin = "red_right";
+			rotOffset = "225 0 0";
 			parent = "shockWallF";
 			parentModTrans = "-4.18203 -18.5614 50.2188 -0.451292 -0.566779 -0.689273 1.692310";
 			parentOffset = "0 0 0";
@@ -2294,6 +2295,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "Sign01";
 			skin = "red_left";
 			parent = "LBendF";
+			rotOffset = "120 0 0";
 			parentModTrans = "-11.9389 -18.4038 44.4648 -0.0480953 -0.456365 0.888492 2.954877";
 			parentOffset = "0 0 0";
 			parentTransform = "-11.9389 -18.4038 44.4648 -0.0480953 -0.456365 0.888492 2.954877";

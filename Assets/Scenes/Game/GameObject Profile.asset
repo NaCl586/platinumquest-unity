@@ -125,7 +125,7 @@ MonoBehaviour:
     m_Value: 2
   maxStep:
     m_OverrideState: 0
-    m_Value: 16
+    m_Value: 4
   accumFactor:
     m_OverrideState: 0
     m_Value: 0.75

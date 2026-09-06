@@ -965,12 +965,6 @@ new SimGroup(MissionGroup) {
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			VelocityMultiplier = "0.5";
 	};
-	new TSStatic() {
-		position = "6.8125 3.375 42.5";
-		rotation = "1 0 0 0";
-		scale = "0.25 1 5.25";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
 	new StaticShape() {
 		position = "11.5 9 24.125";
 		rotation = "1 0 0 0";
@@ -1245,54 +1239,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.9 0.9 0.9";
 		dataBlock = "Sign01";
 			skin = "red_diag_1";
-	};
-	new TSStatic() {
-		position = "7.75 2.53125 42.5";
-		rotation = "1 0 0 0";
-		scale = "1 0.25 5.25";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "7.75 4.34375 42.5";
-		rotation = "1 0 0 0";
-		scale = "1 0.25 5.25";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "8.6875 3.375 42.5";
-		rotation = "1 0 0 0";
-		scale = "0.25 1 5.25";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "12 8.125 20.1875";
-		rotation = "1 0 0 0";
-		scale = "1 0.25 9.75";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "12.625 8.9 20.175";
-		rotation = "1 0 0 0";
-		scale = "0.25 1 10.5";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "10.8195 8.90599 29.4368";
-		rotation = "1 0 0 0";
-		scale = "0.125 1 5.25";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "11.75 9.875 20.175";
-		rotation = "1 0 0 0";
-		scale = "1 0.25 9.75";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "11 9 26";
-		rotation = "1 0 0 0";
-		scale = "0.125 0.75 6.85";
-		shapeName = "~/data/shapes_pq/colmesh.dts";
 	};
 	new Item() {
 		position = "7.75 7.15625 53.25";

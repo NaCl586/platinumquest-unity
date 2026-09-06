@@ -22,7 +22,7 @@ public class SceneryDatabase : ScriptableObject
     public GameObject Fence_3TilesLength;
     public GameObject Fence_4TilesLength;
     public GameObject Fence_5TilesLength;
-    public GameObject FencePole;
+    public GameObject Fence_Pole;
 
     public GameObject Metal_End_Fence_Short;
     public GameObject Metal_Start_Fence_Short;

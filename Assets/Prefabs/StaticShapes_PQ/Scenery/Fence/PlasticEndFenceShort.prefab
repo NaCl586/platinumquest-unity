@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4119590891910361028}
   - component: {fileID: 238986387413526793}
   - component: {fileID: 283749765139232029}
+  - component: {fileID: 6605283821186380215}
   m_Layer: 0
   m_Name: Plane#2
   m_TagString: Untagged
@@ -83,6 +84,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &6605283821186380215
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 35733085645836166}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5118431318676111234, guid: b4dc37cc83148b84a92f018fb5ea63a9, type: 3}
 --- !u!1 &387820973858586800
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,6 +414,7 @@ GameObject:
   - component: {fileID: 7236887262405887634}
   - component: {fileID: 617833273473970281}
   - component: {fileID: 3143393665757803541}
+  - component: {fileID: 1607447841514649801}
   m_Layer: 0
   m_Name: Plane#3
   m_TagString: Untagged
@@ -463,3 +487,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &1607447841514649801
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9188909618288036292}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5687795915407333624, guid: b4dc37cc83148b84a92f018fb5ea63a9, type: 3}

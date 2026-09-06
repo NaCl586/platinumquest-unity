@@ -59,6 +59,14 @@ public static class PathNodeParser
              * Use the project's existing rotation conversion.
              */
             node.localRotation = Utils.ConvertRotation(rotation);
+
+            var finalRotOffset = obj.GetField("finalRotOffset");
+
+            if (!string.IsNullOrEmpty(finalRotOffset))
+            {
+                float[] rot = Utils.ParseVectorString(finalRotOffset);
+                node.localRotation = node.localRotation * Quaternion.Euler(rot[0], rot[2], rot[1]);
+            }
         }
         else
         {

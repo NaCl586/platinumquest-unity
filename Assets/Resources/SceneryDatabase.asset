@@ -33,7 +33,7 @@ MonoBehaviour:
     type: 3}
   Fence_5TilesLength: {fileID: 2065259096666738888, guid: 62883bc907c338e4690002e8ca1532e8,
     type: 3}
-  FencePole: {fileID: 885700422095572859, guid: 49060cc0350786c4b8116ae2c168e26a,
+  Fence_Pole: {fileID: 885700422095572859, guid: 49060cc0350786c4b8116ae2c168e26a,
     type: 3}
   Metal_End_Fence_Short: {fileID: 6292423628392741725, guid: 2ec99fa0e6f918a45aacb617cb6f177b,
     type: 3}

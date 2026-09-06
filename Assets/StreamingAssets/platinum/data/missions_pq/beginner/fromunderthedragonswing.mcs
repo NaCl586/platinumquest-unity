@@ -150,14 +150,14 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(Path1) {
 			position = "17.0866 18.1663 -8";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path2";
 				timeToNext = "1800";
 				Smooth = "0";
 				usePosition = "1";
-				useRotation = "0";
+				useRotation = "1";
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -165,7 +165,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(Path2) {
 			position = "16.7705 5.28666 -8";
-			rotation = "0 0 1 53";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path3";
@@ -180,7 +180,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(Path3) {
 			position = "17.7259 -1.69069 -8";
-			rotation = "0 0 1 174";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path4";
@@ -195,7 +195,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(Path4) {
 			position = "14.1583 -6.52698 -8";
-			rotation = "0 0 -1 117";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path5";
@@ -210,7 +210,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(path5) {
 			position = "17.4708 -17.7945 -8";
-			rotation = "0 0 -1 90";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path6";
@@ -225,7 +225,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(path6) {
 			position = "17.9051 -8.75857 -8";
-			rotation = "0 0 -1 49";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path7";
@@ -240,7 +240,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(path7) {
 			position = "13.9161 -2.01014 -8";
-			rotation = "0 0 -1 27";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path8";
@@ -255,7 +255,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(path8) {
 			position = "14.8416 8.20185 -8";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "path1";
@@ -270,14 +270,14 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath1) {
 			position = "15.2638 18.1949 -8";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath2";
 				timeToNext = "300";
 				Smooth = "0";
 				usePosition = "1";
-				useRotation = "0";
+				useRotation = "1";
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -285,7 +285,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath2) {
 			position = "18.0669 7.89957 -8";
-			rotation = "0 0 1 33";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath3";
@@ -300,7 +300,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath3) {
 			position = "14.819 -3.85456 -8";
-			rotation = "0 0 1 86";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath4";
@@ -315,7 +315,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath4) {
 			position = "13.7097 -15.0374 -8";
-			rotation = "0 0 1 135";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath5";
@@ -330,7 +330,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath5) {
 			position = "17.6217 -11.2985 -8";
-			rotation = "0 0 1 189";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath6";
@@ -345,7 +345,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath6) {
 			position = "17.9524 0.229885 -8";
-			rotation = "0 0 1 231";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath7";
@@ -360,7 +360,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath7) {
 			position = "14.8603 3.50261 -8";
-			rotation = "0 0 -1 48";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath8";
@@ -375,7 +375,7 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape(altpath8) {
 			position = "17.3515 14.5578 -8";
-			rotation = "1 0 0 0";
+			rotation = "1 0 0 90";
 			scale = "1 1 1";
 			dataBlock = "PathNode";
 				nextNode = "altpath1";
@@ -388,6 +388,247 @@ new SimGroup(MissionGroup) {
 				FinalRotOffset = "0 0 0";
 				placed = "1";
 		};
+		new StaticShape(pathgem1) {
+			position = "17.0866 18.1663 -8";
+			rotation = "1 0 0 0";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem2";
+				timeToNext = "1800";
+				Smooth = "0";
+				usePosition = "1";
+				useRotation = "0";
+				useScale = "0";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				placed = "1";
+		};
+		new StaticShape(pathgem2) {
+			position = "16.7705 5.28666 -8";
+			rotation = "0 0 1 53";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem3";
+				timeToNext = "2000";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem3) {
+			position = "17.7259 -1.69069 -8";
+			rotation = "0 0 1 174";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem4";
+				timeToNext = "2100";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem4) {
+			position = "14.1583 -6.52698 -8";
+			rotation = "0 0 -1 117";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem5";
+				timeToNext = "1500";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem5) {
+			position = "17.4708 -17.7945 -8";
+			rotation = "0 0 -1 90";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem6";
+				timeToNext = "1300";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem6) {
+			position = "17.9051 -8.75857 -8";
+			rotation = "0 0 -1 49";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem7";
+				timeToNext = "900";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem7) {
+			position = "13.9161 -2.01014 -8";
+			rotation = "0 0 -1 27";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem8";
+				timeToNext = "700";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(pathgem8) {
+			position = "14.8416 8.20185 -8";
+			rotation = "1 0 0 0";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "pathgem1";
+				timeToNext = "2200";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem1) {
+			position = "15.2638 18.1949 -8";
+			rotation = "1 0 0 0";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem2";
+				timeToNext = "300";
+				Smooth = "0";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "0";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				placed = "1";
+		};
+		new StaticShape(altpathgem2) {
+			position = "18.0669 7.89957 -8";
+			rotation = "0 0 1 33";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem3";
+				timeToNext = "900";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem3) {
+			position = "14.819 -3.85456 -8";
+			rotation = "0 0 1 86";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem4";
+				timeToNext = "1100";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem4) {
+			position = "13.7097 -15.0374 -8";
+			rotation = "0 0 1 135";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem5";
+				timeToNext = "800";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem5) {
+			position = "17.6217 -11.2985 -8";
+			rotation = "0 0 1 189";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem6";
+				timeToNext = "1900";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem6) {
+			position = "17.9524 0.229885 -8";
+			rotation = "0 0 1 231";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem7";
+				timeToNext = "2000";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem7) {
+			position = "14.8603 3.50261 -8";
+			rotation = "0 0 -1 48";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem8";
+				timeToNext = "1300";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+		new StaticShape(altpathgem8) {
+			position = "17.3515 14.5578 -8";
+			rotation = "1 0 0 0";
+			scale = "1 1 1";
+			dataBlock = "PathNode";
+				nextNode = "altpathgem1";
+				timeToNext = "2500";
+				usePosition = "1";
+				useRotation = "1";
+				useScale = "1";
+				reverseRotation = "0";
+				RotationMultiplier = "1";
+				FinalRotOffset = "0 0 0";
+				placed = "1";
+		};
+
 		new StaticShape(CameraPath1) {
 			position = "4.9275 -47.5458 8.97909";
 			rotation = "0.811722 0.0795995 -0.578594 19.2386";
@@ -889,7 +1130,7 @@ new SimGroup(MissionGroup) {
 				initialPathPosition = "16 8.5 -8 1 0 0 0";
 				initialPathScale = "1 1 1";
 				noParticles = "0";
-				Path = "altpath3";
+				Path = "altpathgem3";
 		};
 		new Item() {
 			position = "-11.5 8.5 1";
@@ -952,7 +1193,7 @@ new SimGroup(MissionGroup) {
 				initialPathPosition = "15 -3 -8 1 0 0 0";
 				initialPathScale = "1 1 1";
 				noParticles = "0";
-				Path = "path7";
+				Path = "pathgem7";
 		};
 		new Item(movegem3) {
 			position = "17.3515 14.5578 -8";
@@ -965,7 +1206,7 @@ new SimGroup(MissionGroup) {
 				initialPathPosition = "17 -9.5 -8 1 0 0 0";
 				initialPathScale = "1 1 1";
 				noParticles = "0";
-				Path = "altpath8";
+				Path = "altpathgem8";
 		};
 		new Item() {
 			position = "-14.2156 -8.89575 -9.5";

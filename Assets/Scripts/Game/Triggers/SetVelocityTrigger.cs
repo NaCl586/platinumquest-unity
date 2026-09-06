@@ -23,10 +23,10 @@ public class SetVelocityTrigger : MonoBehaviour
             newVelocity.x = -velocity.x;
 
         if (!ignoreY)
-            newVelocity.y = velocity.y;
+            newVelocity.y = velocity.z;
 
         if (!ignoreZ)
-            newVelocity.z = velocity.z;
+            newVelocity.z = velocity.y;
 
         marble.movement.marbleVelocity = newVelocity;
     }

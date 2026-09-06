@@ -762,7 +762,7 @@ new SimGroup(MissionGroup) {
 			SetCamYaw = "-1";
 	};
 	new Trigger(dest1) {
-		position = "-2.5 18.5 4";
+		position = "-2.5 18.5 5";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "DestinationTrigger";
@@ -872,8 +872,8 @@ new SimGroup(MissionGroup) {
 			SetCamPitch = "-1";
 	};
 	new Trigger(dest3) {
-		position = "-50.5 10.5 28";
-		rotation = "1 0 0 0";
+		position = "-49.5 9.5 28.5";
+		rotation = "0 0 1 180";
 		scale = "1 1 1";
 		dataBlock = "DestinationTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";

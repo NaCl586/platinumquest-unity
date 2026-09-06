@@ -312,6 +312,13 @@ public sealed class GameObjectParentFollower : MonoBehaviour
         {
             modelCorrection = Quaternion.Euler(90f, 0f, 0f);
         }
+        else
+        {
+            var pathOriginalScale = GetComponent<PathOriginalScale>();
+
+            if (pathOriginalScale != null)
+                modelCorrection = Quaternion.Euler(pathOriginalScale.rotationOffset);
+        }
 
         Quaternion finalRotation =
             effectiveParentRotation *

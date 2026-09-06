@@ -3594,7 +3594,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "EndPad_PQ";
 	};
 	new StaticShape() {
-		position = "6.46285 20.3661 -41.1404";
+		position = "6.46285 20.3661 -38.1404";
 		rotation = "0.672148 -0.739492 0.0370054 8.51582";
 		scale = "1.5 1.5 1.5";
 		dataBlock = "RegularFinishlinesign";

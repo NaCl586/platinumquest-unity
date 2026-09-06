@@ -1031,12 +1031,6 @@ new SimGroup(MissionGroup) {
 		dataBlock = "InBoundsTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 	};
-	new TSStatic() {
-		position = "28.6765 90.8915 -9.67976";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
 	new Item() {
 		position = "21.4331 7.86818 0.484061";
 		rotation = "1 0 0 0";
@@ -1045,15 +1039,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-	};
-	new Trigger() {
-		position = "61.0531 6.35059 1.52906";
-		rotation = "1 0 0 0";
-		scale = "1 1 1";
-		dataBlock = "SpawnTrigger";
-		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
-			center = "1";
-			gravity = "0";
 	};
 	new StaticShape(CBase3) {
 		position = "23.3658 126.88 2.12393";
@@ -1118,18 +1103,6 @@ new SimGroup(MissionGroup) {
 		rotation = "0 0 1 167";
 		scale = "1 1 1";
 		dataBlock = "DefaultCannonBase";
-	};
-	new TSStatic() {
-		position = "23.5066 57.6462 -17.6068";
-		rotation = "0 0 -1 90.0002";
-		scale = "46.6 0.09 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "28.6766 83.8915 -9.67976";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
 	};
 	new StaticShape() {
 		position = "88.7603 59.0706 -1.25215";
@@ -1257,42 +1230,12 @@ new SimGroup(MissionGroup) {
 				initialTargetPosition = "-1";
 		};
 	};
-	new TSStatic() {
-		position = "79.7646 90.9656 -9.78665";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
 	new StaticShape() {
 		position = "15.8344 4.92471 0.499377";
 		rotation = "0 0 -1 90.0002";
 		scale = "1.5 1.5 1.5";
 		dataBlock = "ConstructonRoadsignYellow";
 			skin = "Right";
-	};
-	new TSStatic() {
-		position = "38.4948 11.2356 -9.68665";
-		rotation = "1 0 0 0";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "58.2248 11.2356 -9.68665";
-		rotation = "1 0 0 0";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "69.9748 11.2356 -9.68665";
-		rotation = "1 0 0 0";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "79.7647 51.0356 -9.78665";
-		rotation = "0 0 -1 90.0002";
-		scale = "40 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
 	};
 	new InteriorInstance() {
 		position = "87.6553 24.9107 -4.5636";
@@ -1335,30 +1278,6 @@ new SimGroup(MissionGroup) {
 		scale = "1 1 1";
 		dataBlock = "RoadsignYellow";
 			skin = "TurnArround";
-	};
-	new TSStatic() {
-		position = "28.6768 21.0915 -9.67976";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "28.6767 40.6915 -9.67976";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "28.6767 60.3915 -16.5798";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
-	};
-	new TSStatic() {
-		position = "28.6766 64.9915 -16.5798";
-		rotation = "0 0 -1 90.0002";
-		scale = "10 0.25 10";
-		shapeName = "~/data/shapes/colmesh.dts";
 	};
 	new SimGroup(MustChange_g) {
 

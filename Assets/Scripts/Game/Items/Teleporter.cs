@@ -105,6 +105,7 @@ public class Teleporter : Powerups
         else
         {
             ActivateTeleport();
+            GameManager.instance.ConsumePowerup();
         }
 
         waitingForRelease = true;
@@ -165,9 +166,11 @@ public class Teleporter : Powerups
         {
             teleportTime -= Time.deltaTime;
 
+            float remainingTime = Mathf.Max(0f, teleportTime);
+
             float alpha =
                 initTime > 0f
-                    ? Mathf.Clamp01(teleportTime / initTime)
+                    ? Mathf.Clamp01(remainingTime / initTime)
                     : 0f;
 
             if (marbleMaterial != null)
@@ -178,7 +181,45 @@ public class Teleporter : Powerups
                 marbleMaterial.color = color;
             }
 
+            // Update the appropriate timer.
+            if (GameUIManager.instance != null)
+            {
+                if (keepVelocity)
+                {
+                    GameUIManager.instance.SetTransporterTimer(
+                        remainingTime,
+                        initTime
+                    );
+                }
+                else
+                {
+                    GameUIManager.instance.SetTeleporterTimer(
+                        remainingTime,
+                        initTime
+                    );
+                }
+            }
+
             yield return null;
+        }
+
+        // Make sure the timer reaches zero before teleporting.
+        if (GameUIManager.instance != null)
+        {
+            if (keepVelocity)
+            {
+                GameUIManager.instance.SetTransporterTimer(
+                    0f,
+                    initTime
+                );
+            }
+            else
+            {
+                GameUIManager.instance.SetTeleporterTimer(
+                    0f,
+                    initTime
+                );
+            }
         }
 
         RemoveTeleportMarker();
@@ -221,8 +262,26 @@ public class Teleporter : Powerups
         locationSet = false;
         teleportCoroutine = null;
 
-        if (activeTeleporter == this)
-            activeTeleporter = null;
+        // Clear the appropriate timer.
+        if (GameUIManager.instance != null)
+        {
+            if (keepVelocity)
+            {
+                GameUIManager.instance.SetTransporterTimer(
+                    -1f,
+                    teleportDelay
+                );
+            }
+            else
+            {
+                GameUIManager.instance.SetTeleporterTimer(
+                    -1f,
+                    teleportDelay
+                );
+            }
+        }
+
+        activeTeleporter = null;
     }
 
     private void CreateTeleportMarker()
@@ -359,7 +418,7 @@ public class Teleporter : Powerups
             MaterialGlobalIlluminationFlags.None;
     }
 
-    public void ResetTeleporter()
+    public void ResetTeleporter(bool checkpointReset = false)
     {
         if (teleportCoroutine != null)
         {
@@ -373,8 +432,27 @@ public class Teleporter : Powerups
         teleporting = false;
         waitingForRelease = false;
 
-        if (activeTeleporter == this)
-            activeTeleporter = null;
+        // Clear both timer types so a reset can never leave
+        // a Teleporter or Transporter timer on screen.
+        if (GameUIManager.instance != null)
+        {
+            GameUIManager.instance.SetTeleporterTimer(
+                -1f,
+                teleportDelay
+            );
+
+            GameUIManager.instance.SetTransporterTimer(
+                -1f,
+                teleportDelay
+            );
+        }
+
+        if (!checkpointReset)
+        {
+            if (activeTeleporter == this)
+                activeTeleporter = null;
+        }
+        
 
         SetOpaque();
     }
@@ -385,6 +463,19 @@ public class Teleporter : Powerups
             StopCoroutine(teleportCoroutine);
 
         RemoveTeleportMarker();
+
+        if (GameUIManager.instance != null)
+        {
+            GameUIManager.instance.SetTeleporterTimer(
+                -1f,
+                teleportDelay
+            );
+
+            GameUIManager.instance.SetTransporterTimer(
+                -1f,
+                teleportDelay
+            );
+        }
 
         if (activeTeleporter == this)
             activeTeleporter = null;

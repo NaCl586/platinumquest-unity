@@ -141,7 +141,7 @@ new SimGroup(MissionGroup) {
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-90 0 0";
 				placed = "1";
 		};
 		new StaticShape(slowTheseDamnCloudsDown2) {
@@ -156,7 +156,7 @@ new SimGroup(MissionGroup) {
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-90 0 0";
 				placed = "1";
 		};
 		new StaticShape(slowTheseDamnCloudsDown3) {
@@ -171,7 +171,7 @@ new SimGroup(MissionGroup) {
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
-				FinalRotOffset = "0 0 0";
+				FinalRotOffset = "-90 0 0";
 				placed = "1";
 		};
 		new StaticShape(under3) {
@@ -1155,7 +1155,7 @@ new SimGroup(MissionGroup) {
 			value0 = "2.5";
 	};
 	new StaticShape(purpleMObutton) {
-		position = "0.06 -0.0999996 137.61";
+		position = "0.06 -0.0999996 137.3";
 		rotation = "1 0 0 180";
 		scale = "2.5 2.5 2";
 		dataBlock = "PushButtonFlat_PQ";

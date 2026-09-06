@@ -431,7 +431,7 @@ public class GameObjectPathFollower
                 next.localScale,
                 adjustedT
             )
-            : Vector3.one;
+            : target.transform.localScale;
 
         Vector3 scaleResult =
             Vector3.Scale(

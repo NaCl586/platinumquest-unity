@@ -10,10 +10,16 @@ using UnityEngine.SceneManagement;
 public class PathOriginalScale : MonoBehaviour
 {
     public Vector3 scale;
+    public Vector3 rotationOffset = Vector3.zero;
 
     public void SetScale(Vector3 value)
     {
         scale = value;
+    }
+
+    public void SetRotationOffset(Vector3 value)
+    {
+        rotationOffset = value;
     }
 }
 
@@ -263,7 +269,6 @@ namespace TS
         private readonly List<PendingMultipleTGTTEntry> pendingMultipleTGTTEntries = new List<PendingMultipleTGTTEntry>();
         private readonly List<PendingPathEntry> pendingPathEntries = new List<PendingPathEntry>();
         private readonly List<PendingCheckpointTriggerEntry> pendingCheckpointTriggerEntries = new List<PendingCheckpointTriggerEntry>();
-        private readonly Dictionary<GameObject, Vector3> initialObjectScales = new Dictionary<GameObject, Vector3>();
 
         private GameObject finishSign;
 
@@ -308,7 +313,6 @@ namespace TS
             pendingPathTriggerEntries.Clear();
             pendingMultipleTGTTEntries.Clear();
             pendingCheckpointTriggerEntries.Clear();
-            initialObjectScales.Clear();
 
             checkpoints.Clear();
             destinationTriggers.Clear();
@@ -411,8 +415,13 @@ namespace TS
                     transform,
                     false
                 );
+                Vector3 originalPrefabScale = gobj.transform.localScale;
 
                 gobj.name = isFancy ? "FancyGem" : "Gem";
+
+                string name = obj.Name;
+                if (!string.IsNullOrEmpty(name))
+                    gobj.name = name;
 
                 gobj.transform.Find("Particle System").gameObject.SetActive(false);
 
@@ -454,13 +463,14 @@ namespace TS
                     Quaternion.identity
                 );
 
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
 
                 gobj.transform.Find("Particle System").gameObject.SetActive(true);
             }
             else if (IsPowerup(objectName, out GameObject prefab, out string defaultName))
             {
                 var gobj = Instantiate(prefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? defaultName : obj.Name;
                 bool isAntiGravity = objectName == "AntiGravityItem_PQ" || objectName == "NoRespawnAntiGravityItem_PQ";
 
@@ -508,7 +518,7 @@ namespace TS
 
                 Quaternion additionalRot = isAntiGravity ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
                 RegisterImportedObject(obj, gobj, additionalRot);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "TimeTravelItem_PQ" || objectName == "SundialItem_PQ" || objectName == "TimePenaltyItem_PQ" || objectName == "RespawningTimeTravelItem_PQ")
             {
@@ -523,6 +533,7 @@ namespace TS
                 }
 
                 var gobj = Instantiate(prefabToUse, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "TimeTravelItem" : obj.Name;
                 SetTransformsPowerup(gobj, obj);
 
@@ -545,23 +556,25 @@ namespace TS
                 }
 
                 RegisterImportedObject(obj, gobj, Quaternion.identity, offsetRotate);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "NestEgg_PQ")
             {
                 var gobj = Instantiate(easterEggPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = "NestEgg";
                 SetTransformsPowerup(gobj, obj);
                 ApplySkins(gobj, obj.GetField("skin"), false);
 
                 RegisterImportedObject(obj, gobj, Quaternion.identity);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
         }
 
         private void ImportInteriorInstance(TSObject obj)
         {
             var gobj = Instantiate(interiorPrefab, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = string.IsNullOrEmpty(obj.Name) ? "InteriorInstance" : obj.Name;
             Vector3 scale = SetTransforms(gobj, obj, Quaternion.identity);
 
@@ -578,7 +591,7 @@ namespace TS
             }
 
             RegisterImportedObject(obj, gobj, Quaternion.Euler(90f, 0f, 0f));
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportStaticShape(TSObject obj, Transform pathNodeParent)
@@ -588,6 +601,7 @@ namespace TS
             if (objectName == "PhysModEmitterBase")
             {
                 GameObject emitter = Instantiate(physModEmitterPrefab, transform, false);
+                Vector3 originalPrefabScale = emitter.transform.localScale;
                 emitter.name = !string.IsNullOrEmpty(obj.Name) ? obj.Name : "PhysModEmitterBase";
                 emitter.transform.position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 emitter.transform.rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
@@ -596,7 +610,7 @@ namespace TS
                 emitter.transform.Find("particle").gameObject.SetActive(!ParseBoolField(obj, "noEmitters", false));
 
                 RegisterImportedObject(obj, emitter, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, emitter);
+                CheckForPath(originalPrefabScale, obj, emitter);
             }
             else if (IsPushButtonDataBlock(objectName, out GameObject buttonPrefab, out bool isToggle))
             {
@@ -630,6 +644,7 @@ namespace TS
             else if (objectName == "EndPad_PQ")
             {
                 var gobj = Instantiate(finishPadPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
 
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
@@ -642,11 +657,12 @@ namespace TS
                 ApplySkins(gobj, obj.GetField("skin"), false);
 
                 RegisterImportedObject(obj, gobj, Quaternion.identity);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "EndPad_PQ_Construction")
             {
                 var gobj = Instantiate(finishPadConstructionPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
 
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
@@ -659,7 +675,7 @@ namespace TS
                 ApplySkins(gobj, obj.GetField("skin"), false);
 
                 RegisterImportedObject(obj, gobj, Quaternion.identity);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName.Equals("checkpoint_pq", StringComparison.OrdinalIgnoreCase))
             {
@@ -668,6 +684,7 @@ namespace TS
             else if (IsFinishSign(objectName, out GameObject signPrefab))
             {
                 var gobj = Instantiate(signPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = "SignFinish";
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
 
@@ -682,12 +699,13 @@ namespace TS
                 gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
 
                 RegisterImportedObject(obj, gobj, Quaternion.identity);
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "WaterPlane")
             {
                 if (waterPlanePrefab == null) return;
                 GameObject gobj = Instantiate(waterPlanePrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "WaterPlane" : obj.Name;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
@@ -695,11 +713,12 @@ namespace TS
                 gobj.transform.localScale = Vector3.Scale(Vector3.Scale(scale, gobj.transform.localScale), new Vector3(3f, 0.0001f, 3f));
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "WaterCylinder")
             {
                 GameObject gobj = Instantiate(waterPlanePrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "WaterCylinder" : obj.Name;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
@@ -707,11 +726,12 @@ namespace TS
                 gobj.transform.localScale = new Vector3(scale.x * gobj.transform.localScale.x, scale.z * gobj.transform.localScale.y, scale.y * gobj.transform.localScale.z);
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "WaterCylinder_slow")
             {
                 GameObject gobj = Instantiate(waterPlaneSlowPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "WaterCylinder_slow" : obj.Name;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
@@ -719,12 +739,13 @@ namespace TS
                 gobj.transform.localScale = new Vector3(scale.x * gobj.transform.localScale.x, scale.z * gobj.transform.localScale.y, scale.y * gobj.transform.localScale.z);
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "IceShard1" || objectName == "IceShard2" || objectName == "PointsIceShard2" || objectName == "PointsIceShard1")
             {
                 GameObject prefab = (objectName == "IceShard1" || objectName == "PointsIceShard1") ? iceShardPrefab1 : iceShardPrefab2;
                 var gobj = Instantiate(prefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
 
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? objectName : obj.Name;
 
@@ -741,12 +762,13 @@ namespace TS
 
                 ApplySkins(gobj, obj.GetField("skin"));
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (IsHazard(objectName, out GameObject hazardPrefab, out string hazardName))
             {
                 var gobj = Instantiate(hazardPrefab, transform, false);
-                gobj.name = hazardName;
+                Vector3 originalPrefabScale = gobj.transform.localScale;
+                gobj.name = string.IsNullOrEmpty(obj.Name) ? hazardName : obj.Name;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
                 Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
@@ -767,7 +789,7 @@ namespace TS
                 }
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (IsCannonDataBlock(objectName))
             {
@@ -776,6 +798,7 @@ namespace TS
             else if (objectName.Equals("target", StringComparison.OrdinalIgnoreCase))
             {
                 GameObject gobj = Instantiate(cannonTarget, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "Target" : obj.Name;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation *= ConvertRotation(ParseVectorString(obj.GetField("rotation")));
@@ -784,7 +807,7 @@ namespace TS
 
                 ApplySkins(gobj, obj.GetField("skin"));
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName.StartsWith("FadePlat", StringComparison.OrdinalIgnoreCase))
             {
@@ -798,6 +821,7 @@ namespace TS
             {
                 if (propPrefab == null) return;
                 GameObject gobj = Instantiate(propPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = objectName;
                 gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
                 gobj.transform.localRotation = ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
@@ -805,7 +829,7 @@ namespace TS
                 gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (PathNodeParser.IsPathNode(obj))
             {
@@ -827,28 +851,31 @@ namespace TS
             }
             else
             {
-                var shape = staticShapes.FirstOrDefault(go => go != null && go.name.Equals(objectName, StringComparison.OrdinalIgnoreCase));
-                if (shape != null)
-                {
-                    var gobj = Instantiate(shape, transform, false);
-                    gobj.name = objectName;
-                    gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                    gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
-                    Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
-                    gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
+                var foundInScenery = ImportSceneryObject(obj);
 
-                    if (objectName.ToLower() == "endpad")
+                if (!foundInScenery)
+                {
+                    var shape = staticShapes.FirstOrDefault(go => go != null && go.name.Equals(objectName, StringComparison.OrdinalIgnoreCase));
+
+                    if (shape != null)
                     {
-                        GameManager.instance.finishPad = gobj;
-                        finishPad = gobj;
-                    }
+                        var gobj = Instantiate(shape, transform, false);
+                        Vector3 originalPrefabScale = gobj.transform.localScale;
+                        gobj.name = objectName;
+                        gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
+                        Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+                        gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
 
-                    RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                    CheckForPath(obj, gobj);
-                }
-                else
-                {
-                    ImportSceneryObject(obj);
+                        if (objectName.ToLower() == "endpad")
+                        {
+                            GameManager.instance.finishPad = gobj;
+                            finishPad = gobj;
+                        }
+
+                        RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
+                        CheckForPath(originalPrefabScale, obj, gobj);
+                    }
                 }
             }
         }
@@ -867,6 +894,7 @@ namespace TS
                 };
 
                 var triggerObj = Instantiate(prefab, transform, false);
+                Vector3 originalPrefabScale = triggerObj.transform.localScale;
                 triggerObj.name = obj.Name;
 
                 if (objectName == "HelpTrigger")
@@ -874,7 +902,7 @@ namespace TS
 
                 SetupTriggerTransform(triggerObj, obj);
                 RegisterImportedObject(obj, triggerObj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, triggerObj);
+                CheckForPath(originalPrefabScale, obj, triggerObj);
             }
             else if (objectName == "TeleportTrigger" || objectName == "DestinationTrigger")
             {
@@ -883,6 +911,7 @@ namespace TS
             else if (objectName == "GravityWellTrigger" || objectName == "GravityWell")
             {
                 var gwObj = Instantiate(gravityWellTrigger, transform, false);
+                Vector3 originalPrefabScale = gwObj.transform.localScale;
                 gwObj.name = string.IsNullOrEmpty(obj.Name) ? objectName : obj.Name;
 
                 var gravityWell = gwObj.GetComponent<GravityWellTrigger>();
@@ -901,11 +930,12 @@ namespace TS
 
                 SetupTriggerTransform(gwObj, obj);
                 RegisterImportedObject(obj, gwObj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, gwObj);
+                CheckForPath(originalPrefabScale, obj, gwObj);
             }
             else if (objectName == "WaterPhysicsTrigger")
             {
                 GameObject gobj = Instantiate(waterPhysicsTriggerPrefab, transform, false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
                 gobj.name = string.IsNullOrEmpty(obj.Name) ? "WaterPhysicsTrigger" : obj.Name;
 
                 SetupTriggerTransform(gobj, obj);
@@ -916,7 +946,7 @@ namespace TS
                 }
 
                 RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, gobj);
+                CheckForPath(originalPrefabScale, obj, gobj);
             }
             else if (objectName == "MarblePhysModTrigger" || objectName == "PhysModTrigger")
             {
@@ -1030,6 +1060,7 @@ namespace TS
                         movingPlatformPrefab,
                         transform,
                         false);
+                Vector3 originalPrefabScale = gobj.transform.localScale;
 
                 gobj.name =
                     string.IsNullOrEmpty(pathedInterior.Name)
@@ -1165,9 +1196,7 @@ namespace TS
                     gobj,
                     Quaternion.Euler(-90f, 0f, 0f));
 
-                CheckForPath(
-                    pathedInterior,
-                    gobj);
+                CheckForPath(originalPrefabScale, pathedInterior, gobj);
 
                 movingPlatforms.Add(movingPlatform);
             }
@@ -1248,6 +1277,7 @@ namespace TS
                         triggerGoToTarget,
                         transform,
                         false);
+                Vector3 originalPrefabScale = tgttObj.transform.localScale;
 
                 tgttObj.name =
                     string.IsNullOrEmpty(trigger.Name)
@@ -1308,9 +1338,7 @@ namespace TS
                     tgttObj,
                     Quaternion.Euler(-90f, 0f, 0f));
 
-                CheckForPath(
-                    trigger,
-                    tgttObj);
+                CheckForPath(originalPrefabScale, trigger, tgttObj);
             }
             else if (string.Equals(
                          dataBlock,
@@ -1328,6 +1356,7 @@ namespace TS
                             triggerGotoDelayTargetPrefab,
                             transform,
                             false);
+                    Vector3 originalPrefabScale = tgtdObj.transform.localScale;
 
                     tgtdObj.name =
                         string.IsNullOrEmpty(trigger.Name)
@@ -1356,9 +1385,7 @@ namespace TS
                         tgtdObj,
                         Quaternion.Euler(-90f, 0f, 0f));
 
-                    CheckForPath(
-                        trigger,
-                        tgtdObj);
+                    CheckForPath(originalPrefabScale, trigger, tgtdObj);
                 }
             }
             else if (string.Equals(
@@ -1380,6 +1407,7 @@ namespace TS
                                 : triggerGoToTarget,
                             transform,
                             false);
+                    Vector3 originalPrefabScale = rtgttObj.transform.localScale;
 
                     rtgttObj.name =
                         string.IsNullOrEmpty(trigger.Name)
@@ -1416,9 +1444,7 @@ namespace TS
                         rtgttObj,
                         Quaternion.Euler(-90f, 0f, 0f));
 
-                    CheckForPath(
-                        trigger,
-                        rtgttObj);
+                    CheckForPath(originalPrefabScale, trigger, rtgttObj);
                 }
             }
         }
@@ -1444,6 +1470,7 @@ namespace TS
             if (prefab == null) return;
 
             GameObject gobj = Instantiate(prefab, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = obj.Name;
 
             gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -1473,7 +1500,7 @@ namespace TS
             );
 
             RegisterImportedObject(obj, gobj, Quaternion.Euler(0f, 0f, 0f));
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportMegaManPlatform(TSObject obj, string objectName)
@@ -1493,6 +1520,7 @@ namespace TS
             if (prefab == null) return;
 
             GameObject gobj = Instantiate(prefab, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = obj.Name;
 
             gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -1512,13 +1540,14 @@ namespace TS
 
             ApplySkins(gobj, obj.GetField("skin"), true);
             RegisterImportedObject(obj, gobj, Quaternion.Euler(0f, 0f, 0f));
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportTeleportOrDestinationTrigger(TSObject obj, string objectName)
         {
             bool isTeleport = objectName == "TeleportTrigger";
             var triggerObj = Instantiate(isTeleport ? teleportTrigger : destinationTrigger, transform, false);
+            Vector3 originalPrefabScale = triggerObj.transform.localScale;
             triggerObj.name = string.IsNullOrEmpty(obj.Name) ? objectName : obj.Name;
 
             if (isTeleport)
@@ -1581,23 +1610,19 @@ namespace TS
                 destinationTriggers.Add(triggerObj);
             }
 
-            Transform cameraPos = triggerObj.transform.Find("CameraPos");
-            if (cameraPos != null) cameraPos.SetParent(null, true);
-
-            SetupTriggerTransform(triggerObj, obj);
-
-            if (cameraPos != null) cameraPos.SetParent(triggerObj.transform, true);
+            SetupTriggerWithSpawnPos(triggerObj, obj);
 
             if (!string.IsNullOrEmpty(obj.Name) || !isTeleport)
                 destinationTriggers.Add(triggerObj);
 
             RegisterImportedObject(obj, triggerObj, Quaternion.Euler(-90f, 0f, 0f));
-            CheckForPath(obj, triggerObj);
+            CheckForPath(originalPrefabScale, obj, triggerObj);
         }
 
         private void ImportCheckpoint(TSObject obj)
         {
             var cp = Instantiate(checkpointPrefab, transform, false);
+            Vector3 originalPrefabScale = cp.transform.localScale;
             cp.name = string.IsNullOrEmpty(obj.Name) ? "Checkpoint" : obj.Name;
 
             Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -1653,7 +1678,7 @@ namespace TS
             spawnPos.transform.parent = cp.transform;
 
             RegisterImportedObject(obj, cp, Quaternion.Euler(-90f, 0f, 0f));
-            CheckForPath(obj, cp);
+            CheckForPath(originalPrefabScale, obj, cp);
         }
 
         private void ImportLapsCheckpoint(TSObject obj)
@@ -1668,6 +1693,7 @@ namespace TS
 
             GameObject triggerObj =
                 Instantiate(lapsCheckpointPrefab, transform, false);
+            Vector3 originalPrefabScale = triggerObj.transform.localScale;
 
             triggerObj.name =
                 string.IsNullOrEmpty(obj.Name)
@@ -1769,7 +1795,7 @@ namespace TS
                 Quaternion.Euler(-90f, 0f, 0f)
             );
 
-            CheckForPath(obj, triggerObj);
+            CheckForPath(originalPrefabScale, obj, triggerObj);
         }
 
         private void ImportLapsCounterTrigger(TSObject obj)
@@ -1788,6 +1814,7 @@ namespace TS
                     transform,
                     false
                 );
+            Vector3 originalPrefabScale = triggerObj.transform.localScale;
 
             triggerObj.name =
                 string.IsNullOrEmpty(obj.Name)
@@ -1835,7 +1862,7 @@ namespace TS
                 Quaternion.Euler(-90f, 0f, 0f)
             );
 
-            CheckForPath(obj, triggerObj);
+            CheckForPath(originalPrefabScale, obj, triggerObj);
         }
 
         private void ImportExtendedTrigger(TSObject obj, string objectName, GameObject prefab)
@@ -1859,6 +1886,7 @@ namespace TS
             }
 
             GameObject triggerObj = Instantiate(prefab, transform, false);
+            Vector3 originalPrefabScale = triggerObj.transform.localScale;
             triggerObj.name = string.IsNullOrEmpty(obj.Name) ? objectName : obj.Name;
 
             switch (nameLower)
@@ -2171,7 +2199,7 @@ namespace TS
 
             SetupTriggerTransform(triggerObj, obj);
             RegisterImportedObject(obj, triggerObj, Quaternion.Euler(-90f, 0f, 0f));
-            CheckForPath(obj, triggerObj);
+            CheckForPath(originalPrefabScale, obj, triggerObj);
         }
 
         private GameObject ImportPathTrigger(TSObject obj)
@@ -2182,6 +2210,7 @@ namespace TS
                     transform,
                     false
                 );
+            Vector3 originalPrefabScale = gobj.transform.localScale;
 
             gobj.name =
                 string.IsNullOrEmpty(obj.Name)
@@ -2264,6 +2293,7 @@ namespace TS
             if (physModTrigger == null) return;
 
             GameObject gobj = Instantiate(physModTrigger, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = string.IsNullOrEmpty(obj.Name) ? "PhysModTrigger" : obj.Name;
             SetupTriggerTransform(gobj, obj);
 
@@ -2291,7 +2321,7 @@ namespace TS
                 SpawnPhysModEmitters(obj, gobj.transform);
 
             RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f));
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportCannon(TSObject obj, string objectName)
@@ -2299,6 +2329,7 @@ namespace TS
             if (cannonPrefab == null) return;
 
             GameObject gobj = Instantiate(cannonPrefab, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = string.IsNullOrEmpty(obj.Name) ? objectName : obj.Name;
 
             Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -2359,7 +2390,7 @@ namespace TS
             cannon.ResetCannon();
 
             RegisterImportedObject(obj, gobj, Quaternion.identity);
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportHelpBubble(TSObject obj, Transform parent)
@@ -2367,6 +2398,7 @@ namespace TS
             if (helpBubblePrefab == null) return;
 
             GameObject gobj = Instantiate(helpBubblePrefab, parent, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = string.IsNullOrEmpty(obj.Name) ? "HelpBubble" : obj.Name;
 
             Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -2400,7 +2432,7 @@ namespace TS
             }
 
             RegisterImportedObject(obj, gobj);
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportPushButton(TSObject obj, GameObject prefab, bool isToggle)
@@ -2408,6 +2440,7 @@ namespace TS
             if (prefab == null) return;
 
             GameObject instance = Instantiate(prefab, transform, false);
+            Vector3 originalPrefabScale = instance.transform.localScale;
             instance.name = string.IsNullOrEmpty(obj.Name) ? obj.GetField("dataBlock") : obj.Name;
             instance.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
             instance.transform.localRotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
@@ -2428,7 +2461,7 @@ namespace TS
             button.initialState = isToggle && ParseBoolField(obj, "initialstate", false);
 
             RegisterImportedObject(obj, instance, Quaternion.Euler(-90f, 0f, 0f));
-            CheckForPath(obj, instance);
+            CheckForPath(originalPrefabScale, obj, instance);
         }
 
         private void ImportPathNode(TSObject obj, Transform pathNodeParent, PathManager pathManager)
@@ -2447,14 +2480,17 @@ namespace TS
             pathManager.RegisterNode(node);
         }
 
-        private void ImportSceneryObject(TSObject obj)
+        private bool ImportSceneryObject(TSObject obj)
         {
             string datablock = obj.GetField("dataBlock");
+
             if (string.IsNullOrEmpty(datablock))
                 datablock = Path.GetFileNameWithoutExtension(obj.GetField("shapeName"));
 
             GameObject prefab = GetSceneryPrefab(datablock);
-            if (prefab == null) return;
+
+            if (prefab == null)
+                return false;
 
             if (datablock == "OrbitingClouds")
             {
@@ -2464,6 +2500,7 @@ namespace TS
             }
 
             GameObject gobj = Instantiate(prefab, transform, false);
+            Vector3 originalPrefabScale = gobj.transform.localScale;
             gobj.name = datablock;
 
             Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
@@ -2476,7 +2513,9 @@ namespace TS
 
             ApplySkins(gobj, obj.GetField("skin"), true);
             RegisterImportedObject(obj, gobj, Quaternion.Euler(90f, 0f, 0f));
-            CheckForPath(obj, gobj);
+            CheckForPath(originalPrefabScale, obj, gobj);
+
+            return true;
         }
 
         private void SpawnPhysModEmitters(TSObject obj, Transform triggerTransform)
@@ -2538,6 +2577,7 @@ namespace TS
             for (int i = 0; i < worldCorners.Length; i++)
             {
                 GameObject emitter = Instantiate(physModEmitterPrefab, triggerTransform.parent, false);
+                Vector3 originalPrefabScale = emitter.transform.localScale;
                 emitter.name = string.IsNullOrEmpty(obj.Name) ? $"PhysModEmitterBase_{i}" : $"{obj.Name}_Emitter_{i}";
                 emitter.transform.position = worldCorners[i];
                 emitter.transform.rotation = Quaternion.identity;
@@ -2743,6 +2783,7 @@ namespace TS
                 }
 
                 GameObject cpTrigger = Instantiate(checkpointTriggerPrefab, transform, false);
+                Vector3 originalPrefabScale = cpTrigger.transform.localScale;
                 cpTrigger.name = string.IsNullOrEmpty(obj.Name) ? $"CheckpointTrigger_{respawnPoint}" : obj.Name;
 
                 CheckpointTrigger trigger = cpTrigger.GetComponent<CheckpointTrigger>();
@@ -2760,7 +2801,7 @@ namespace TS
                     collider.enabled = true;
 
                 RegisterImportedObject(obj, cpTrigger, Quaternion.Euler(-90f, 0f, 0f));
-                CheckForPath(obj, cpTrigger);
+                CheckForPath(originalPrefabScale, obj, cpTrigger);
             }
 
             pendingCheckpointTriggerEntries.Clear();
@@ -2859,6 +2900,37 @@ namespace TS
             ApplyTriggerPolyhedron(gobj, obj);
         }
 
+        private void SetupTriggerWithSpawnPos(GameObject gobj, TSObject obj, bool setLocal = true)
+        {
+            Transform cameraPos = gobj.transform.Find("CameraPos");
+            Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+            Quaternion rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+
+            Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+            Quaternion convertedRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
+
+            if (setLocal)
+            {
+                gobj.transform.localPosition = position;
+                gobj.transform.localRotation = convertedRotation;
+
+                if (cameraPos != null) cameraPos.SetParent(null, true);
+                gobj.transform.localScale = scale;
+                if (cameraPos != null) cameraPos.SetParent(gobj.transform, true);
+            }
+            else
+            {
+                gobj.transform.position = position;
+                gobj.transform.rotation = convertedRotation;
+
+                if (cameraPos != null) cameraPos.SetParent(null, true);
+                gobj.transform.localScale = scale;
+                if (cameraPos != null) cameraPos.SetParent(gobj.transform, true);
+            }
+
+            ApplyTriggerPolyhedron(gobj, obj);
+        }
+
         private void SetupLapsTriggerTransform(
             GameObject gobj,
             TSObject obj, bool setLocal = true)
@@ -2952,27 +3024,29 @@ namespace TS
             gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
         }
 
-        private void CheckForPath(TSObject obj, GameObject go)
+        private void CheckForPath(Vector3 originalPrefabScale, TSObject obj, GameObject go)
         {
             if (obj == null || go == null)
                 return;
 
-            string pathName = NormalizeMissionObjectName(obj.GetField("Path"));
-
-            if (string.IsNullOrEmpty(pathName))
-                return;
-
-            // The object's current local scale here is the fully imported
-            // scale, including the mission object's scale and the prefab's
-            // original scale where applicable. Preserve it so the path
-            // follower can multiply its path scale by this initial size.
-            Vector3 originalObjectScale = go.transform.localScale;
-
+            // This is the prefab scale captured immediately after Instantiate,
+            // before any mission/parser scale is applied. Preserve it so the
+            // path follower can multiply its path scale by the original prefab size.
+            Vector3 originalObjectScale = originalPrefabScale;
             PathOriginalScale originalScaleComponent =
                 go.GetComponent<PathOriginalScale>() ??
                 go.AddComponent<PathOriginalScale>();
 
             originalScaleComponent.SetScale(originalObjectScale);
+
+            var rotOffset = obj.GetField("rotOffset");
+            if(!string.IsNullOrEmpty(rotOffset))
+                originalScaleComponent.SetRotationOffset(ConvertPoint(ParseVectorString(rotOffset)));
+
+            string pathName = NormalizeMissionObjectName(obj.GetField("Path"));
+
+            if (string.IsNullOrEmpty(pathName))
+                return;
 
             Vector3? initialPathPosition = null;
             Quaternion? initialPathRotation = null;
@@ -3424,7 +3498,9 @@ namespace TS
 
         private GameObject GetSceneryPrefab(string datablock)
         {
-            if (sceneryObjects == null) return null;
+            if (sceneryObjects == null)
+                return null;
+
             var field = typeof(SceneryDatabase).GetField(datablock);
             return field?.GetValue(sceneryObjects) as GameObject;
         }
@@ -3612,7 +3688,8 @@ namespace TS
             Time.timeScale = 1f;
             GameManager.instance.InitGemCount();
 
-            GameManager.instance.InitializeHuntCheckpoint();
+            if (MissionInfo.instance.gameModes.Contains(Mode.Hunt))
+                GameManager.instance.InitializeHuntCheckpoint();
 
             foreach (IGameMode gm in GameManager.instance.GameModes)
                 gm.OnMissionLoad();
@@ -3740,21 +3817,6 @@ namespace TS
                 torqueRotation;
 
             return true;
-        }
-
-        private GameObject InstantiatePathObject(
-            GameObject prefab,
-            Transform parent
-        )
-        {
-            GameObject go = Instantiate(prefab, parent, false);
-
-            if (go != null)
-            {
-                initialObjectScales[go] = go.transform.localScale;
-            }
-
-            return go;
         }
     }
 }

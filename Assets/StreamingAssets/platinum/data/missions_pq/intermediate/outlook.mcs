@@ -297,14 +297,14 @@ new SimGroup(MissionGroup) {
 		};
 		new StaticShape() {
 			position = "23.99 -17.9639 6.35005";
-			rotation = "0.567324 0.596898 -0.567324 118.337";
-			scale = "0.5 0.5 1";
+			rotation = "1 0 0 0";
+			scale = "0.5 0.5 0.5";
 			dataBlock = "Tornado_Graffiti";
 		};
 		new StaticShape() {
 			position = "23.99 -6.14864 6.34962";
-			rotation = "0.571332 0.589203 -0.571332 118.99";
-			scale = "0.5 0.5 1";
+			rotation = "1 0 0 0	";
+			scale = "0.5 0.5 0.5";
 			dataBlock = "Tornado_Graffiti";
 		};
 	};
@@ -319,7 +319,7 @@ new SimGroup(MissionGroup) {
 			gravity = "1";
 	};
 	new Trigger() {
-		position = "-21.85 -29.9 9.8";
+		position = "-21.85 -29.9 11.3";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "SpawnTrigger";
@@ -327,7 +327,7 @@ new SimGroup(MissionGroup) {
 			gravity = "1";
 	};
 	new Trigger() {
-		position = "28 -44 2.15";
+		position = "28 -44 3.65";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "SpawnTrigger";
@@ -368,7 +368,7 @@ new SimGroup(MissionGroup) {
 			gravity = "1";
 	};
 	new Trigger() {
-		position = "50.8 -34.9 7.6";
+		position = "50.8 -34.9 9.6";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "SpawnTrigger";

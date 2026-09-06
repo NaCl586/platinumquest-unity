@@ -146,6 +146,9 @@ public class GravityModifier : Powerups
 
     public void ApplyGravity(Vector3 targetDir)
     {
+        if (targetDir.normalized == GravitySystem.GravityDir.normalized)
+            return;
+
         StopAllCoroutines();
 
         StartCoroutine(

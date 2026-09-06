@@ -982,7 +982,7 @@ GameObject:
   - component: {fileID: 4375233829040355428}
   - component: {fileID: 8960454556894533128}
   - component: {fileID: 1182470347719236630}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: U3DMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

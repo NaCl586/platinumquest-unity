@@ -64,7 +64,10 @@ public class Marble : MonoBehaviour
     // being inside a cannon or by the cannon's post-launch lockTime.
     private bool cannonMovementTriggerActive;
 
+    bool canUsePowerupAfterCannon = true;
     public bool IsInCannon => activeCannon != null;
+    public bool CanUsePowerupAfterCannon => canUsePowerupAfterCannon;
+
     public Cannon ActiveCannon => activeCannon;
     public bool isUsingBubble;
 
@@ -185,6 +188,7 @@ public class Marble : MonoBehaviour
             }
         }
 
+        canUsePowerupAfterCannon = true;
     }
 
     private void Update()
@@ -197,7 +201,9 @@ public class Marble : MonoBehaviour
             return;
         }
 
-        if (activeCannon != null) UpdateCannonFiring();
+        if (activeCannon != null) 
+            UpdateCannonFiring();
+
         UpdateCannonLocks();
 
         float speed = movement.marbleVelocity.magnitude;
@@ -254,7 +260,7 @@ public class Marble : MonoBehaviour
 
         if (Input.GetKey(ControlBinding.instance.usePowerup) && !GameManager.isPaused &&
             !GameManager.gameFinish && movement.canMove && !ReplayRecorder.loadReplay &&
-            !IsInCannon && !isFrozen && !IsPowerupUseLocked &&
+            !IsInCannon && canUsePowerupAfterCannon && !isFrozen && !IsPowerupUseLocked &&
             GameManager.instance.activePowerup != PowerupType.Bubble)
         {
 
@@ -278,7 +284,7 @@ public class Marble : MonoBehaviour
             return;
 
         if (Time.time >= lastFreezeTime + IceShard.FREEZE_TIME)
-            Unfreeze(true);
+            Unfreeze(false);
     }
 
     private void FixedUpdate()
@@ -702,6 +708,7 @@ public class Marble : MonoBehaviour
 
         cannonCharge = 0f;
         activeCannon = cannon;
+        canUsePowerupAfterCannon = false;
         cannon.ResetCharge();
 
         cannonPreviousCanMove = movement.canMove;
@@ -744,6 +751,7 @@ public class Marble : MonoBehaviour
         {
             cannon.HideAimVisualization();
             CancelCannon();
+
             return;
         }
 
@@ -804,7 +812,8 @@ public class Marble : MonoBehaviour
 
     private void FireCannon(Cannon cannon, Vector3 fireDirection, float forceFraction)
     {
-        if (cannon == null) return;
+        if (cannon == null) 
+            return;
 
         cannonCharge = 0f;
         float launchForce = cannon.force * (cannon.useCharge ? Mathf.Clamp01(forceFraction) : 1f);
@@ -828,7 +837,10 @@ public class Marble : MonoBehaviour
         DG.Tweening.DOVirtual.DelayedCall(1f, () =>
         {
             cannon.ResetCannon();
-            foreach (Collider c in cannon.GetComponentsInChildren<Collider>()) c.enabled = true;
+            foreach (Collider c in cannon.GetComponentsInChildren<Collider>()) 
+                c.enabled = true;
+
+            canUsePowerupAfterCannon = true;
         }, false);
 
         GameUIManager.instance.SetPowerupLocked(false);
@@ -929,9 +941,12 @@ public class Marble : MonoBehaviour
     private void LeaveCannonInternal()
     {
         Cannon cannon = activeCannon;
-        if (cannon == null) return;
+
+        if (cannon == null) 
+            return;
 
         cannon.HideAimVisualization();
+
         activeCannon = null;
         lastCannon = cannon;
         cannonReenableTime = Time.time + 0.2f;
@@ -947,6 +962,7 @@ public class Marble : MonoBehaviour
         StopCannonChargeAudio();
         Vector3 exitPosition = cannon.GetExitPosition();
 
+        canUsePowerupAfterCannon = true;
         LeaveCannonInternal();
 
         movement.SetPosition(exitPosition);
@@ -1009,7 +1025,7 @@ public class Marble : MonoBehaviour
         if (GameUIManager.instance != null)
             GameUIManager.instance.SetPowerupLocked(true);
 
-        if (iceShard != null)
+        if (iceShard != null && GameManager.gameStart)
             iceShard.PlayFreezeSound(this);
     }
 
@@ -1049,7 +1065,7 @@ public class Marble : MonoBehaviour
         if (GameUIManager.instance != null)
             GameUIManager.instance.SetPowerupLocked(false);
 
-        if (iceShard != null)
+        if (iceShard != null && GameManager.gameStart)
             iceShard.PlayCrackSound(this);
 
         iceShard = null;
@@ -1062,7 +1078,7 @@ public class Marble : MonoBehaviour
     /// </summary>
     private IEnumerator ResetFreezeState()
     {
-        while (isFrozen || iceShard != null || lastFreezeTime != Mathf.NegativeInfinity || frozenIce.activeSelf)
+        for (int i = 0; i < 200; i ++)
         {
             isFrozen = false;
             iceShard = null;
@@ -1070,13 +1086,22 @@ public class Marble : MonoBehaviour
             frozenIce.SetActive(false);
             GameUIManager.instance.SetPowerupLocked(false);
 
+            if (GameManager.instance.useCheckpoint)
+                movement.StartMoving();
+            else if (!GameManager.gameStart)
+                movement.StopAllbutJumping();
+            else
+                movement.StartMoving();
+
             yield return null;
         }
 
         if (GameManager.instance.useCheckpoint)
             movement.StartMoving();
-        else
+        else if (!GameManager.gameStart)
             movement.StopAllbutJumping();
+        else
+            movement.StartMoving();
     }
 
     // Powerup-use trigger locking
@@ -1108,7 +1133,7 @@ public class Marble : MonoBehaviour
     {
         PowerupType powerUp = GameManager.instance.activePowerup;
 
-        if (powerUp == PowerupType.Teleporter)
+        if (powerUp == PowerupType.Teleporter || powerUp == PowerupType.Transporter)
         {
             if (Teleporter.activeTeleporter != null)
                 Teleporter.activeTeleporter.UseTeleporter();

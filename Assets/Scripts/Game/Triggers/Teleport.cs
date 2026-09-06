@@ -66,6 +66,7 @@ public class Teleport : MonoBehaviour
             }
         }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         Marble marble = other.GetComponent<Marble>();
@@ -138,6 +139,9 @@ public class Teleport : MonoBehaviour
             return;
 
         teleporting = false;
+
+        // Clear Teleport Trigger timer.
+        GameUIManager.instance?.SetTeleportTriggerTimer(0f, time);
 
         CancelInvoke(nameof(TeleportMarble));
 
@@ -217,6 +221,9 @@ public class Teleport : MonoBehaviour
 
             teleporting = false;
             SetOpaque();
+
+            GameUIManager.instance?.SetTeleportTriggerTimer(-1f, time);
+
             return;
         }
 
@@ -228,6 +235,9 @@ public class Teleport : MonoBehaviour
 
             teleporting = false;
             SetOpaque();
+
+            GameUIManager.instance?.SetTeleportTriggerTimer(-1f, time);
+
             return;
         }
 
@@ -238,6 +248,9 @@ public class Teleport : MonoBehaviour
         {
             teleporting = false;
             SetOpaque();
+
+            GameUIManager.instance?.SetTeleportTriggerTimer(-1, time);
+
             return;
         }
 
@@ -303,6 +316,9 @@ public class Teleport : MonoBehaviour
             ApplyDestinationCamera(destinationTrigger);
 
         SetOpaque();
+
+        // Clear Teleport Trigger timer after teleporting.
+        GameUIManager.instance?.SetTeleportTriggerTimer(-1f, time);
     }
 
     private void ApplyDestinationCamera(
@@ -316,15 +332,9 @@ public class Teleport : MonoBehaviour
         if (cameraController == null)
             return;
 
-        if (destinationTrigger.cameraPos == null)
-            return;
-
-        if (destinationTrigger.cameraPos.childCount < 2)
-            return;
-
         cameraController.SetCameraPosition(
-            destinationTrigger.cameraPos.GetChild(0).position,
-            destinationTrigger.cameraPos.GetChild(1).position
+            destinationTrigger.spawn.position,
+            destinationTrigger.cameraPos.position
         );
     }
 
@@ -474,8 +484,16 @@ public class Teleport : MonoBehaviour
                 marbleMaterial.color = color;
             }
 
+            // Update Teleport Trigger timer.
+            GameUIManager.instance?.SetTeleportTriggerTimer(
+                Mathf.Max(0f, teleportTime),
+                time
+            );
+
             yield return null;
         }
+
+        GameUIManager.instance?.SetTeleportTriggerTimer(-1f, time);
 
         teleportFadeCoroutine = null;
     }
@@ -489,6 +507,9 @@ public class Teleport : MonoBehaviour
         StopAllCoroutines();
 
         SetOpaque();
+
+        // Clear Teleport Trigger timer on reset.
+        GameUIManager.instance?.SetTeleportTriggerTimer(-1f, time);
 
         if (Marble.instance != null &&
             Marble.instance.teleportSound != null)
