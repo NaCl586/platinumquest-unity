@@ -7,6 +7,7 @@ public class SpawnTrigger : MonoBehaviour
     public Vector3 offset = new Vector3(0, 0, 0);
     public bool hasAddOrSub;
     public Transform spawnPos;
+    public bool center = true;
 
     public void InitSpawnTrigger()
     {

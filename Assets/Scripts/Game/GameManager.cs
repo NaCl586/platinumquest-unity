@@ -211,8 +211,6 @@ public class GameManager : MonoBehaviour
                 case Mode.Madness: gameModes.Add(new MadnessMode(this)); guim.ShowMadnessHuntGemCountUI(true); break;
                 case Mode.Hunt: gameModes.Add(new HuntMode(this)); guim.ShowMadnessHuntGemCountUI(true); huntRestartRequested = true; break;
             }
-
-            Debug.Log(mode);
         }
 
         if (gameModes.Count == 0) gameModes.Add(new NullMode(this));
@@ -632,15 +630,17 @@ public class GameManager : MonoBehaviour
         if (guim == null)
             guim = GameObject.FindObjectOfType<GameUIManager>(true);
 
-        guim.SetPowerupLocked(true);
         guim.SetCenterImage(3);
         PlayOutOfBoundsAudio();
         CameraController.instance.LockCamera(false);
         CameraController.instance.EnterTwoDOutOfBounds();
         CancelInvoke();
 
-        if (GetGameMode<HuntMode>() != null) huntRestartRequested = false;
-        if (!ReplayRecorder.loadReplay) Invoke(nameof(InvokeRespawn), 2f);
+        if (GetGameMode<HuntMode>() != null) 
+            huntRestartRequested = false;
+
+        if (!ReplayRecorder.loadReplay) 
+            Invoke(nameof(InvokeRespawn), 2f);
     }
 
     public void IncrementOutOfBoundsCount()
@@ -679,7 +679,7 @@ public class GameManager : MonoBehaviour
 
             if (closest != null)
             {
-                Transform spawnPoint = closest.transform.Find("Spawn");
+                Transform spawnPoint = closest.transform.Find("SpawnPos/Spawn");
                 SetActiveCheckpoint(spawnPoint != null ? spawnPoint : closest.transform, -closest.transform.forward);
             }
         }
@@ -811,7 +811,9 @@ public class GameManager : MonoBehaviour
         else
         {
             StopActiveTimeTravel(true);
-            Marble.instance.InactivateTimeTravel();
+
+            if (GetGameMode<HuntMode>() == null)
+                Marble.instance.InactivateTimeTravel();
 
             ForEachGameMode(mode => mode.OnRespawn());
             specialGameMode?.OnRespawn();
@@ -885,6 +887,8 @@ public class GameManager : MonoBehaviour
             GameUIManager.instance.SetPowerupIcon(activePowerup);
             Marble.instance.RestorePowerupCheckpoint();
         }
+
+        ResetAll<IceShard>(ice => ice.ResetShard());
 
         GameUIManager.instance.SetCenterImage(-1);
         Movement.instance.ResetMovementTriggerCount();
@@ -1666,19 +1670,19 @@ public class GameManager : MonoBehaviour
         if (isHunt)
         {
             parPassed =
-                MissionInfo.instance.parScore <= 0 ||
+                MissionInfo.instance.parScore >= 0 &&
                 leaderboardValue >= MissionInfo.instance.parScore;
 
             platinum =
-                MissionInfo.instance.platinumTime <= 0 ||
+                MissionInfo.instance.platinumTime >= 0 &&
                 leaderboardValue >= MissionInfo.instance.platinumTime;
 
             ultimate =
-                MissionInfo.instance.ultimateTime <= 0 ||
+                MissionInfo.instance.ultimateTime >= 0 &&
                 leaderboardValue >= MissionInfo.instance.ultimateTime;
 
             awesome =
-                MissionInfo.instance.awesomeTime <= 0 ||
+                MissionInfo.instance.awesomeTime >= 0 &&
                 leaderboardValue >= MissionInfo.instance.awesomeTime;
         }
 
@@ -1744,7 +1748,7 @@ public class GameManager : MonoBehaviour
             // Platinum
             // -------------------------
 
-            if (MissionInfo.instance.platinumTime > 0)
+            if (MissionInfo.instance.platinumTime >= 0)
             {
                 if (platinumIsScore)
                 {
@@ -1763,7 +1767,7 @@ public class GameManager : MonoBehaviour
             // Ultimate
             // -------------------------
 
-            if (MissionInfo.instance.ultimateTime > 0)
+            if (MissionInfo.instance.ultimateTime >= 0)
             {
                 if (ultimateIsScore)
                 {
@@ -1782,7 +1786,7 @@ public class GameManager : MonoBehaviour
             // Awesome
             // -------------------------
 
-            if (MissionInfo.instance.awesomeTime > 0)
+            if (MissionInfo.instance.awesomeTime >= 0)
             {
                 if (awesomeIsScore)
                 {
@@ -1809,15 +1813,15 @@ public class GameManager : MonoBehaviour
                 elapsedTime < MissionInfo.instance.time;
 
             platinum =
-                MissionInfo.instance.platinumTime <= 0 ||
+                MissionInfo.instance.platinumTime >= 0 &&
                 elapsedTime < MissionInfo.instance.platinumTime;
 
             ultimate =
-                MissionInfo.instance.ultimateTime <= 0 ||
+                MissionInfo.instance.ultimateTime >= 0 &&
                 elapsedTime < MissionInfo.instance.ultimateTime;
 
             awesome =
-                MissionInfo.instance.awesomeTime <= 0 ||
+                MissionInfo.instance.awesomeTime >= 0 &&
                 elapsedTime < MissionInfo.instance.awesomeTime;
         }
 
@@ -2011,8 +2015,11 @@ public class GameManager : MonoBehaviour
                 $"<color=#FF3333>{Utils.FormatTime(MissionInfo.instance.awesomeTime)}</color>";
         }
 
+        float huntMadnessTime = MissionInfo.instance.time + bonusTime;
+        float regularTime = elapsedTime + bonusTime;
+
         timePassedText.text =
-            Utils.FormatTime(elapsedTime + bonusTime);
+            Utils.FormatTime((isHunt || isMadness) ? huntMadnessTime : regularTime);
 
         clockBonusesText.text =
             Utils.FormatTime(bonusTime);

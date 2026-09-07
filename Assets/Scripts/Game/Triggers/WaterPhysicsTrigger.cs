@@ -9,6 +9,10 @@ public class WaterPhysicsTrigger : MonoBehaviour
     [Tooltip("Matches the Haxe implementation. 0.5 removes 50% of entry velocity.")]
     public float velocityMultiplier = 0.5f;
 
+    [Header("Water Particles")]
+    [Tooltip("If enabled, particles are only kept while they are inside at least one water trigger.")]
+    [SerializeField] private bool constrainParticles = true;
+
     private Collider waterCollider;
 
     private static readonly Dictionary<Marble, List<WaterPhysicsTrigger>> activeWaterTriggers =
@@ -16,6 +20,19 @@ public class WaterPhysicsTrigger : MonoBehaviour
 
     private readonly Dictionary<Marble, HashSet<Collider>> localOverlaps =
         new Dictionary<Marble, HashSet<Collider>>();
+
+    // ============================================================
+    // Shared Water Particle State
+    // ============================================================
+
+    private static readonly List<WaterPhysicsTrigger> allWaterTriggers =
+        new List<WaterPhysicsTrigger>();
+
+    private static ParticleSystem sharedWaterParticles;
+
+    private static WaterPhysicsTrigger particleController;
+
+    private static ParticleSystem.Particle[] particleBuffer;
 
     private void Awake()
     {
@@ -25,10 +42,194 @@ public class WaterPhysicsTrigger : MonoBehaviour
 
     private void Start()
     {
+        waterParticlesSetup();
+
         // Physics trigger events may not be generated for objects
         // that were already inside the trigger when the scene started.
         StartCoroutine(InitializeExistingOverlaps());
     }
+
+    // ============================================================
+    // Water Particles
+    // ============================================================
+
+    private void waterParticlesSetup()
+    {
+        if (Marble.instance == null)
+            return;
+
+        ParticleSystem particles = Marble.instance.bubbleParticle;
+
+        if (particles == null)
+            return;
+
+        sharedWaterParticles = particles;
+
+        if (!allWaterTriggers.Contains(this))
+            allWaterTriggers.Add(this);
+
+        // Only one WaterPhysicsTrigger is responsible for filtering
+        // the shared particle system. This prevents multiple triggers
+        // from independently deleting particles.
+        if (particleController == null)
+            particleController = this;
+    }
+
+    private void LateUpdate()
+    {
+        // The particle system is shared by every water trigger.
+        // Only one trigger should perform the filtering.
+        if (particleController != this)
+            return;
+
+        ConstrainSharedWaterParticles();
+    }
+
+    private static void ConstrainSharedWaterParticles()
+    {
+        if (sharedWaterParticles == null)
+            return;
+
+        // Remove destroyed/disabled trigger references.
+        for (int i = allWaterTriggers.Count - 1; i >= 0; i--)
+        {
+            WaterPhysicsTrigger trigger = allWaterTriggers[i];
+
+            if (trigger == null ||
+                !trigger.isActiveAndEnabled ||
+                trigger.waterCollider == null ||
+                !trigger.waterCollider.enabled ||
+                !trigger.constrainParticles)
+            {
+                allWaterTriggers.RemoveAt(i);
+            }
+        }
+
+        if (allWaterTriggers.Count == 0)
+            return;
+
+        int particleCount = sharedWaterParticles.particleCount;
+
+        if (particleCount <= 0)
+            return;
+
+        if (particleBuffer == null ||
+            particleBuffer.Length < particleCount)
+        {
+            particleBuffer = new ParticleSystem.Particle[particleCount];
+        }
+
+        int count = sharedWaterParticles.GetParticles(particleBuffer);
+
+        ParticleSystem.MainModule main = sharedWaterParticles.main;
+
+        int writeIndex = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+            ParticleSystem.Particle particle = particleBuffer[i];
+
+            Vector3 worldPosition =
+                GetParticleWorldPosition(
+                    sharedWaterParticles,
+                    main,
+                    particle);
+
+            bool insideAnyWaterTrigger = false;
+
+            for (int j = 0; j < allWaterTriggers.Count; j++)
+            {
+                WaterPhysicsTrigger trigger = allWaterTriggers[j];
+
+                if (trigger == null ||
+                    trigger.waterCollider == null ||
+                    !trigger.waterCollider.enabled ||
+                    !trigger.constrainParticles)
+                {
+                    continue;
+                }
+
+                if (IsPointInsideCollider(
+                        trigger.waterCollider,
+                        worldPosition))
+                {
+                    insideAnyWaterTrigger = true;
+                    break;
+                }
+            }
+
+            // Particle is outside every water trigger.
+            // Do not copy it into the output array, effectively deleting it.
+            if (!insideAnyWaterTrigger)
+                continue;
+
+            particleBuffer[writeIndex] = particle;
+            writeIndex++;
+        }
+
+        if (writeIndex != count)
+        {
+            sharedWaterParticles.SetParticles(
+                particleBuffer,
+                writeIndex);
+        }
+    }
+
+    private static Vector3 GetParticleWorldPosition(
+        ParticleSystem particles,
+        ParticleSystem.MainModule main,
+        ParticleSystem.Particle particle)
+    {
+        switch (main.simulationSpace)
+        {
+            case ParticleSystemSimulationSpace.Local:
+
+                return particles.transform.TransformPoint(
+                    particle.position);
+
+            case ParticleSystemSimulationSpace.World:
+
+                return particle.position;
+
+            case ParticleSystemSimulationSpace.Custom:
+
+                if (main.customSimulationSpace != null)
+                {
+                    return main.customSimulationSpace.TransformPoint(
+                        particle.position);
+                }
+
+                return particle.position;
+
+            default:
+
+                return particle.position;
+        }
+    }
+
+    private static bool IsPointInsideCollider(
+        Collider collider,
+        Vector3 worldPosition)
+    {
+        if (collider == null ||
+            !collider.enabled)
+        {
+            return false;
+        }
+
+        Vector3 closestPoint =
+            collider.ClosestPoint(worldPosition);
+
+        // For a point inside a collider, ClosestPoint returns the
+        // original point.
+        const float epsilon = 0.000001f;
+
+        return (closestPoint - worldPosition).sqrMagnitude <= epsilon;
+    }
+
+    // ============================================================
+    // Existing Water Trigger Logic
+    // ============================================================
 
     private IEnumerator InitializeExistingOverlaps()
     {
@@ -75,7 +276,9 @@ public class WaterPhysicsTrigger : MonoBehaviour
         }
     }
 
-    private static bool CollidersActuallyOverlap(Collider a, Collider b)
+    private static bool CollidersActuallyOverlap(
+        Collider a,
+        Collider b)
     {
         if (a == null || b == null)
             return false;
@@ -153,7 +356,9 @@ public class WaterPhysicsTrigger : MonoBehaviour
         if (marble == null)
             return;
 
-        if (!localOverlaps.TryGetValue(marble, out HashSet<Collider> overlaps))
+        if (!localOverlaps.TryGetValue(
+                marble,
+                out HashSet<Collider> overlaps))
             return;
 
         overlaps.Remove(other);
@@ -217,7 +422,8 @@ public class WaterPhysicsTrigger : MonoBehaviour
                 continue;
 
             Vector3 center = trigger.waterCollider.bounds.center;
-            float distance = (center - marblePosition).sqrMagnitude;
+            float distance =
+                (center - marblePosition).sqrMagnitude;
 
             if (distance <= closestDistance)
             {
@@ -322,8 +528,35 @@ public class WaterPhysicsTrigger : MonoBehaviour
         return null;
     }
 
+    // ============================================================
+    // Cleanup
+    // ============================================================
+
     private void OnDisable()
     {
+        allWaterTriggers.Remove(this);
+
+        if (particleController == this)
+        {
+            particleController = null;
+
+            // Find another active trigger to take over particle filtering.
+            for (int i = 0; i < allWaterTriggers.Count; i++)
+            {
+                WaterPhysicsTrigger trigger = allWaterTriggers[i];
+
+                if (trigger != null &&
+                    trigger.isActiveAndEnabled &&
+                    trigger.waterCollider != null &&
+                    trigger.waterCollider.enabled &&
+                    trigger.constrainParticles)
+                {
+                    particleController = trigger;
+                    break;
+                }
+            }
+        }
+
         List<Marble> affected = new List<Marble>();
 
         foreach (var pair in localOverlaps)

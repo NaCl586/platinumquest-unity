@@ -116,6 +116,11 @@ public class Marble : MonoBehaviour
     public float nextFireBlastTime = Mathf.NegativeInfinity;
     [SerializeField] AudioClip fireExtinguishSound;
 
+    // Matches Haxe Marble.timeSinceLastJump.
+    // The Haxe implementation starts this at a very large value, which
+    // makes jumpFraction clamp to 1 until the marble jumps.
+    private float timeSinceLastJump = Mathf.Infinity;
+
     public float GetFireballTime()
     {
         if (!fireball) return 0f;
@@ -152,6 +157,7 @@ public class Marble : MonoBehaviour
 
     // LockPowerupTrigger state.
     private int powerupUseLockCount;
+    public int PowerupUseLockCount => powerupUseLockCount;
 
     // Respawn Event
     public class OnRespawn : UnityEvent { }
@@ -191,6 +197,15 @@ public class Marble : MonoBehaviour
         canUsePowerupAfterCannon = true;
     }
 
+    // Prevents a held usePowerup key from being registered immediately
+    // after an out-of-bounds respawn.
+    [Header("Powerup Respawn")]
+    [SerializeField] private float powerupRespawnCooldown = 0.1f;
+    private float powerupUseBlockedUntil = Mathf.NegativeInfinity;
+
+    private bool IsPowerupInputBlocked =>
+        Time.time < powerupUseBlockedUntil;
+
     private void Update()
     {
         if (GameUIManager.instance != null && GameUIManager.instance.IsChatInputOpen) return;
@@ -201,7 +216,7 @@ public class Marble : MonoBehaviour
             return;
         }
 
-        if (activeCannon != null) 
+        if (activeCannon != null)
             UpdateCannonFiring();
 
         UpdateCannonLocks();
@@ -251,6 +266,12 @@ public class Marble : MonoBehaviour
             }
         }
 
+        // Haxe tracks the time since the last jump independently of the
+        // fireball state. Movement should call NotifyJump() when a jump is
+        // actually performed.
+        if (!float.IsPositiveInfinity(timeSinceLastJump))
+            timeSinceLastJump += Time.deltaTime;
+
         if (Input.GetKeyDown(ControlBinding.instance.blast))
             FireBlast();
 
@@ -273,8 +294,10 @@ public class Marble : MonoBehaviour
                 GameManager.instance.InvokeRespawn();
                 return;
             }
-
-            UsePowerup();
+            else if (!IsPowerupInputBlocked)
+            {
+                UsePowerup();
+            }
         }
     }
 
@@ -368,6 +391,7 @@ public class Marble : MonoBehaviour
 
         if (use && inWater && movement.canMove && !GameManager.isPaused &&
             !GameManager.gameFinish && !ReplayRecorder.loadReplay && !IsInCannon &&
+            !IsPowerupInputBlocked &&
             (bubbleInfinite || bubbleTime > 0f))
         {
             ActivateBubble();
@@ -537,6 +561,8 @@ public class Marble : MonoBehaviour
         if (bubbleParticle == null)
             return;
 
+        // The bubble particle system stays active permanently.
+        // When the marble is fully submerged, allow it to emit.
         if (active)
         {
             if (!bubbleParticle.gameObject.activeSelf)
@@ -547,16 +573,15 @@ public class Marble : MonoBehaviour
         }
         else
         {
+            // Stop creating new bubbles, but keep all bubbles that have
+            // already been emitted alive until their normal lifetime ends.
             if (bubbleParticle.isPlaying)
             {
                 bubbleParticle.Stop(
                     true,
-                    ParticleSystemStopBehavior.StopEmittingAndClear
+                    ParticleSystemStopBehavior.StopEmitting
                 );
             }
-
-            if (bubbleParticle.gameObject.activeSelf)
-                bubbleParticle.gameObject.SetActive(false);
         }
     }
 
@@ -738,7 +763,6 @@ public class Marble : MonoBehaviour
         }
 
         GameUIManager.instance.ShowCannonMenu(true);
-        GameUIManager.instance.SetPowerupLocked(true);
     }
 
     // Cannon - Firing
@@ -812,7 +836,7 @@ public class Marble : MonoBehaviour
 
     private void FireCannon(Cannon cannon, Vector3 fireDirection, float forceFraction)
     {
-        if (cannon == null) 
+        if (cannon == null)
             return;
 
         cannonCharge = 0f;
@@ -837,13 +861,12 @@ public class Marble : MonoBehaviour
         DG.Tweening.DOVirtual.DelayedCall(1f, () =>
         {
             cannon.ResetCannon();
-            foreach (Collider c in cannon.GetComponentsInChildren<Collider>()) 
+            foreach (Collider c in cannon.GetComponentsInChildren<Collider>())
                 c.enabled = true;
 
             canUsePowerupAfterCannon = true;
         }, false);
 
-        GameUIManager.instance.SetPowerupLocked(false);
         GameUIManager.instance.ShowCannonMenu(false);
     }
 
@@ -942,7 +965,7 @@ public class Marble : MonoBehaviour
     {
         Cannon cannon = activeCannon;
 
-        if (cannon == null) 
+        if (cannon == null)
             return;
 
         cannon.HideAimVisualization();
@@ -981,7 +1004,6 @@ public class Marble : MonoBehaviour
         cannonControlLockUntil = Mathf.NegativeInfinity;
         cannonCameraLockUntil = Mathf.NegativeInfinity;
 
-        GameUIManager.instance.SetPowerupLocked(false);
         GameUIManager.instance.ShowCannonMenu(false);
     }
 
@@ -1022,9 +1044,6 @@ public class Marble : MonoBehaviour
         if (frozenIce != null)
             frozenIce.SetActive(true);
 
-        if (GameUIManager.instance != null)
-            GameUIManager.instance.SetPowerupLocked(true);
-
         if (iceShard != null && GameManager.gameStart)
             iceShard.PlayFreezeSound(this);
     }
@@ -1063,10 +1082,9 @@ public class Marble : MonoBehaviour
             frozenIce.SetActive(false);
 
         if (GameUIManager.instance != null)
-            GameUIManager.instance.SetPowerupLocked(false);
 
-        if (iceShard != null && GameManager.gameStart)
-            iceShard.PlayCrackSound(this);
+            if (iceShard != null && GameManager.gameStart)
+                iceShard.PlayCrackSound(this);
 
         iceShard = null;
     }
@@ -1078,13 +1096,12 @@ public class Marble : MonoBehaviour
     /// </summary>
     private IEnumerator ResetFreezeState()
     {
-        for (int i = 0; i < 200; i ++)
+        for (int i = 0; i < 200; i++)
         {
             isFrozen = false;
             iceShard = null;
             lastFreezeTime = Mathf.NegativeInfinity;
             frozenIce.SetActive(false);
-            GameUIManager.instance.SetPowerupLocked(false);
 
             if (GameManager.instance.useCheckpoint)
                 movement.StartMoving();
@@ -1108,21 +1125,11 @@ public class Marble : MonoBehaviour
     public void LockPowerupUse()
     {
         powerupUseLockCount++;
-
-        if (GameUIManager.instance != null)
-            GameUIManager.instance.SetPowerupLocked(true);
     }
 
     public void UnlockPowerupUse()
     {
-        powerupUseLockCount =
-            Mathf.Max(0, powerupUseLockCount - 1);
-
-        if (powerupUseLockCount == 0 &&
-            GameUIManager.instance != null)
-        {
-            GameUIManager.instance.SetPowerupLocked(false);
-        }
+        powerupUseLockCount = Mathf.Max(0, powerupUseLockCount - 1);
     }
 
     public bool IsPowerupUseLocked =>
@@ -1164,6 +1171,12 @@ public class Marble : MonoBehaviour
 
     public void Respawn()
     {
+        // Prevent a held usePowerup key from being registered
+        // immediately after respawning.
+        powerupUseBlockedUntil = Time.time + Mathf.Max(0f, powerupRespawnCooldown);
+
+        timeSinceLastJump = Mathf.Infinity;
+
         // Completely cancel any existing Ice Shard freeze.
         // This must happen before anything else in the respawn process.
         StartCoroutine(ResetFreezeState());
@@ -1179,19 +1192,13 @@ public class Marble : MonoBehaviour
         DeactivateBubble();
         DeactivateFireball();
 
-        if (!GameManager.instance.useCheckpoint)
+        if (!GameManager.instance.useCheckpoint && GameManager.instance.GetGameMode<HuntMode>() == null)
         {
             bubbleTime = 0f;
             bubbleInfinite = false;
             GameUIManager.instance.SetBubbleTimer(
                 -1,
                 bubbleTotalTime
-            );
-
-            fireballTime = 0f;
-            GameUIManager.instance.SetFireballTimer(
-                -1,
-                fireballTotalTime
             );
 
             GameManager.instance.activePowerup =
@@ -1205,7 +1212,6 @@ public class Marble : MonoBehaviour
 
         powerupUseLockCount = 0;
 
-        GameUIManager.instance.SetPowerupLocked(false);
         GameUIManager.instance.ShowCannonMenu(false);
 
         ClearPhysicsLayers();
@@ -1220,7 +1226,8 @@ public class Marble : MonoBehaviour
             GameManager.instance.activeCheckpoint.position
         );
 
-        CameraController.instance?.ResetCam();
+        if (GameManager.instance.GetGameMode<HuntMode>() == null)
+            CameraController.instance?.ResetCam();
 
         PhysModTrigger.RefreshAllTriggers(this);
         WaterPhysicsTrigger.RefreshMarbleWaterState(this);
@@ -1485,6 +1492,11 @@ public class Marble : MonoBehaviour
 
         if (fireballParticle != null)
             fireballParticle.SetActive(false);
+
+        GameUIManager.instance.SetFireballTimer(
+                -1,
+                fireballTotalTime
+            );
     }
 
     private void UpdateFireball()
@@ -1508,7 +1520,7 @@ public class Marble : MonoBehaviour
         if (!fireball) return;
 
         shard.DestroyByFireball();
-        fireballTime -= 0.5f;
+        //fireballTime -= 0.5f;
 
         if (GetFireballTime() <= 0f)
         {
@@ -1519,6 +1531,12 @@ public class Marble : MonoBehaviour
 
     public bool canBlast => (Time.time > nextFireBlastTime && GetFireballTime() > 1f);
     GameObject blastParticle;
+    public void NotifyJump()
+    {
+        timeSinceLastJump = 0f;
+    }
+
+
     public void FireBlast()
     {
         if (!fireball) return;
@@ -1528,23 +1546,71 @@ public class Marble : MonoBehaviour
 
         nextFireBlastTime = Time.time + 2f;
 
-        float blastAmount = remaining / fireballTime;
-        float impulseStrength = (blastAmount > 1f ? blastAmount : Mathf.Sqrt(blastAmount)) * 10f;
+        // Haxe: fireballTime / fireballTotalTime.
+        // In Unity, fireballTime stores the original duration and
+        // GetFireballTime() returns the remaining duration.
+        float timeFraction = fireballTotalTime > 0f
+            ? remaining / fireballTotalTime
+            : 0f;
 
-        movement.marbleVelocity += -GravitySystem.GravityDir.normalized * impulseStrength;
+        // Haxe: clamp(timeSinceLastJump / 0.4, 0, 1).
+        float jumpFraction = Mathf.Clamp01(timeSinceLastJump / 0.4f);
 
-        blastParticle = Instantiate(fireballBlastParticle, transform.position, Quaternion.identity);
+        // Haxe: timeFraction * 5 + jumpFraction * 5 + 2.
+        float scale =
+            timeFraction * 5f +
+            jumpFraction * 5f +
+            2f;
+
+        // Haxe applies the impulse along currentUp. In this Unity port,
+        // the opposite of GravityDir is the marble's current up direction.
+        Vector3 currentUp =
+            -GravitySystem.GravityDir.normalized;
+
+        movement.marbleVelocity += currentUp * scale;
+
+        blastParticle = Instantiate(
+            fireballBlastParticle,
+            transform.position,
+            Quaternion.identity
+        );
+
         GameManager.instance.PlayFireballBlastSfx();
         Destroy(blastParticle.gameObject, 1f);
 
-        float radius = blastAmount * 1.5f + 1.5f;
-        Collider[] hits = Physics.OverlapSphere(transform.position, radius);
+        // Haxe: timeFraction * 1.5 + 1.5.
+        float radius = timeFraction * 1.5f + 1.5f;
+        Vector3 pos = transform.position;
 
-        foreach (Collider hit in hits)
+        // Haxe iterates over level.iceShards and performs a sphere-vs-AABB
+        // distance test rather than Physics.OverlapSphere().
+        IceShard[] shards = FindObjectsOfType<IceShard>(true);
+
+        foreach (IceShard shard in shards)
         {
-            IceShard shard = hit.GetComponentInParent<IceShard>();
-            if (shard == null) continue;
-            shard.DestroyByFireball();
+            if (shard == null || !shard.gameObject.activeInHierarchy)
+                continue;
+
+            Collider shardCollider =
+                shard.GetComponentInChildren<Collider>();
+
+            if (shardCollider == null)
+                continue;
+
+            Bounds bounds = shardCollider.bounds;
+
+            float cx = Mathf.Clamp(pos.x, bounds.min.x, bounds.max.x);
+            float cy = Mathf.Clamp(pos.y, bounds.min.y, bounds.max.y);
+            float cz = Mathf.Clamp(pos.z, bounds.min.z, bounds.max.z);
+
+            float dx = pos.x - cx;
+            float dy = pos.y - cy;
+            float dz = pos.z - cz;
+
+            if (dx * dx + dy * dy + dz * dz <= radius * radius)
+            {
+                shard.DestroyByFireball();
+            }
         }
     }
 

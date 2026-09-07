@@ -300,6 +300,9 @@ public class GameUIManager : MonoBehaviour
 
     private void Update()
     {
+        bool showLockedPowerup = GameManager.instance.IsOutOfBounds || Marble.instance.IsInCannon || Marble.instance.isFrozen || Marble.instance.PowerupUseLockCount > 0;
+        powerupLocked.SetActive(showLockedPowerup);
+
         if (fpsText != null)
         {
             timer += Time.unscaledDeltaTime;
@@ -370,8 +373,6 @@ public class GameUIManager : MonoBehaviour
             }
         }
     }
-
-    public void SetPowerupLocked(bool show) => powerupLocked.SetActive(show);
 
     public void ShowGemCountUI(bool show)
     {

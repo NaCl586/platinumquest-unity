@@ -1062,6 +1062,7 @@ new SimGroup(MissionGroup) {
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			cameraYaw = "270";
 			centerDestPoint = "1";
+			keepCamera = "1";
 	};
 	new Trigger(wormhole1) {
 		position = "-64.5 0 24";
@@ -1156,6 +1157,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "DestinationTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			centerDestPoint = "1";
+			keepCamera = "1";
 	};
 	new Trigger(dest4) {
 		position = "-66 41 54";
@@ -1164,6 +1166,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "DestinationTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			centerDestPoint = "1";
+			keepCamera = "1";
 	};
 	new StaticShape() {
 		position = "-55 39 56";
@@ -1324,6 +1327,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "DestinationTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			centerDestPoint = "1";
+			keepCamera = "1";
 	};
 	new Trigger(dest6) {
 		position = "-20.5 -11.5 66";
@@ -1332,6 +1336,7 @@ new SimGroup(MissionGroup) {
 		dataBlock = "DestinationTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 			centerDestPoint = "1";
+			keepCamera = "1";
 	};
 	new StaticShape() {
 		position = "-43.5 -13.5 56";

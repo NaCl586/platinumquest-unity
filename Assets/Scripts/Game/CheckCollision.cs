@@ -88,7 +88,9 @@ public class CheckCollision : MonoBehaviour
         if (collider.TryGetComponent<CannonBase>(out var cannonBase)) cannonBase.EnterTrigger(gameObject.GetComponent<Collider>());
 
         if (collider.CompareTag("OutOfBounds"))
+        {
             GameManager.onOutOfBounds?.Invoke();
+        }
 
         if (collider.CompareTag("Finish"))
         {
@@ -110,7 +112,9 @@ public class CheckCollision : MonoBehaviour
     private void OnTriggerExit(Collider collider)
     {
         if (collider.CompareTag("InBounds"))
+        {
             GameManager.onOutOfBounds?.Invoke();
+        }
     }
 
     // ============================================================

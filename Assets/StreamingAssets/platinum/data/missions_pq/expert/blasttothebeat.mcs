@@ -107,7 +107,6 @@ new SimGroup(MissionGroup) {
 				disable = "0";
 				displayonce = "0";
 				extended = "0";
-				initialPathPosition = "36 94 10 1 0 0 0";
 				initialPathScale = "1.0505 1.0505 1.0505";
 				Path = "helpBeat1";
 				persistTime = "2000";
@@ -122,7 +121,6 @@ new SimGroup(MissionGroup) {
 				disable = "0";
 				displayonce = "0";
 				extended = "0";
-				initialPathPosition = "-30 158 13.25 1 0 0 0";
 				initialPathScale = "1.0505 1.0505 1.0505";
 				Path = "helpBeat1";
 				persistTime = "2000";
@@ -137,7 +135,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 102.903";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree01";
-				initialPathPosition = "4.033574 25.88447 7.1509 0 0 1 1.796";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -158,7 +155,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 153.266";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree02";
-				initialPathPosition = "32.01337 37.83121 9.1509 0 0 1 2.675";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -191,7 +187,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 110.065";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree01";
-				initialPathPosition = "40.01987 140.1979 20.97271 0 0 1 1.921";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -218,7 +213,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 22.6891";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree03";
-				initialPathPosition = "-43.56229 143.9774 13.98973 0 0 1 0.396";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -251,7 +245,6 @@ new SimGroup(MissionGroup) {
 			rotation = "-0.00772164 0.116824 0.993123 53.2575";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree01";
-				initialPathPosition = "-33.813 182.4179 14.73051 -0.00772164 0.1168245 0.9931226 0.929518";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -272,7 +265,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 213.484";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree02";
-				initialPathPosition = "-119.6235 155.2783 15.29651 0 0 1 3.726002";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -305,7 +297,6 @@ new SimGroup(MissionGroup) {
 			rotation = "0 0 1 42.6175";
 			scale = "0.8 0.8 0.8";
 			dataBlock = "Tree02";
-				initialPathPosition = "-91.65523 164.2669 19.97424 0 0 1 0.7438157";
 				initialPathScale = "0.8 0.8 0.8084167";
 				Path = "treeBeat1";
 		};
@@ -350,7 +341,6 @@ new SimGroup(MissionGroup) {
 		scale = "1e-05 1e-05 1e-05";
 		interiorFile = "~/data/interiors_pq/expert/bttb_yellow.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "0 0 -1000 1 0 0 0";
 			initialPathScale = "1e-05 1e-05 1e-05";
 			Path = "yellowPathBeat3";
 	};
@@ -360,7 +350,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-3.390438 -2.886012 3.605485 -0.9612797 -0.194861 -0.194861 1.610274";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -370,7 +359,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-3.390438 -2.886012 5.095473 -0.9612797 -0.194861 -0.194861 1.610274";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1235,7 +1223,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "3.445621 -2.885366 5.095473 -0.964045 0.1879056 0.1879065 1.607403";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1245,7 +1232,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "3.445621 -2.885366 3.610151 -0.964045 0.1879056 0.1879065 1.607403";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1255,7 +1241,6 @@ new SimGroup(MissionGroup) {
 		scale = "1 1 1";
 		interiorFile = "~/data/interiors_pq/expert/bttb_blue.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "0 0 0 1 0 0 0";
 			initialPathScale = "1 1 1";
 			Path = "greenPathBeat1";
 	};
@@ -1264,7 +1249,6 @@ new SimGroup(MissionGroup) {
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "Checkpoint_PQ";
-			initialPathPosition = "36 87.75 7 1 0 0 0";
 			initialPathScale = "1.016833 1.016833 1.016833";
 			Path = "cpBeat1";
 	};
@@ -1274,7 +1258,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "28.60956 82.61399 7.605484 -0.9612797 -0.194861 -0.194861 1.610274";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1284,7 +1267,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "28.60956 82.61399 9.095472 -0.9612797 -0.194861 -0.194861 1.610274";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1303,7 +1285,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-			initialPathPosition = "36 94 7 1 0 0 0";
 			initialPathScale = "1.033667 1.033667 1.033667";
 			Path = "itemBeat1";
 	};
@@ -1313,7 +1294,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "31.05912 138.9096 23.22218 -0.7955456 0.4284309 0.4284323 1.797553";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1323,7 +1303,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "31.05912 138.9096 21.73219 -0.7955456 0.4284309 0.4284323 1.797553";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1350,7 +1329,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-29.0425 151.4298 17.60919 -0.7976425 -0.4264775 -0.4264781 1.794988";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1360,7 +1338,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-29.0425 151.4298 19.09917 -0.7976425 -0.4264775 -0.4264781 1.794988";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1379,7 +1356,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-			initialPathPosition = "-30 179 10 1 0 0 0";
 			initialPathScale = "1.033667 1.033667 1.033667";
 			noParticles = "0";
 			Path = "itemBeat1";
@@ -1389,7 +1365,6 @@ new SimGroup(MissionGroup) {
 		rotation = "0 0 -1 90.0002";
 		scale = "1 1 1";
 		dataBlock = "Checkpoint_PQ";
-			initialPathPosition = "-53.75 162 14 0 0 -1 1.570796";
 			initialPathScale = "1.016833 1.016833 1.016833";
 			Path = "cpBeat1";
 	};
@@ -1413,7 +1388,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-125.5466 165.4098 19.24523 -0.796595 -0.4274555 -0.4274559 1.796269";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1423,7 +1397,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-127.4871 158.5465 21.2574 0.5038871 0.6107768 0.6107779 4.075099";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1433,7 +1406,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-127.4871 158.5465 22.74739 0.5038871 0.6107768 0.6107779 4.075099";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1443,7 +1415,6 @@ new SimGroup(MissionGroup) {
 		scale = "0.15 0.15 0.15";
 		interiorFile = "~/data/interiors_pq/expert/bttb_speaker.dif";
 		showTerrainInside = "0";
-			initialPathPosition = "-125.5466 165.4098 20.73522 -0.796595 -0.4274555 -0.4274559 1.796269";
 			initialPathScale = "0.1769333 0.1769333 0.15";
 			Path = "speakerBeat1";
 	};
@@ -1452,7 +1423,6 @@ new SimGroup(MissionGroup) {
 		rotation = "0 0 -1 57.4677";
 		scale = "1.5 1.5 1.5";
 		dataBlock = "RegularFinishlinesign";
-			initialPathPosition = "-121.9002 162.2222 26.25 0 0 -1 1.002998";
 			initialPathScale = "1.0505 1.0505 1.0505";
 			Path = "endBeat1";
 	};
@@ -1481,7 +1451,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-			initialPathPosition = "-87 162 11.5 1 0 0 0";
 			initialPathScale = "1.033667 1.033667 1.033667";
 			Path = "itemBeat1";
 			timeBonus = "5000";
@@ -1494,7 +1463,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-			initialPathPosition = "-75 151 12 1 0 0 0";
 			initialPathScale = "1.033667 1.033667 1.033667";
 			Path = "itemBeat1";
 			timeBonus = "2000";
@@ -1507,7 +1475,6 @@ new SimGroup(MissionGroup) {
 		collideable = "0";
 		static = "1";
 		rotate = "1";
-			initialPathPosition = "-93 159 13.5 1 0 0 0";
 			initialPathScale = "1.033667 1.033667 1.033667";
 			Path = "itemBeat1";
 			timeBonus = "3000";

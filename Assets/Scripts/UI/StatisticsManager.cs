@@ -92,7 +92,7 @@ public class StatisticsManager : MonoBehaviour
         int tutorialTotal = tutorial.Count;
         int beginnerTotal = beginner.Count;
         int intermediateTotal = intermediate.Count;
-        int advancedTotal = advanced.Count;
+        int advancedTotal = advanced.Count; //vice-versa counted as one
         int expertTotal = expert.Count;
         int bonusTotal = bonus.Count;
 
@@ -124,6 +124,12 @@ public class StatisticsManager : MonoBehaviour
 
         int advancedCompleted =
             GetTotalCompletion(advanced);
+
+        //vice versa
+        if (advancedCompleted >= 26)
+            advancedTotal++;
+
+        advancedTotal = Mathf.Min(advancedTotal, advanced.Count);
 
         int expertCompleted =
             GetTotalCompletion(expert);
@@ -164,16 +170,13 @@ public class StatisticsManager : MonoBehaviour
 
         int awesomeCount = 0;
 
-        if (ShowAwesomeHints())
-        {
-            awesomeCount =
+        awesomeCount =
                 GetTotalAwesome(tutorial) +
                 GetTotalAwesome(beginner) +
                 GetTotalAwesome(intermediate) +
                 GetTotalAwesome(advanced) +
                 GetTotalAwesome(expert) +
                 GetTotalAwesome(bonus);
-        }
 
         // ============================================================
         // EASTER EGGS
@@ -299,7 +302,7 @@ public class StatisticsManager : MonoBehaviour
             "Platinum Times:\n" +
             "Ultimate Times:\n";
 
-        if (ShowAwesomeHints())
+        if (awesomeCount > 0)
         {
             rightCaptions +=
                 "Awesome Times:\n";
@@ -315,23 +318,24 @@ public class StatisticsManager : MonoBehaviour
         // RIGHT VALUES
         // ============================================================
 
+        //Minus 1 bcs vice doesnt have challenge time
         string rightValues =
             FormatPercentageValue(
                 platinumCount,
-                grandTotalLevelCount
+                grandTotalLevelCount - 1
             ) + "\n" +
 
             FormatPercentageValue(
                 ultimateCount,
-                grandTotalLevelCount
+                grandTotalLevelCount - 1
             ) + "\n";
 
-        if (ShowAwesomeHints())
+        if (awesomeCount > 0)
         {
             rightValues +=
                 FormatPercentageValue(
                     awesomeCount,
-                    grandTotalLevelCount
+                    grandTotalLevelCount - 1
                 ) + "\n";
         }
 
@@ -981,18 +985,6 @@ public class StatisticsManager : MonoBehaviour
             minutes,
             seconds
         );
-    }
-
-    // ================================================================
-    // AWESOME HINTS
-    // ================================================================
-
-    private bool ShowAwesomeHints()
-    {
-        return PlayerPrefs.GetInt(
-            "ShowAwesomeHints",
-            0
-        ) != 0;
     }
 
     // ================================================================

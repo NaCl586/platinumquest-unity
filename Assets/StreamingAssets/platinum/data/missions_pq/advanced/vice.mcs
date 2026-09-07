@@ -748,7 +748,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -768,7 +768,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -788,7 +788,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "0";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -807,7 +807,7 @@ new SimGroup(MissionGroup) {
 				Smooth = "0";
 				CamFOV = "0";
 				LookAtPoint = " ";
-				usePosition = "0";
+				usePosition = "1";
 				useRotation = "1";
 				useScale = "0";
 				reverseRotation = "1";

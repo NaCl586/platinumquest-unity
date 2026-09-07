@@ -3122,7 +3122,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -3148,7 +3148,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";
@@ -3174,7 +3174,7 @@ new SimGroup(MissionGroup) {
 				CamFOV = "0";
 				LookAtPoint = " ";
 				usePosition = "1";
-				useRotation = "1";
+				useRotation = "0";
 				useScale = "1";
 				reverseRotation = "0";
 				RotationMultiplier = "1";

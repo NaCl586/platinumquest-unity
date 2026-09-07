@@ -1112,6 +1112,10 @@ public class FadePlatform : MonoBehaviour
     public void ResetPlatform()
     {
         StopAllCoroutines();
+
+        if (!gameObject.activeSelf) 
+            return;
+
         StartCoroutine(
             ResetPlatformCoroutine()
         );

@@ -4294,6 +4294,7 @@ new SimGroup(MissionGroup) {
 			parentModTrans = "0 0 2.499 1 0 0 0";
 			parentOffset = "0 0 0";
 			parentTransform = "0 0 2.499 1 0 0 0";
+			rotOffset = "90 0 0";
 	};
 	new Trigger(WaterGiantTrig) {
 		position = "40 49 -7.5";

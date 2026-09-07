@@ -55,17 +55,7 @@ public class ViceVersaStateData
 public class NamedBoolState
 {
     public string name;
-
     public bool hidden;
-
-    // ------------------------------------------------------------
-    // FadePlatform state
-    // ------------------------------------------------------------
-
-    /// <summary>
-    /// Exact opacity when the state was saved.
-    /// </summary>
-    public float opacity = 1f;
 }
 
 [Serializable]
@@ -535,12 +525,6 @@ public static class ViceVersaState
                                 fp.CurrentOpacity,
                                 0f
                             ),
-
-                        /*
-                         * Store the actual visual state too.
-                         */
-                        opacity =
-                            fp.CurrentOpacity
                     }
                 );
             }
@@ -550,8 +534,7 @@ public static class ViceVersaState
                     new NamedBoolState
                     {
                         name = name,
-                        hidden = false,
-                        opacity = 1f
+                        hidden = false
                     }
                 );
             }
@@ -696,7 +679,7 @@ public static class ViceVersaState
                 if (fp == null)
                     continue;
 
-                fp.gameObject.SetActive(state.opacity <= 0);
+                fp.gameObject.SetActive(!state.hidden);
             }
         }
 

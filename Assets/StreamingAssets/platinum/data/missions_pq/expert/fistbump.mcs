@@ -1027,7 +1027,7 @@ new SimGroup(MissionGroup) {
 		new StaticShape() {
 			position = "-7.65 3.91045 7.67044";
 			rotation = "-0.204086 -0.957513 -0.20376 92.5773";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {
@@ -1045,31 +1045,31 @@ new SimGroup(MissionGroup) {
 		new StaticShape() {
 			position = "-7.65 -6.85926 7.97016";
 			rotation = "-0.0845934 -0.99283 -0.084459 90.5036";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {
 			position = "-7.65 -1.77526 7.6048";
 			rotation = "-0.257749 -0.931312 -0.257338 94.1648";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {
 			position = "-6.35 5.62204 -0.606199";
 			rotation = "0.266371 0.926333 -0.266371 94.3808";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {
 			position = "-6.35 -0.125391 -0.620617";
 			rotation = "0.231259 0.945007 -0.23126 93.2392";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {
 			position = "-6.35 -6.17409 -0.6719";
 			rotation = "0.287605 0.913546 -0.287605 95.1737";
-			scale = "2 2 4.1";
+			scale = "2 4.1 2";
 			dataBlock = "TriangleBumper_PQ";
 		};
 		new StaticShape() {

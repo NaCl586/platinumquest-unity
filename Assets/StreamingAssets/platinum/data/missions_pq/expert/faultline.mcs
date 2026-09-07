@@ -1092,8 +1092,8 @@ new SimGroup(MissionGroup) {
 			simrotation = "1 0 0 180";
 	};
 	new Trigger(reversegrav) {
-		position = "-25 25 -1";
-		rotation = "1 0 0 0";
+		position = "-25 -25 -0.5";
+		rotation = "1 0 0 180";
 		scale = "50 50 0.5";
 		dataBlock = "GravityTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
@@ -1108,8 +1108,8 @@ new SimGroup(MissionGroup) {
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 	};
 	new Trigger(reversegrav2) {
-		position = "-25 25 -4";
-		rotation = "1 0 0 0";
+		position = "-25 -25 -3.5";
+		rotation = "1 0 0 180";
 		scale = "50 50 0.5";
 		dataBlock = "GravityTrigger";
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";

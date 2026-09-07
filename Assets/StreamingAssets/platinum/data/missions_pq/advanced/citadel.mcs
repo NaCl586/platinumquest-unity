@@ -10587,7 +10587,7 @@ new SimGroup(MissionGroup) {
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 	};
 	new Trigger(selector) {
-		position = "18 0 40";
+		position = "18 0 40.5";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "DestinationTrigger";

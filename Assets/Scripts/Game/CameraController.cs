@@ -297,50 +297,47 @@ public class CameraController : MonoBehaviour
         float epsilon = 0.001f;
         int iter = 0;
 
-        if (!MissionInfo.instance.gameModes.Contains(Mode.TwoD))
+        while (Physics.Raycast(marblePos, targetPos - marblePos, out RaycastHit hitInfo, Vector3.Distance(targetPos, marblePos)))
         {
-            while (Physics.Raycast(marblePos, targetPos - marblePos, out RaycastHit hitInfo, Vector3.Distance(targetPos, marblePos)))
+            if (!hitInfo.collider.isTrigger)
             {
-                if (!hitInfo.collider.isTrigger)
-                {
-                    targetPos += Vector3.Project(hitInfo.point - targetPos, hitInfo.normal);
-                    targetPos += hitInfo.normal * epsilon;
-                    diff = targetPos - marblePos;
-                }
-
-                if (++iter > 100) break;
+                targetPos += Vector3.Project(hitInfo.point - targetPos, hitInfo.normal);
+                targetPos += hitInfo.normal * epsilon;
+                diff = targetPos - marblePos;
             }
 
-            Vector3[] directions =
-            {
+            if (++iter > 100) break;
+        }
+
+        Vector3[] directions =
+        {
             Vector3.down, Vector3.up, Vector3.forward, Vector3.right, Vector3.left, Vector3.back,
             new Vector3(1, 1, 1), new Vector3(-1, 1, 1), new Vector3(1, -1, 1), new Vector3(-1, -1, 1),
             new Vector3(1, 1, -1), new Vector3(-1, 1, -1), new Vector3(1, -1, -1), new Vector3(-1, -1, -1)
             };
 
-            float castDistance = 0.05f;
+        float castDistance = 0.05f;
 
-            for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
+        {
+            bool hitSomething = false;
+
+            foreach (Vector3 dir in directions)
             {
-                bool hitSomething = false;
-
-                foreach (Vector3 dir in directions)
+                if (Physics.Raycast(marblePos + diff, dir, out var hitInfo, castDistance - epsilon))
                 {
-                    if (Physics.Raycast(marblePos + diff, dir, out var hitInfo, castDistance - epsilon))
+                    if (!hitInfo.collider.isTrigger)
                     {
-                        if (!hitInfo.collider.isTrigger)
-                        {
-                            hitSomething = true;
-                            Vector3 newPos = hitInfo.point + hitInfo.normal * castDistance;
-                            diff = newPos - marblePos;
-                        }
+                        hitSomething = true;
+                        Vector3 newPos = hitInfo.point + hitInfo.normal * castDistance;
+                        diff = newPos - marblePos;
                     }
                 }
-
-                if (!hitSomething) break;
             }
+
+            if (!hitSomething) break;
         }
-        
+
         if (positionLocked || GameManager.gameFinish || TwoDModeLocked)
         {
             transform.position = marble.position + diff;

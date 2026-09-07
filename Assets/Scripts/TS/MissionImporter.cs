@@ -640,6 +640,9 @@ namespace TS
 
                 ApplySkins(spMesh.gameObject, obj.GetField("skin"), false);
                 RegisterImportedObject(obj, startPad, Quaternion.Euler(-90f, 0f, 0f));
+
+                if (spMesh.localScale == Vector3.zero)
+                    spMesh.gameObject.SetActive(false);
             }
             else if (objectName == "EndPad_PQ")
             {
@@ -2108,6 +2111,7 @@ namespace TS
                             spawnTrigger.hasAddOrSub = false;
                             spawnTrigger.offset = new Vector3(0f, 0f, 0f);
                         }
+
                         spawnTrigger.InitSpawnTrigger();
                     }
                     break;
@@ -2505,7 +2509,7 @@ namespace TS
 
             Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
             Quaternion rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
-            Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+            Vector3 scale = ConvertScaleXZY(ParseVectorString(obj.GetField("scale")));
 
             gobj.transform.localPosition = position;
             gobj.transform.localRotation = gobj.transform.localRotation * rotation * Quaternion.Euler(90f, 0f, 0f);

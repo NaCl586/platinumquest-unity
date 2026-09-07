@@ -2840,7 +2840,7 @@ new SimGroup(MissionGroup) {
 		polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 	};
 	new Trigger(dest1) {
-		position = "-37.5 33.5 8.5";
+		position = "-38 34 8.5";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "DestinationTrigger";
@@ -2858,9 +2858,10 @@ new SimGroup(MissionGroup) {
 			keepVelocity = "0";
 			SetCamPitch = "-1";
 			SetCamYaw = "-1";
+			centerdestpoint = "1";
 	};
 	new Trigger(dest2) {
-		position = "-9 -20.5 4.5";
+		position = "-9.5 -20 4.5";
 		rotation = "1 0 0 0";
 		scale = "1 1 1";
 		dataBlock = "DestinationTrigger";
@@ -2878,6 +2879,7 @@ new SimGroup(MissionGroup) {
 			keepVelocity = "0";
 			SetCamPitch = "-1";
 			SetCamYaw = "-1";
+			centerdestpoint = "1";
 	};
 	new SimGroup(PathNodeGroup) {
 
