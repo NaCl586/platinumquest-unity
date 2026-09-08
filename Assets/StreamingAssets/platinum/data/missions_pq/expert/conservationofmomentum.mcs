@@ -821,7 +821,7 @@ new SimGroup(MissionGroup) {
 			polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
 				customSpawnPoint = "1";
 				enableRespawning = "1";
-				spawnPoint = "1 -8 1.5";
+				spawnPoint = "1 -8 1.5 1 0 0 0";
 		};
 	};
 	new Trigger(Bounds) {

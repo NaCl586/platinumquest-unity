@@ -586,17 +586,25 @@ new SimGroup(MissionGroup) {
       triggerOnce = "0";
       datablock = "LapsCheckpoint";
       checkpointNumber = "0";
+			customSpawnPoint = "1";
+			enableRespawning = "1";
+			spawnPoint = "-42.5 51.5 -7.5 1 0 0 0";
+			forceGravity = "1 0 0 0";
    };
 
    new Trigger() {
-      position = "-2 46 -43";
-      rotation = "1.0 0.0 0.0 0";
+      position = "-2 47.34885 -23.02049";
+      rotation = "1.0 0.0 0.0 180";
       scale = "12 1 20";
       path = "";
       polyhedron = "0 0 0 1 0 0 0 1 0 0 0 1";
       triggerOnce = "0";
       datablock = "LapsCheckpoint";
       checkpointNumber = "1";
+			customSpawnPoint = "1";
+			enableRespawning = "1";
+			spawnPoint = "6 46.5 -24 1 0 0 180";
+			forceGravity = "1 0 0 180";
    };
 
    new Trigger() {
@@ -608,6 +616,10 @@ new SimGroup(MissionGroup) {
       triggerOnce = "0";
       datablock = "LapsCheckpoint";
       checkpointNumber = "2";
+			customSpawnPoint = "1";
+			enableRespawning = "1";
+			spawnPoint = "3 -115.5 -25 1 0 0 180";
+			forceGravity = "1 0 0 180";
    };
 
    new Trigger() {
@@ -618,6 +630,9 @@ new SimGroup(MissionGroup) {
       polyhedron = "0 0 0 1 0 0 0 1 0 0 0 1";
       triggerOnce = "0";
       datablock = "LapsCounterTrigger";
+			customSpawnPoint = "1";
+			enableRespawning = "1";
+			spawnPoint = "3 5.75 0.5 1 0 0 0";
    };
 
    new Item() {

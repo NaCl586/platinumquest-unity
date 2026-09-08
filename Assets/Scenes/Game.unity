@@ -521,16 +521,16 @@ MonoBehaviour:
   activeCheckpoint: {fileID: 0}
   activeCheckpointGravityDir: {x: 0, y: 0, z: 0}
   jump: {fileID: 8300000, guid: 406c72c1052752343937064f24e4a7d5, type: 3}
-  puSpawn: {fileID: 8300000, guid: b4f3fc829e1879d4e822e7f8be4f2603, type: 3}
+  puSpawn: {fileID: 8300000, guid: 6be13735a4752a14699862c0cf0da08f, type: 3}
   puReady: {fileID: 8300000, guid: e44d6aaf03a52764ea5838eb4c086494, type: 3}
   puSet: {fileID: 8300000, guid: 80f471bf031582b4ea7a26977b2636f7, type: 3}
   puGo: {fileID: 8300000, guid: f1b7983232d783f419765f088267205d, type: 3}
-  puFinish: {fileID: 8300000, guid: 84cfd4f324d566f48818ffedd15ac45a, type: 3}
+  puFinish: {fileID: 8300000, guid: 2453ba9fc48b84a4a913027079f8aa01, type: 3}
   puOutOfBounds: {fileID: 8300000, guid: 6293670d1efa4f04c985b4ccc29b9e0a, type: 3}
   puHelp: {fileID: 8300000, guid: 07c110ced645a49439b009fff14440dd, type: 3}
-  puMissingGems: {fileID: 8300000, guid: da09851d54e01434e9cd6b94205b0bb8, type: 3}
-  checkpointSfx: {fileID: 8300000, guid: 90c343a902e5af6418071fbbcf732414, type: 3}
-  overParTimeSfx: {fileID: 8300000, guid: 8fe66ea4bcd8c8a4a8fb4f28a4fd9852, type: 3}
+  puMissingGems: {fileID: 8300000, guid: 14006ae21e199684b92b8ef1c9228871, type: 3}
+  checkpointSfx: {fileID: 8300000, guid: 18e5fc5336b4c3d42be8fec2f6ef95b3, type: 3}
+  overParTimeSfx: {fileID: 8300000, guid: 7993d2e5375cbeb4d8a068a71576a509, type: 3}
   bassPunch: {fileID: 8300000, guid: eaf31113c95f37b45926b33bd70aa365, type: 3}
   platformSurpriseSfx: {fileID: 8300000, guid: c3ddb49c8fb0e904e8de62c71a7958eb, type: 3}
   helpTutorialSfx: {fileID: 8300000, guid: 0adda215a8ae8e948aee466c67ba31ce, type: 3}

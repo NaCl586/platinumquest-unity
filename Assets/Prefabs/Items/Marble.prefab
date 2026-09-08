@@ -875,6 +875,7 @@ MonoBehaviour:
   nextFireBlastTime: -Infinity
   fireExtinguishSound: {fileID: 8300000, guid: b9626d4ae4139564e971e595b9a59287, type: 3}
   gyrocopterTransitionCooldown: 0.15
+  powerupRespawnCooldown: 0.1
 --- !u!82 &3094592717009676412
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2326,22 +2327,22 @@ PrefabInstance:
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.75
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.75
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.75
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.022964
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
@@ -2351,7 +2352,7 @@ PrefabInstance:
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0064265
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7655887130198341456, guid: 0e42a1031550a8b438e8cbb2d598b57f,
         type: 3}

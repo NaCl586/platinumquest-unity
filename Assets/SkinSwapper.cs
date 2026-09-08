@@ -61,6 +61,7 @@ public class SkinSwapper : MonoBehaviour
     private void Start()
     {
         ApplySkin();
+        Invoke(nameof(ApplySkin), 0.1f);
     }
 
     private string GetTextureKey(Texture2D texture)

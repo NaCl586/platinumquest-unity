@@ -82,8 +82,8 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 147e7212ad44de94bb53dd83980bb64d, type: 3}
   mrTop: {fileID: 1877604282840877002}
   mrBottom: {fileID: 6818972614408947879}
-  pickupSound: {fileID: 8300000, guid: 6212741acfe13d34f90e7d6a3f18e86b, type: 3}
-  pickupLastGem: {fileID: 8300000, guid: e532bf22d93e15a468b73b994a5efbea, type: 3}
+  pickupSound: {fileID: 8300000, guid: 77b404eb162d036419a4991a4de63e74, type: 3}
+  pickupLastGem: {fileID: 8300000, guid: 2e06482b52c93bc40bd36f1bde8ae3c9, type: 3}
   gemColor: {r: 0, g: 0, b: 0, a: 0}
   beam: {fileID: 344581417513971250}
   particle: {fileID: 8702810141464711219}

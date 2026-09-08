@@ -881,8 +881,20 @@ public class GameManager : MonoBehaviour
 
         if (GetGameMode<HuntMode>() == null)
         {
-            foreach (GameObject gem in recentGems) { gem.SetActive(true); currentGems--; }
-            GameUIManager.instance.SetCurrentGem(currentGems);
+            // LapsMode manages its own gem checkpoint state.
+            // Do not restore recentGems here, because that would
+            // overwrite the gem count restored by LapsMode.OnRespawn().
+            if (GetGameMode<LapsMode>() == null)
+            {
+                foreach (GameObject gem in recentGems)
+                {
+                    gem.SetActive(true);
+                    currentGems--;
+                }
+
+                GameUIManager.instance.SetCurrentGem(currentGems);
+            }
+
             activePowerup = tempPowerup;
             GameUIManager.instance.SetPowerupIcon(activePowerup);
             Marble.instance.RestorePowerupCheckpoint();

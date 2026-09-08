@@ -376,8 +376,8 @@ public class LapsMode : NullMode
     // ============================================================
 
     public void OnCheckpointTrigger(
-        LapsCheckpoint trigger,
-        Marble marble)
+    LapsCheckpoint trigger,
+    Marble marble)
     {
         if (trigger == null)
             return;
@@ -401,9 +401,15 @@ public class LapsMode : NullMode
                 lapsCPCheck++;
             }
 
-            ActivateCheckpoint(
-                trigger
-            );
+            if (trigger.EnableRespawning)
+            {
+                // Save all gems collected up to this checkpoint.
+                SaveCheckpointGems();
+
+                ActivateCheckpoint(
+                    trigger
+                );
+            }
         }
         else
         {
@@ -501,6 +507,8 @@ public class LapsMode : NullMode
             lapsUp =
                 Vector3.up;
         }
+
+        Debug.Log(lapsUp);
 
         // --------------------------------------------------------
         // Spawn

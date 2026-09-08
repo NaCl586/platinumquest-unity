@@ -174,9 +174,15 @@ public class Movement : MonoBehaviour
         public Mesh mesh;
 
         public Vector3[] localVertices;
-        public Vector3[] worldVertices;
-        public Vector3[] worldTriangleNormals;
         public int[] triangles;
+
+        // The spatial grid is stored in MESH LOCAL SPACE.
+        // This is critical for rotating/moving platforms: the grid does not
+        // need to be rebuilt when the platform moves or rotates.
+        public Dictionary<Vector3Int, List<int>> triangleGrid;
+        public List<int> largeTriangles;
+        public int[] triangleQueryStamp;
+        public int triangleQueryVersion;
 
         public Matrix4x4 localToWorld;
         public Matrix4x4 worldToLocal;
@@ -190,6 +196,7 @@ public class Movement : MonoBehaviour
         public PathMover pathMover;
         public Rigidbody attachedRigidbody;
         public FrictionComponent frictionComponent;
+
     }
 
     private List<MeshData> meshes;
@@ -216,6 +223,16 @@ public class Movement : MonoBehaviour
     // Prevents repeated jumps, including repeated jumps within the same
     // Unity FixedUpdate when the custom physics loop performs substeps.
     private float jumpCooldownRemaining = 0f;
+
+
+    // Triangle broadphase settings. The grid is deliberately independent of
+    // Unity's PhysX broadphase because Movement uses its own triangle-level
+    // collision system. A 4-unit cell keeps the number of indexed cells low
+    // while still reducing the number of triangle tests dramatically in
+    // large interior meshes.
+    private const float TRIANGLE_GRID_CELL_SIZE = 4f;
+    private const int TRIANGLE_GRID_MIN_TRIANGLES = 64;
+    private const int TRIANGLE_GRID_MAX_CELLS_PER_TRIANGLE = 64;
 
     public void SetPosition(Vector3 newPos, bool silent = false)
     {
@@ -458,8 +475,8 @@ public class Movement : MonoBehaviour
         // the marble is moving fast enough to travel a large distance in
         // one step. This prevents high-speed tunneling through geometry.
         const float STEP_SIZE = 0.008f;
-        const float MAX_STEP_DISTANCE_MULTIPLIER = 0.5f;
-        const int MAX_SUBSTEPS = 32;
+        const float MAX_STEP_DISTANCE_MULTIPLIER = 1.0f;
+        const int MAX_SUBSTEPS = 6;
 
         oldPos = position;
         prevRot = transform.rotation;
@@ -523,6 +540,83 @@ public class Movement : MonoBehaviour
         transform.rotation.Normalize();
     }
 
+    private void AdvancePhysics(ref float _dt)
+    {
+        Bounds searchBox = new Bounds(
+            position,
+            Vector3.one * (marbleRadius * 2f)
+        );
+        searchBox.Expand(0.1f);
+
+        contacts = FindContacts(searchBox);
+
+        // Preserve the special-material contact hook used by the mission
+        // modes. This is intentionally called once per physics substep,
+        // matching the custom physics flow.
+        ProcessSpecialMaterialContacts();
+
+        UpdateMove(ref _dt);
+    }
+
+    private void ProcessSpecialMaterialContacts()
+    {
+        if (contacts == null || contacts.Count == 0)
+            return;
+
+        if (GameManager.instance == null)
+            return;
+
+        PlatinumQuestScripts.ISpecialGameMode specialMode =
+            GameManager.instance.specialGameMode;
+
+        if (specialMode == null)
+            return;
+
+        Marble marble = Marble.instance;
+
+        if (marble == null)
+            return;
+
+        // Only process the same collider once while the marble remains in
+        // contact with it. Remove it below when contact is lost.
+        for (int i = 0; i < contacts.Count; i++)
+        {
+            CollisionInfo contact = contacts[i];
+
+            if (contact == null || contact.collider == null)
+                continue;
+
+            if (specialMaterialContactColliders.Contains(contact.collider))
+                continue;
+
+            specialMaterialContactColliders.Add(contact.collider);
+
+            specialMode.ProcessMaterialContact(
+                marble,
+                contact
+            );
+        }
+
+        specialMaterialContactColliders.RemoveWhere(
+            collider =>
+            {
+                if (collider == null)
+                    return true;
+
+                for (int i = 0; i < contacts.Count; i++)
+                {
+                    if (contacts[i] != null &&
+                        contacts[i].collider == collider)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        );
+    }
+
     List<CollisionInfo> FindContacts(Bounds bounds)
     {
         contacts.Clear();
@@ -561,209 +655,15 @@ public class Movement : MonoBehaviour
             if (!_meshCollider.bounds.Intersects(bounds))
                 continue;
 
-            // PathMover platforms can rotate through their movement system,
-            // so their effective transform may change without the collider
-            // transform cache detecting it reliably.
-            if (_mesh.pathMover != null)
-            {
-                Transform t = _meshCollider.transform;
+            // Keep the mesh transform current. The spatial grid is stored in
+            // local space, so even a rotating PathMover does NOT rebuild the
+            // grid or transform every vertex here.
+            UpdateMeshTransform(_mesh);
 
-                _mesh.localToWorld = t.localToWorldMatrix;
-                _mesh.worldToLocal = t.worldToLocalMatrix;
-
-                _mesh.lastPosition = t.position;
-                _mesh.lastRotation = t.rotation;
-                _mesh.lastScale = t.lossyScale;
-
-                RebuildWorldMeshData(_mesh);
-            }
-            else
-            {
-                UpdateMeshTransform(_mesh);
-            }
-
-            int _length = _mesh.triangles.Length;
-
-            for (int _i = 0; _i < _length; _i += 3)
-            {
-                Vector3 _p0 =
-                    _mesh.worldVertices[_mesh.triangles[_i]];
-
-                Vector3 _p1 =
-                    _mesh.worldVertices[_mesh.triangles[_i + 1]];
-
-                Vector3 _p2 =
-                    _mesh.worldVertices[_mesh.triangles[_i + 2]];
-
-                Vector3 _normal =
-                    _mesh.worldTriangleNormals[_i / 3];
-
-                var closest = Vector3.zero;
-                var contactNormal = Vector3.zero;
-
-                var res = CollisionHelpers.TriangleSphereIntersection(
-                    _p0,
-                    _p1,
-                    _p2,
-                    position,
-                    _radius,
-                    out closest,
-                    out contactNormal
-                );
-
-                if (res)
-                {
-                    var contactDist = (closest - position).sqrMagnitude;
-
-                    if (contactDist <= _radius * _radius)
-                    {
-                        if (Vector3.Dot(position - closest, _normal) > 0)
-                        {
-                            Vector3 colliderVelocity = Vector3.zero;
-
-                            PathMover pathMover = _mesh.pathMover;
-
-                            if (pathMover != null && pathMover.pathFollower != null)
-                            {
-                                colliderVelocity =
-                                    pathMover.pathFollower.GetPointVelocity(
-                                        closest
-                                    );
-                            }
-                            else if (_mesh.attachedRigidbody != null)
-                            {
-                                colliderVelocity =
-                                    _mesh.attachedRigidbody.GetPointVelocity(
-                                        closest
-                                    );
-                            }
-                            else
-                            {
-                                colliderVelocity =
-                                    (_meshCollider.transform.position -
-                                     _mesh.lastPosition)
-                                    / Time.fixedDeltaTime;
-                            }
-
-                            FrictionComponent frictionComponent =
-                                _mesh.frictionComponent;
-
-                            CollisionInfo newCollision =
-                                new CollisionInfo
-                                {
-                                    point = closest,
-                                    normal = contactNormal.normalized,
-                                    collider = _meshCollider,
-                                    contactDistance = Mathf.Sqrt(contactDist),
-
-                                    restitution =
-                                        frictionComponent != null
-                                            ? frictionComponent.restitution
-                                            : 1.0f,
-
-                                    friction =
-                                        frictionComponent != null
-                                            ? frictionComponent.friction
-                                            : 1.0f,
-
-                                    bounce =
-                                        frictionComponent != null
-                                            ? frictionComponent.bounce
-                                            : 0.0f,
-
-                                    velocity = colliderVelocity,
-                                };
-
-                            contacts.Add(newCollision);
-                            lastNormal = newCollision.normal;
-
-                            if (contacts.Count >= 4)
-                                break;
-                        }
-                    }
-                }
-            }
+            TestMeshContacts(_mesh, bounds, _radius);
         }
 
         return contacts;
-    }
-
-    private void AdvancePhysics(ref float _dt)
-    {
-        var searchBox = sphereCollider.bounds;
-        searchBox.Expand(0.1f);
-
-        contacts = FindContacts(searchBox);
-
-        // Give the active special mission mode a chance to process
-        // material contacts. This is the Unity equivalent of the
-        // original Haxe processMaterialContact() hook.
-        ProcessSpecialMaterialContacts();
-
-        UpdateMove(ref _dt);
-    }
-
-    private void ProcessSpecialMaterialContacts()
-    {
-        if (contacts == null || contacts.Count == 0)
-            return;
-
-        if (GameManager.instance == null)
-            return;
-
-        PlatinumQuestScripts.ISpecialGameMode specialMode =
-            GameManager.instance.specialGameMode;
-
-        if (specialMode == null)
-            return;
-
-        Marble marble = Marble.instance;
-
-        if (marble == null)
-            return;
-
-        // A special-mode contact can remain present for multiple physics
-        // substeps. Only process the same collider once until contact with
-        // that collider is lost. This makes the hook behave like a
-        // collision-enter event rather than OnTriggerStay.
-        for (int i = 0; i < contacts.Count; i++)
-        {
-            CollisionInfo contact = contacts[i];
-
-            if (contact == null || contact.collider == null)
-                continue;
-
-            if (specialMaterialContactColliders.Contains(contact.collider))
-                continue;
-
-            specialMaterialContactColliders.Add(contact.collider);
-
-            specialMode.ProcessMaterialContact(
-                marble,
-                contact
-            );
-        }
-
-        // Remove colliders that are no longer in contact so they can fire
-        // again if the marble leaves and later touches them again.
-        specialMaterialContactColliders.RemoveWhere(
-            collider =>
-            {
-                if (collider == null)
-                    return true;
-
-                for (int i = 0; i < contacts.Count; i++)
-                {
-                    if (contacts[i] != null &&
-                        contacts[i].collider == collider)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        );
     }
 
     void UpdateMeshTransform(MeshData data)
@@ -772,6 +672,20 @@ public class Movement : MonoBehaviour
             return;
 
         Transform t = data.collider.transform;
+
+        if (data.pathMover != null)
+        {
+            // PathMover can update a platform through its movement system.
+            // Keep the matrices current, but DO NOT rebuild the triangle grid.
+            // The grid is stored in local space and remains valid after
+            // translation, rotation, or scale changes.
+            data.localToWorld = t.localToWorldMatrix;
+            data.worldToLocal = t.worldToLocalMatrix;
+            data.lastPosition = t.position;
+            data.lastRotation = t.rotation;
+            data.lastScale = t.lossyScale;
+            return;
+        }
 
         if (
             t.position != data.lastPosition
@@ -785,8 +699,6 @@ public class Movement : MonoBehaviour
             data.lastPosition = t.position;
             data.lastRotation = t.rotation;
             data.lastScale = t.lossyScale;
-
-            RebuildWorldMeshData(data);
         }
     }
 
@@ -795,39 +707,486 @@ public class Movement : MonoBehaviour
         if (data == null || data.localVertices == null || data.triangles == null)
             return;
 
-        if (data.worldVertices == null ||
-            data.worldVertices.Length != data.localVertices.Length)
+        // This method is now only the initialization entry point. The grid is
+        // built from local-space geometry and is never rebuilt merely because
+        // a PathMover rotates or translates the collider.
+        BuildTriangleSpatialGrid(data);
+    }
+
+    private Vector3Int LocalToTriangleGridCell(Vector3 localPosition)
+    {
+        float cellSize = TRIANGLE_GRID_CELL_SIZE;
+
+        return new Vector3Int(
+            Mathf.FloorToInt(localPosition.x / cellSize),
+            Mathf.FloorToInt(localPosition.y / cellSize),
+            Mathf.FloorToInt(localPosition.z / cellSize)
+        );
+    }
+
+    private void GetLocalBounds(
+        MeshData data,
+        Bounds worldBounds,
+        out Vector3 localMin,
+        out Vector3 localMax
+    )
+    {
+        // Transform all eight corners of the marble's world-space AABB into
+        // mesh-local space. The resulting local AABB is conservative, so no
+        // potentially colliding triangle is lost when the mesh rotates.
+        Vector3 min = worldBounds.min;
+        Vector3 max = worldBounds.max;
+
+        Vector3 p0 = data.worldToLocal.MultiplyPoint3x4(new Vector3(min.x, min.y, min.z));
+        Vector3 p1 = data.worldToLocal.MultiplyPoint3x4(new Vector3(min.x, min.y, max.z));
+        Vector3 p2 = data.worldToLocal.MultiplyPoint3x4(new Vector3(min.x, max.y, min.z));
+        Vector3 p3 = data.worldToLocal.MultiplyPoint3x4(new Vector3(min.x, max.y, max.z));
+        Vector3 p4 = data.worldToLocal.MultiplyPoint3x4(new Vector3(max.x, min.y, min.z));
+        Vector3 p5 = data.worldToLocal.MultiplyPoint3x4(new Vector3(max.x, min.y, max.z));
+        Vector3 p6 = data.worldToLocal.MultiplyPoint3x4(new Vector3(max.x, max.y, min.z));
+        Vector3 p7 = data.worldToLocal.MultiplyPoint3x4(new Vector3(max.x, max.y, max.z));
+
+        localMin = Vector3.Min(p0, p1);
+        localMin = Vector3.Min(localMin, p2);
+        localMin = Vector3.Min(localMin, p3);
+        localMin = Vector3.Min(localMin, p4);
+        localMin = Vector3.Min(localMin, p5);
+        localMin = Vector3.Min(localMin, p6);
+        localMin = Vector3.Min(localMin, p7);
+
+        localMax = Vector3.Max(p0, p1);
+        localMax = Vector3.Max(localMax, p2);
+        localMax = Vector3.Max(localMax, p3);
+        localMax = Vector3.Max(localMax, p4);
+        localMax = Vector3.Max(localMax, p5);
+        localMax = Vector3.Max(localMax, p6);
+        localMax = Vector3.Max(localMax, p7);
+    }
+
+    private void BuildTriangleSpatialGrid(MeshData data)
+    {
+        if (data == null ||
+            data.triangles == null ||
+            data.localVertices == null)
         {
-            data.worldVertices = new Vector3[data.localVertices.Length];
+            return;
         }
 
-        if (data.worldTriangleNormals == null ||
-            data.worldTriangleNormals.Length != data.triangles.Length / 3)
+        int triangleCount =
+            data.triangles.Length / 3;
+
+        if (triangleCount < TRIANGLE_GRID_MIN_TRIANGLES)
         {
-            data.worldTriangleNormals =
-                new Vector3[data.triangles.Length / 3];
+            data.triangleGrid = null;
+            data.largeTriangles = null;
+            data.triangleQueryStamp = null;
+            data.triangleQueryVersion = 0;
+            return;
         }
 
-        for (int i = 0; i < data.localVertices.Length; i++)
+        if (data.triangleGrid == null)
         {
-            data.worldVertices[i] =
-                data.localToWorld.MultiplyPoint3x4(data.localVertices[i]);
+            data.triangleGrid =
+                new Dictionary<Vector3Int, List<int>>();
+        }
+        else
+        {
+            data.triangleGrid.Clear();
         }
 
-        for (int i = 0; i < data.triangles.Length; i += 3)
+        if (data.largeTriangles == null)
+            data.largeTriangles = new List<int>();
+        else
+            data.largeTriangles.Clear();
+
+        if (data.triangleQueryStamp == null ||
+            data.triangleQueryStamp.Length != triangleCount)
         {
-            Vector3 p0 = data.worldVertices[data.triangles[i]];
-            Vector3 p1 = data.worldVertices[data.triangles[i + 1]];
-            Vector3 p2 = data.worldVertices[data.triangles[i + 2]];
-
-            Vector3 normal = Vector3.Cross(p1 - p0, p2 - p0);
-            float magnitudeSqr = normal.sqrMagnitude;
-
-            data.worldTriangleNormals[i / 3] =
-                magnitudeSqr > 1e-12f
-                    ? normal / Mathf.Sqrt(magnitudeSqr)
-                    : Vector3.up;
+            data.triangleQueryStamp =
+                new int[triangleCount];
         }
+        else
+        {
+            Array.Clear(
+                data.triangleQueryStamp,
+                0,
+                data.triangleQueryStamp.Length
+            );
+        }
+
+        data.triangleQueryVersion = 0;
+
+        for (int triangleIndex = 0;
+             triangleIndex < triangleCount;
+             triangleIndex++)
+        {
+            int offset = triangleIndex * 3;
+
+            Vector3 p0 =
+                data.localVertices[data.triangles[offset]];
+            Vector3 p1 =
+                data.localVertices[data.triangles[offset + 1]];
+            Vector3 p2 =
+                data.localVertices[data.triangles[offset + 2]];
+
+            Vector3 min =
+                Vector3.Min(
+                    p0,
+                    Vector3.Min(p1, p2)
+                );
+
+            Vector3 max =
+                Vector3.Max(
+                    p0,
+                    Vector3.Max(p1, p2)
+                );
+
+            Vector3Int minCell =
+                LocalToTriangleGridCell(min);
+            Vector3Int maxCell =
+                LocalToTriangleGridCell(max);
+
+            long spanX =
+                (long)maxCell.x - minCell.x + 1L;
+            long spanY =
+                (long)maxCell.y - minCell.y + 1L;
+            long spanZ =
+                (long)maxCell.z - minCell.z + 1L;
+
+            long cellCount =
+                spanX * spanY * spanZ;
+
+            if (cellCount <= 0 ||
+                cellCount > TRIANGLE_GRID_MAX_CELLS_PER_TRIANGLE)
+            {
+                data.largeTriangles.Add(triangleIndex);
+                continue;
+            }
+
+            for (int x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (int y = minCell.y; y <= maxCell.y; y++)
+                {
+                    for (int z = minCell.z; z <= maxCell.z; z++)
+                    {
+                        Vector3Int cell =
+                            new Vector3Int(x, y, z);
+
+                        if (!data.triangleGrid.TryGetValue(
+                                cell,
+                                out List<int> triangleList
+                            ))
+                        {
+                            triangleList =
+                                new List<int>(4);
+
+                            data.triangleGrid.Add(
+                                cell,
+                                triangleList
+                            );
+                        }
+
+                        triangleList.Add(triangleIndex);
+                    }
+                }
+            }
+        }
+    }
+
+    private void TestMeshContacts(
+        MeshData meshData,
+        Bounds bounds,
+        float radius
+    )
+    {
+        if (meshData == null ||
+            meshData.localVertices == null ||
+            meshData.triangles == null)
+        {
+            return;
+        }
+
+        int triangleCount =
+            meshData.triangles.Length / 3;
+
+        // Small meshes are cheaper to test directly.
+        if (triangleCount < TRIANGLE_GRID_MIN_TRIANGLES ||
+            meshData.triangleGrid == null)
+        {
+            TestTriangleRange(
+                meshData,
+                0,
+                triangleCount,
+                radius
+            );
+
+            return;
+        }
+
+        if (meshData.triangleQueryStamp == null ||
+            meshData.triangleQueryStamp.Length != triangleCount)
+        {
+            // This should normally only happen during initialization.
+            meshData.triangleQueryStamp =
+                new int[triangleCount];
+            meshData.triangleQueryVersion = 0;
+        }
+
+        meshData.triangleQueryVersion++;
+
+        if (meshData.triangleQueryVersion == int.MaxValue)
+        {
+            Array.Clear(
+                meshData.triangleQueryStamp,
+                0,
+                meshData.triangleQueryStamp.Length
+            );
+
+            meshData.triangleQueryVersion = 1;
+        }
+
+        int queryStamp =
+            meshData.triangleQueryVersion;
+
+        Vector3 localMin;
+        Vector3 localMax;
+
+        GetLocalBounds(
+            meshData,
+            bounds,
+            out localMin,
+            out localMax
+        );
+
+        Vector3Int minCell =
+            LocalToTriangleGridCell(localMin);
+        Vector3Int maxCell =
+            LocalToTriangleGridCell(localMax);
+
+        if (meshData.largeTriangles != null)
+        {
+            for (int i = 0; i < meshData.largeTriangles.Count; i++)
+            {
+                int triangleIndex =
+                    meshData.largeTriangles[i];
+
+                if (meshData.triangleQueryStamp[triangleIndex] == queryStamp)
+                    continue;
+
+                meshData.triangleQueryStamp[triangleIndex] = queryStamp;
+
+                if (TestTriangle(
+                        meshData,
+                        triangleIndex,
+                        radius
+                    ) &&
+                    contacts.Count >= 4)
+                {
+                    return;
+                }
+            }
+        }
+
+        for (int x = minCell.x; x <= maxCell.x; x++)
+        {
+            for (int y = minCell.y; y <= maxCell.y; y++)
+            {
+                for (int z = minCell.z; z <= maxCell.z; z++)
+                {
+                    if (!meshData.triangleGrid.TryGetValue(
+                            new Vector3Int(x, y, z),
+                            out List<int> triangleIndices
+                        ))
+                    {
+                        continue;
+                    }
+
+                    for (int i = 0; i < triangleIndices.Count; i++)
+                    {
+                        int triangleIndex =
+                            triangleIndices[i];
+
+                        if (meshData.triangleQueryStamp[triangleIndex] == queryStamp)
+                            continue;
+
+                        meshData.triangleQueryStamp[triangleIndex] = queryStamp;
+
+                        if (TestTriangle(
+                                meshData,
+                                triangleIndex,
+                                radius
+                            ) &&
+                            contacts.Count >= 4)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void TestTriangleRange(
+        MeshData meshData,
+        int startTriangle,
+        int triangleCount,
+        float radius
+    )
+    {
+        int endTriangle =
+            Mathf.Min(
+                startTriangle + triangleCount,
+                meshData.triangles.Length / 3
+            );
+
+        for (int triangleIndex = startTriangle;
+             triangleIndex < endTriangle;
+             triangleIndex++)
+        {
+            if (TestTriangle(
+                    meshData,
+                    triangleIndex,
+                    radius
+                ) &&
+                contacts.Count >= 4)
+            {
+                return;
+            }
+        }
+    }
+
+    private bool TestTriangle(
+        MeshData meshData,
+        int triangleIndex,
+        float radius
+    )
+    {
+        int triangleOffset =
+            triangleIndex * 3;
+
+        Vector3 localP0 =
+            meshData.localVertices[
+                meshData.triangles[triangleOffset]
+            ];
+
+        Vector3 localP1 =
+            meshData.localVertices[
+                meshData.triangles[triangleOffset + 1]
+            ];
+
+        Vector3 localP2 =
+            meshData.localVertices[
+                meshData.triangles[triangleOffset + 2]
+            ];
+
+        // Always transform only the candidate triangle. This is the key
+        // difference from the previous implementation: rotating a large
+        // platform no longer transforms/recomputes every vertex and every
+        // triangle normal just to update the spatial grid.
+        Vector3 _p0 =
+            meshData.localToWorld.MultiplyPoint3x4(localP0);
+        Vector3 _p1 =
+            meshData.localToWorld.MultiplyPoint3x4(localP1);
+        Vector3 _p2 =
+            meshData.localToWorld.MultiplyPoint3x4(localP2);
+
+        Vector3 edge1 = _p1 - _p0;
+        Vector3 edge2 = _p2 - _p0;
+        Vector3 _normal = Vector3.Cross(edge1, edge2);
+        float normalMagnitudeSqr = _normal.sqrMagnitude;
+
+        if (normalMagnitudeSqr <= 1e-12f)
+            return false;
+
+        _normal /= Mathf.Sqrt(normalMagnitudeSqr);
+
+        var closest = Vector3.zero;
+        var contactNormal = Vector3.zero;
+
+        var res = CollisionHelpers.TriangleSphereIntersection(
+            _p0,
+            _p1,
+            _p2,
+            position,
+            radius,
+            out closest,
+            out contactNormal
+        );
+
+        if (!res)
+            return false;
+
+        var contactDist =
+            (closest - position).sqrMagnitude;
+
+        if (contactDist > radius * radius)
+            return false;
+
+        if (Vector3.Dot(position - closest, _normal) <= 0)
+            return false;
+
+        Vector3 colliderVelocity =
+            Vector3.zero;
+
+        PathMover pathMover =
+            meshData.pathMover;
+
+        if (pathMover != null &&
+            pathMover.pathFollower != null)
+        {
+            colliderVelocity =
+                pathMover.pathFollower.GetPointVelocity(
+                    closest
+                );
+        }
+        else if (meshData.attachedRigidbody != null)
+        {
+            colliderVelocity =
+                meshData.attachedRigidbody.GetPointVelocity(
+                    closest
+                );
+        }
+        else
+        {
+            colliderVelocity =
+                (meshData.collider.transform.position -
+                 meshData.lastPosition) /
+                Time.fixedDeltaTime;
+        }
+
+        FrictionComponent frictionComponent =
+            meshData.frictionComponent;
+
+        CollisionInfo newCollision =
+            new CollisionInfo
+            {
+                point = closest,
+                normal = contactNormal.normalized,
+                collider = meshData.collider,
+                contactDistance = Mathf.Sqrt(contactDist),
+
+                restitution =
+                    frictionComponent != null
+                        ? frictionComponent.restitution
+                        : 1.0f,
+
+                friction =
+                    frictionComponent != null
+                        ? frictionComponent.friction
+                        : 1.0f,
+
+                bounce =
+                    frictionComponent != null
+                        ? frictionComponent.bounce
+                        : 0.0f,
+
+                velocity = colliderVelocity,
+            };
+
+        contacts.Add(newCollision);
+        lastNormal = newCollision.normal;
+
+        return true;
     }
 
     void UpdateMove(ref float _dt)

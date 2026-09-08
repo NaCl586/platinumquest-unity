@@ -355,21 +355,6 @@ namespace TS
                 }
             }
 
-            TSObject helpBubbleGroup = mission.RecursiveChildren()
-                .FirstOrDefault(x => x.ClassName == "SimGroup" && x.Name == "HelpBubbleGroup");
-
-            if (helpBubbleGroup != null)
-            {
-                GameObject groupObject = new GameObject("HelpBubbleGroup");
-                groupObject.transform.SetParent(transform, false);
-
-                foreach (TSObject obj in helpBubbleGroup.GetFirstChildrens()
-                    .Where(o => o.ClassName == "StaticShape" && o.GetField("dataBlock").Equals("HelpBubble", StringComparison.OrdinalIgnoreCase)))
-                {
-                    ImportHelpBubble(obj, groupObject.transform);
-                }
-            }
-
             ResolvePaths();
             pathManager.LogNodes();
             ResolveParenting();
@@ -598,7 +583,11 @@ namespace TS
         {
             string objectName = obj.GetField("dataBlock");
 
-            if (objectName == "PhysModEmitterBase")
+            if(objectName == "HelpBubble")
+            {
+                ImportHelpBubble(obj, pathNodeParent);
+            }
+            else if (objectName == "PhysModEmitterBase")
             {
                 GameObject emitter = Instantiate(physModEmitterPrefab, transform, false);
                 Vector3 originalPrefabScale = emitter.transform.localScale;
@@ -848,39 +837,71 @@ namespace TS
         {
             string objectName = Path.GetFileNameWithoutExtension(obj.GetField("shapeName"));
 
-            if (objectName.Equals("checkpoint", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(obj.Name))
+            // Checkpoint is a special static object.
+            if (objectName.Equals("checkpoint", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrEmpty(obj.Name))
             {
                 ImportCheckpoint(obj);
+                return;
             }
-            else
+
+            // window03 should bypass scenery importing.
+            if (!objectName.Equals("window03", StringComparison.OrdinalIgnoreCase))
             {
-                var foundInScenery = ImportSceneryObject(obj);
+                bool foundInScenery = ImportSceneryObject(obj);
 
-                if (!foundInScenery)
-                {
-                    var shape = staticShapes.FirstOrDefault(go => go != null && go.name.Equals(objectName, StringComparison.OrdinalIgnoreCase));
-
-                    if (shape != null)
-                    {
-                        var gobj = Instantiate(shape, transform, false);
-                        Vector3 originalPrefabScale = gobj.transform.localScale;
-                        gobj.name = objectName;
-                        gobj.transform.localPosition = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        gobj.transform.localRotation = gobj.transform.localRotation * ConvertRotation(ParseVectorString(obj.GetField("rotation"))) * Quaternion.Euler(90f, 0f, 0f);
-                        Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
-                        gobj.transform.localScale = Vector3.Scale(scale, gobj.transform.localScale);
-
-                        if (objectName.ToLower() == "endpad")
-                        {
-                            GameManager.instance.finishPad = gobj;
-                            finishPad = gobj;
-                        }
-
-                        RegisterImportedObject(obj, gobj, Quaternion.Euler(-90f, 0f, 0f) * Quaternion.Euler(90f, 0f, 0f));
-                        CheckForPath(originalPrefabScale, obj, gobj);
-                    }
-                }
+                if (foundInScenery)
+                    return;
             }
+
+            // Find the matching static shape.
+            var shape = staticShapes.FirstOrDefault(go =>
+                go != null &&
+                go.name.Equals(objectName, StringComparison.OrdinalIgnoreCase));
+
+            if (shape == null)
+                return;
+
+            ImportStaticShape(obj, shape, objectName);
+        }
+
+        private void ImportStaticShape(TSObject obj, GameObject shape, string objectName)
+        {
+            GameObject gobj = Instantiate(shape, transform, false);
+
+            Vector3 originalPrefabScale = gobj.transform.localScale;
+
+            gobj.name = objectName;
+
+            gobj.transform.localPosition =
+                ConvertPoint(ParseVectorString(obj.GetField("position")));
+
+            gobj.transform.localRotation =
+                gobj.transform.localRotation *
+                ConvertRotation(ParseVectorString(obj.GetField("rotation"))) *
+                Quaternion.Euler(90f, 0f, 0f);
+
+            Vector3 scale = ConvertScale(
+                ParseVectorString(obj.GetField("scale"))
+            );
+
+            gobj.transform.localScale =
+                Vector3.Scale(scale, gobj.transform.localScale);
+
+            if (objectName.Equals("endpad", StringComparison.OrdinalIgnoreCase))
+            {
+                GameManager.instance.finishPad = gobj;
+                finishPad = gobj;
+            }
+
+            RegisterImportedObject(
+                obj,
+                gobj,
+                Quaternion.Euler(-90f, 0f, 0f) *
+                Quaternion.Euler(90f, 0f, 0f)
+            );
+
+            CheckForPath(originalPrefabScale, obj, gobj);
         }
 
         private void ImportTrigger(TSObject obj)
@@ -1857,7 +1878,30 @@ namespace TS
             trigger.forceGravity =
                 obj.GetField("forceGravity");
 
-            SetupTriggerTransform(triggerObj, obj);
+            Vector3 position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+            Quaternion rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+            Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+            Quaternion convertedRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
+
+            var spawn = triggerObj.transform.Find("Spawn");
+
+            triggerObj.transform.localPosition = position;
+            triggerObj.transform.localRotation = convertedRotation;
+
+            if (spawn)
+            {
+                spawn.transform.parent = transform;
+
+                Vector3 childPos;
+                Quaternion childRot;
+                TryParseSpawnPoint(obj.GetField("spawnPoint"), out childPos, out childRot);
+
+                spawn.SetPositionAndRotation(childPos, childRot);
+            }
+
+            triggerObj.transform.localScale = scale;
+
+            ApplyTriggerPolyhedron(triggerObj, obj);
 
             RegisterImportedObject(
                 obj,

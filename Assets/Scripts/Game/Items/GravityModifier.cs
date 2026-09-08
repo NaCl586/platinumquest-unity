@@ -90,6 +90,8 @@ public class GravityModifier : Powerups
 
     public static void ResetGravityGlobal()
     {
+        StopAllGravityCoroutines();
+
         ResetGravityInternal();
 
         onResetGravity?.Invoke();
@@ -104,6 +106,8 @@ public class GravityModifier : Powerups
         Vector3 targetDir
     )
     {
+        StopAllGravityCoroutines();
+
         if (targetDir.sqrMagnitude < 0.001f)
             return;
 
@@ -234,6 +238,8 @@ public class GravityModifier : Powerups
 
     private static void ResetGravityInternal()
     {
+        StopAllGravityCoroutines();
+
         GravitySystem.GravityDir =
             Vector3.down;
 
@@ -329,5 +335,19 @@ public class GravityModifier : Powerups
             -90f,
             axis
         ) * oldDir;
+    }
+
+    private static void StopAllGravityCoroutines()
+    {
+        GravityModifier[] modifiers =
+            FindObjectsOfType<GravityModifier>();
+
+        foreach (GravityModifier modifier in modifiers)
+        {
+            modifier.StopAllCoroutines();
+            modifier.triggered = false;
+        }
+
+        isRotating = false;
     }
 }
