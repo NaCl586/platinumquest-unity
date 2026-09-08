@@ -12,7 +12,6 @@ Future versions are to implement Particle Systems, Replay Center, and Leaderboar
 <img src="https://i/imgur.com/5d8rShA.png" width="640">
 <img src="https://i.imgur.com/aVixidr.png" width="640">
 <img src="https://i.imgur.com/32rYXEM.png" width="640">
-<img src="https://i.imgur.com/32rYXEM.png" width="640">
 <img src="https://i.imgur.com/ZMucrey.png" width="640">
 
 ## Download the Windows build [here](https://github.com/NaCl586/platinumquest-unity/releases/)
