@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: NaCl586
-  productName: PlatinumQuest
+  productName: PlatinumQuest 2.0.0
   defaultCursor: {fileID: 2800000, guid: c62b705cdb4bd354298beeb0d4de02b8, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
@@ -141,7 +141,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1
+  bundleVersion: 1.0
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -291,7 +291,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 433461f2f33a2a24480bc046e5924311, type: 3}
+      m_Icon: {fileID: 2800000, guid: 4a78c19b03bd69a4eb026a8f57978def, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
